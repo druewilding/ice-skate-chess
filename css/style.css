@@ -570,6 +570,9 @@ body {
   transform: translateX(-50%);
   z-index: 150;
   pointer-events: all;
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
 .btn-confirm {
@@ -596,6 +599,32 @@ body {
 }
 
 .btn-confirm:active {
+  transform: scale(0.9);
+}
+
+.btn-cancel-move {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #555;
+  color: white;
+  font-size: 22px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s, background 0.18s;
+  padding: 0;
+}
+
+.btn-cancel-move:hover {
+  background: var(--danger);
+  transform: scale(1.08);
+}
+
+.btn-cancel-move:active {
   transform: scale(0.9);
 }
 

@@ -54,6 +54,7 @@
 
     <!-- Confirm move floating button -->
     <div id="confirm-move-bar" class="confirm-move-bar" hidden>
+      <button id="btn-cancel-move" class="btn btn-cancel-move" title="Cancel move">✕</button>
       <button id="btn-confirm-move" class="btn btn-confirm" title="Confirm move">✓</button>
     </div>
 
@@ -516,6 +517,10 @@
     // Confirm move
     document.getElementById('btn-confirm-move').addEventListener('click', () => {
       ui.confirmPendingMove();
+    });
+    document.getElementById('btn-cancel-move').addEventListener('click', () => {
+      ui.cancelPendingMove();
+      document.getElementById('confirm-move-bar').hidden = true;
     });
 
     // Review navigation
