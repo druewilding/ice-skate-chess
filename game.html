@@ -151,18 +151,40 @@
           if (stateJson === lastStateJson) return;
           lastStateJson = stateJson;
 
+          const prevMoveCount = engine.moveHistory.length;
           engine.deserialize(state);
           isMyTurn = engine.turn === myColor && !engine.gameOver;
           ui.interactive = isMyTurn;
 
-          if (engine.moveHistory.length > 0) {
-            ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
-          }
+          const newMoveCount = engine.moveHistory.length;
+          const isOpponentMove =
+            newMoveCount === prevMoveCount + 1 &&
+            engine.moveHistory[newMoveCount - 1].piece.color !== myColor;
 
-          ui.render();
-          updateStatus();
-          updateMoveList();
-          updateCaptured();
+          // For the opponent's latest move, render first (piece appears at dest),
+          // then slide a ghost from source → dest on top.
+          if (isOpponentMove) {
+            const lastMove = engine.moveHistory[newMoveCount - 1];
+            ui.setLastMove(lastMove);
+            ui.render();
+            updateStatus();
+            updateMoveList();
+            updateCaptured();
+            const symbol = ui.pieceSymbols[lastMove.piece.color][lastMove.piece.type];
+            ui.animateMove(
+              lastMove.from.rank, lastMove.from.file,
+              lastMove.to.rank,   lastMove.to.file,
+              symbol, lastMove.piece.color, () => {}
+            );
+          } else {
+            if (engine.moveHistory.length > 0) {
+              ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
+            }
+            ui.render();
+            updateStatus();
+            updateMoveList();
+            updateCaptured();
+          }
 
           if (fullData.drawOffer && fullData.drawOffer !== myColor) {
             document.getElementById('draw-offer-banner').hidden = false;

@@ -179,16 +179,94 @@ export class ChessUI {
     this.render();
   }
 
+  getSquareEl(rank, file) {
+    const displayRank = this.flipped ? 7 - rank : rank;
+    const displayFile = this.flipped ? 7 - file : file;
+    return this.squares[displayRank][displayFile];
+  }
+
+  // Animate a piece sliding from one square to another, then call onComplete.
+  animateMove(fromRank, fromFile, toRank, toFile, symbol, pieceColor, onComplete) {
+    const fromEl = this.getSquareEl(fromRank, fromFile);
+    const toEl   = this.getSquareEl(toRank,   toFile);
+
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect   = toEl.getBoundingClientRect();
+
+    // Hide the real piece at source (and destination, for remote moves where
+    // the piece is already rendered at the target)
+    const srcPiece = fromEl.querySelector('.piece');
+    const dstPiece = toEl.querySelector('.piece');
+    if (srcPiece) srcPiece.style.visibility = 'hidden';
+    if (dstPiece) dstPiece.style.visibility = 'hidden';
+
+    // Create a flying piece fixed-positioned over the source square
+    const flyer = document.createElement('span');
+    flyer.className = `piece piece-${pieceColor}`;
+    flyer.textContent = symbol;
+    const fontSize = Math.round(fromRect.width * 0.78) + 'px';
+    Object.assign(flyer.style, {
+      position: 'fixed',
+      left: fromRect.left + 'px',
+      top:  fromRect.top  + 'px',
+      width:  fromRect.width  + 'px',
+      height: fromRect.height + 'px',
+      fontSize,
+      lineHeight: fromRect.height + 'px',
+      textAlign: 'center',
+      pointerEvents: 'none',
+      zIndex: '1000',
+      transition: 'none',
+      margin: '0',
+      padding: '0',
+    });
+    document.body.appendChild(flyer);
+
+    // Force reflow so the starting position is painted before we transition
+    flyer.getBoundingClientRect();
+
+    const DURATION = 160; // ms
+    flyer.style.transition = `left ${DURATION}ms ease, top ${DURATION}ms ease`;
+    flyer.style.left = toRect.left + 'px';
+    flyer.style.top  = toRect.top  + 'px';
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      flyer.remove();
+      if (srcPiece) srcPiece.style.visibility = '';
+      if (dstPiece) dstPiece.style.visibility = '';
+      onComplete();
+    };
+
+    flyer.addEventListener('transitionend', finish, { once: true });
+    setTimeout(finish, DURATION + 80); // safety fallback
+  }
+
   executeMove(fromRank, fromFile, toRank, toFile, promotion = null) {
-    const moveData = this.engine.makeMove(fromRank, fromFile, toRank, toFile, promotion);
-    if (!moveData) return;
+    const piece = this.engine.getPiece(fromRank, fromFile);
+    if (!piece) return;
 
-    this.lastMove = moveData;
-    this.clearSelection();
+    const symbol = this.pieceSymbols[piece.color][piece.type];
 
-    if (this.onMove) {
-      this.onMove(moveData);
-    }
+    // Clear selection highlights and lock interaction for the duration of the animation
+    this.selectedSquare = null;
+    this.legalMoves = [];
+    this.interactive = false;
+    this.render(); // board shows piece at source, no highlights
+
+    this.animateMove(fromRank, fromFile, toRank, toFile, symbol, piece.color, () => {
+      const moveData = this.engine.makeMove(fromRank, fromFile, toRank, toFile, promotion);
+      if (!moveData) { this.render(); return; }
+
+      this.lastMove = moveData;
+      this.render();
+
+      if (this.onMove) {
+        this.onMove(moveData); // game.html sets ui.interactive based on whose turn it is
+      }
+    });
   }
 
   showPromotionDialog(toRank, toFile) {
