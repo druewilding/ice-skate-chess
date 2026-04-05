@@ -524,6 +524,63 @@ export class ChessEngine {
     return false;
   }
 
+  // Simulate a move and return { check, checkmate } for the opponent — without
+  // permanently modifying game state. Used for move-preview indicators.
+  previewMoveResult(fromRank, fromFile, toRank, toFile, promotion = null) {
+    const piece = this.board[fromRank][fromFile];
+    if (!piece) return { check: false, checkmate: false };
+
+    const legalMoves = this.getLegalMoves(fromRank, fromFile);
+    const moveObj = legalMoves.find(m => {
+      if (m.rank !== toRank || m.file !== toFile) return false;
+      if (promotion) return m.promotion === promotion;
+      return !m.promotion;
+    });
+    if (!moveObj) return { check: false, checkmate: false };
+
+    const opponent = piece.color === 'white' ? 'black' : 'white';
+    const savedBoard = this.board.map(row => row.slice());
+    const savedEnPassant = this.enPassantTarget;
+    const savedTurn = this.turn;
+
+    // Apply the move
+    const movedPiece = moveObj.promotion ? { type: moveObj.promotion, color: piece.color } : piece;
+    this.board[toRank][toFile] = movedPiece;
+    this.board[fromRank][fromFile] = null;
+
+    if (moveObj.enPassant) {
+      this.board[fromRank][toFile] = null;
+    }
+    if (moveObj.castling) {
+      const baseRank = piece.color === 'white' ? 7 : 0;
+      if (moveObj.castling === 'king') {
+        this.board[baseRank][5] = this.board[baseRank][7];
+        this.board[baseRank][7] = null;
+      } else {
+        this.board[baseRank][3] = this.board[baseRank][0];
+        this.board[baseRank][0] = null;
+      }
+    }
+    if (piece.type === 'pawn' && Math.abs(toRank - fromRank) === 2) {
+      this.enPassantTarget = { rank: (fromRank + toRank) / 2, file: fromFile };
+    } else {
+      this.enPassantTarget = null;
+    }
+
+    const inCheck = this.isInCheck(opponent);
+    let checkmate = false;
+    if (inCheck) {
+      this.turn = opponent;
+      checkmate = !this.hasLegalMoves(opponent);
+      this.turn = savedTurn;
+    }
+
+    this.board = savedBoard;
+    this.enPassantTarget = savedEnPassant;
+
+    return { check: inCheck, checkmate };
+  }
+
   // Make a move. Returns move data for sync, or null if illegal.
   makeMove(fromRank, fromFile, toRank, toFile, promotion = null) {
     const piece = this.getPiece(fromRank, fromFile);

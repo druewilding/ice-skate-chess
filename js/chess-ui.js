@@ -89,6 +89,30 @@ export class ChessUI {
   }
 
   render() {
+    // Pre-compute whether the pending move results in check/checkmate
+    let previewCheckKing = null; // { rank, file }
+    let previewIsCheckmate = false;
+    if (this.pendingMoveConfirm) {
+      const { fromRank, fromFile, toRank, toFile, promotion } = this.pendingMoveConfirm;
+      const result = this.engine.previewMoveResult(fromRank, fromFile, toRank, toFile, promotion || null);
+      if (result.check || result.checkmate) {
+        const movingPiece = this.engine.getPiece(fromRank, fromFile);
+        if (movingPiece) {
+          const opponent = movingPiece.color === 'white' ? 'black' : 'white';
+          outer: for (let r = 0; r < 8; r++) {
+            for (let f = 0; f < 8; f++) {
+              const p = this.engine.getPiece(r, f);
+              if (p && p.type === 'king' && p.color === opponent) {
+                previewCheckKing = { rank: r, file: f };
+                break outer;
+              }
+            }
+          }
+          previewIsCheckmate = result.checkmate;
+        }
+      }
+    }
+
     for (let displayRank = 0; displayRank < 8; displayRank++) {
       for (let displayFile = 0; displayFile < 8; displayFile++) {
         const rank = this.flipped ? 7 - displayRank : displayRank;
@@ -101,7 +125,7 @@ export class ChessUI {
         if (oldPiece) oldPiece.remove();
 
         // Remove state classes
-        square.classList.remove('selected', 'legal-move', 'legal-capture', 'last-move', 'in-check', 'pending-from', 'pending-to');
+        square.classList.remove('selected', 'legal-move', 'legal-capture', 'last-move', 'in-check', 'in-checkmate', 'pending-from', 'pending-to', 'preview-check', 'preview-checkmate');
 
         if (piece) {
           const pieceEl = document.createElement('span');
@@ -148,9 +172,18 @@ export class ChessUI {
           }
         }
 
-        // Highlight king in check
+        // Highlight king in check or checkmate
         if (piece && piece.type === 'king' && piece.color === this.engine.turn && this.engine.isInCheck(this.engine.turn)) {
-          square.classList.add('in-check');
+          if (this.engine.gameOver && this.engine.resultReason === 'checkmate') {
+            square.classList.add('in-checkmate');
+          } else {
+            square.classList.add('in-check');
+          }
+        }
+
+        // Highlight opponent king that would be in check/checkmate from pending move
+        if (previewCheckKing && rank === previewCheckKing.rank && file === previewCheckKing.file) {
+          square.classList.add(previewIsCheckmate ? 'preview-checkmate' : 'preview-check');
         }
       }
     }
