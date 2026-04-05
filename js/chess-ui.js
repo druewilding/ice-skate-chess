@@ -77,9 +77,13 @@ export class ChessUI {
   // accounting for a pending-confirm move (shows the piece at its destination).
   getVisualPiece(rank, file) {
     if (this.pendingMoveConfirm) {
-      const { fromRank, fromFile, toRank, toFile } = this.pendingMoveConfirm;
+      const { fromRank, fromFile, toRank, toFile, promotion } = this.pendingMoveConfirm;
       if (rank === fromRank && file === fromFile) return null;
-      if (rank === toRank && file === toFile) return this.engine.getPiece(fromRank, fromFile);
+      if (rank === toRank && file === toFile) {
+        const piece = this.engine.getPiece(fromRank, fromFile);
+        if (promotion && piece) return { ...piece, type: promotion };
+        return piece;
+      }
     }
     return this.engine.getPiece(rank, file);
   }
@@ -320,10 +324,10 @@ export class ChessUI {
 
   confirmPendingMove() {
     if (!this.pendingMoveConfirm) return;
-    const { fromRank, fromFile, toRank, toFile } = this.pendingMoveConfirm;
+    const { fromRank, fromFile, toRank, toFile, promotion } = this.pendingMoveConfirm;
     this.pendingMoveConfirm = null;
     if (this.onPendingMoveChange) this.onPendingMoveChange(null);
-    this.executeMove(fromRank, fromFile, toRank, toFile);
+    this.executeMove(fromRank, fromFile, toRank, toFile, promotion || null);
   }
 
   cancelPendingMove() {
@@ -356,8 +360,14 @@ export class ChessUI {
       btn.textContent = this.pieceSymbols[color][pieceType];
       btn.addEventListener('click', () => {
         overlay.remove();
-        this.executeMove(fromRank, fromFile, toRank, toFile, pieceType);
         this.pendingPromotion = null;
+        if (this.confirmMove) {
+          this.pendingMoveConfirm = { fromRank, fromFile, toRank, toFile, promotion: pieceType };
+          if (this.onPendingMoveChange) this.onPendingMoveChange(this.pendingMoveConfirm);
+          this.render();
+        } else {
+          this.executeMove(fromRank, fromFile, toRank, toFile, pieceType);
+        }
       });
       dialog.appendChild(btn);
     }
