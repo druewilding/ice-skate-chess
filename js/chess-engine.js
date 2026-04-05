@@ -129,9 +129,48 @@ export class ChessEngine {
     const pseudoMoves = this.getPseudoLegalMoves(rank, file, piece);
 
     // Filter out moves that leave the king in check
-    return pseudoMoves.filter(move => {
+    let legalMoves = pseudoMoves.filter(move => {
       return !this.wouldBeInCheck(rank, file, move.rank, move.file, piece.color, move);
     });
+
+    // Ice Skate: sliding pieces must go to the end of their path.
+    // Exception: when the king is already in check, stopping at an intermediate
+    // square to block is valid ("as far as you can go" to escape check).
+    if (this.iceskate && ['bishop', 'rook', 'queen'].includes(piece.type) && !this.isInCheck(piece.color)) {
+      const endpoints = this.getIceskateEndpointSet(rank, file, piece.color, piece.type);
+      legalMoves = legalMoves.filter(m => endpoints.has(`${m.rank},${m.file}`));
+    }
+
+    return legalMoves;
+  }
+
+  getIceskateEndpointSet(rank, file, color, pieceType) {
+    const endpoints = new Set();
+    let directions;
+    if (pieceType === 'bishop') {
+      directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    } else if (pieceType === 'rook') {
+      directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+    } else {
+      directions = [[-1, -1], [-1, 1], [1, -1], [1, 1], [-1, 0], [1, 0], [0, -1], [0, 1]];
+    }
+    for (const [dr, df] of directions) {
+      let endRank = null, endFile = null;
+      for (let dist = 1; dist <= 7; dist++) {
+        const r = rank + dr * dist;
+        const f = file + df * dist;
+        if (r < 0 || r > 7 || f < 0 || f > 7) break;
+        const target = this.board[r][f];
+        if (!target) {
+          endRank = r; endFile = f;
+        } else {
+          if (target.color !== color) { endRank = r; endFile = f; }
+          break;
+        }
+      }
+      if (endRank !== null) endpoints.add(`${endRank},${endFile}`);
+    }
+    return endpoints;
   }
 
   getPseudoLegalMoves(rank, file, piece) {
@@ -233,45 +272,21 @@ export class ChessEngine {
     const maxDist = this.maxDistance[pieceType] || 7;
 
     for (const [dr, df] of directions) {
-      if (this.iceskate) {
-        // Ice Skate Chess: the piece must slide to the END of its path in this
-        // direction — only one valid destination per direction.
-        let endRank = null, endFile = null;
-        for (let dist = 1; dist <= 7; dist++) {
-          const r = rank + dr * dist;
-          const f = file + df * dist;
-          if (r < 0 || r > 7 || f < 0 || f > 7) break;
-          const target = this.board[r][f];
-          if (!target) {
-            endRank = r;
-            endFile = f;
-          } else {
-            if (target.color !== color) {
-              endRank = r;
-              endFile = f;
-            }
-            break;
-          }
-        }
-        if (endRank !== null) {
-          moves.push({ rank: endRank, file: endFile });
-        }
-      } else {
-        // Standard: piece can stop at any square along its path
-        for (let dist = 1; dist <= maxDist; dist++) {
-          const r = rank + dr * dist;
-          const f = file + df * dist;
-          if (r < 0 || r > 7 || f < 0 || f > 7) break;
+      // Generate all squares along the path. The ice skate "endpoint only"
+      // constraint is enforced in getLegalMoves (with a check-blocking exception).
+      for (let dist = 1; dist <= maxDist; dist++) {
+        const r = rank + dr * dist;
+        const f = file + df * dist;
+        if (r < 0 || r > 7 || f < 0 || f > 7) break;
 
-          const target = this.board[r][f];
-          if (!target) {
+        const target = this.board[r][f];
+        if (!target) {
+          moves.push({ rank: r, file: f });
+        } else {
+          if (target.color !== color) {
             moves.push({ rank: r, file: f });
-          } else {
-            if (target.color !== color) {
-              moves.push({ rank: r, file: f });
-            }
-            break; // blocked
           }
+          break; // blocked
         }
       }
     }
