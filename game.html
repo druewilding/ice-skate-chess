@@ -116,30 +116,34 @@
       // Set up Firebase callbacks BEFORE starting the listener,
       // so we never miss an event that fires on the first snapshot.
       gm.onGameStateChanged = (state, fullData) => {
-        const stateJson = JSON.stringify(state);
-        if (stateJson === lastStateJson) return;
-        lastStateJson = stateJson;
+        try {
+          const stateJson = JSON.stringify(state);
+          if (stateJson === lastStateJson) return;
+          lastStateJson = stateJson;
 
-        engine.deserialize(state);
-        isMyTurn = engine.turn === myColor && !engine.gameOver;
-        ui.interactive = isMyTurn;
+          engine.deserialize(state);
+          isMyTurn = engine.turn === myColor && !engine.gameOver;
+          ui.interactive = isMyTurn;
 
-        if (engine.moveHistory.length > 0) {
-          ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
+          if (engine.moveHistory.length > 0) {
+            ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
+          }
+
+          ui.render();
+          updateStatus();
+          updateMoveList();
+          updateCaptured();
+
+          if (fullData.drawOffer && fullData.drawOffer !== myColor) {
+            document.getElementById('draw-offer-banner').hidden = false;
+          } else {
+            document.getElementById('draw-offer-banner').hidden = true;
+          }
+
+          if (engine.gameOver) showGameOver();
+        } catch (err) {
+          console.error('Error applying game state:', err, state);
         }
-
-        ui.render();
-        updateStatus();
-        updateMoveList();
-        updateCaptured();
-
-        if (fullData.drawOffer && fullData.drawOffer !== myColor) {
-          document.getElementById('draw-offer-banner').hidden = false;
-        } else {
-          document.getElementById('draw-offer-banner').hidden = true;
-        }
-
-        if (engine.gameOver) showGameOver();
       };
 
       gm.onPlayerJoined = (data) => {

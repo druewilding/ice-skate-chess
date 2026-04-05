@@ -629,17 +629,36 @@ export class ChessEngine {
 
   // Restore from serialized state
   deserialize(state) {
-    this.board = state.board;
-    this.turn = state.turn;
-    this.castlingRights = state.castlingRights;
-    this.enPassantTarget = state.enPassantTarget;
-    this.halfMoveClock = state.halfMoveClock;
-    this.fullMoveNumber = state.fullMoveNumber;
-    this.moveHistory = state.moveHistory || [];
+    // Firebase strips null values from arrays/objects, so we must rebuild
+    // the board as a proper 8x8 array, replacing any missing entries with null.
+    this.board = Array.from({ length: 8 }, (_, r) => {
+      const row = state.board ? state.board[r] : null;
+      return Array.from({ length: 8 }, (_, f) => {
+        if (!row) return null;
+        return row[f] || null;
+      });
+    });
+
+    this.turn = state.turn || 'white';
+    this.castlingRights = state.castlingRights || { white: { king: true, queen: true }, black: { king: true, queen: true } };
+    this.enPassantTarget = state.enPassantTarget || null;
+    this.halfMoveClock = state.halfMoveClock || 0;
+    this.fullMoveNumber = state.fullMoveNumber || 1;
+    // Firebase may convert arrays to objects with numeric keys — normalize both
+    this.moveHistory = state.moveHistory
+      ? Object.values(state.moveHistory)
+      : [];
     this.capturedPieces = state.capturedPieces || { white: [], black: [] };
-    this.gameOver = state.gameOver;
-    this.result = state.result;
-    this.resultReason = state.resultReason;
+    // Firebase strips falsy values, so normalize captured piece arrays too
+    if (this.capturedPieces.white && !Array.isArray(this.capturedPieces.white)) {
+      this.capturedPieces.white = Object.values(this.capturedPieces.white);
+    }
+    if (this.capturedPieces.black && !Array.isArray(this.capturedPieces.black)) {
+      this.capturedPieces.black = Object.values(this.capturedPieces.black);
+    }
+    this.gameOver = state.gameOver || false;
+    this.result = state.result || null;
+    this.resultReason = state.resultReason || null;
     if (state.maxDistance) {
       this.maxDistance = state.maxDistance;
     }
