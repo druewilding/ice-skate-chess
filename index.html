@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chess</title>
+  <title>Ice Skate Chess</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
     <div class="lobby">
       <div class="card">
         <h2>New Game</h2>
-        <button id="btn-new-standard" class="btn btn-primary">Standard Chess</button>
+        <button id="btn-new-standard" class="btn btn-primary">Ice Skate Chess</button>
         <!-- Future variant buttons -->
         <!-- <button id="btn-new-960" class="btn btn-secondary">Chess 960</button> -->
         <!-- <button id="btn-new-limited" class="btn btn-secondary">Limited Range</button> -->
@@ -39,7 +39,7 @@
     import { GameManager } from './js/game-manager.js';
 
     const gm = new GameManager();
-    const engine = new ChessEngine();
+    const engine = new ChessEngine({ iceskate: true });
     let initialized = false;
 
     async function ensureInit() {

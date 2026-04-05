@@ -11,6 +11,10 @@ export class ChessEngine {
       queen: options.maxQueenDistance || null,
     };
 
+    // Ice Skate Chess: sliding pieces must travel the maximum distance in each
+    // direction — they cannot choose to stop early.
+    this.iceskate = options.iceskate || false;
+
     this.reset();
   }
 
@@ -229,19 +233,45 @@ export class ChessEngine {
     const maxDist = this.maxDistance[pieceType] || 7;
 
     for (const [dr, df] of directions) {
-      for (let dist = 1; dist <= maxDist; dist++) {
-        const r = rank + dr * dist;
-        const f = file + df * dist;
-        if (r < 0 || r > 7 || f < 0 || f > 7) break;
-
-        const target = this.board[r][f];
-        if (!target) {
-          moves.push({ rank: r, file: f });
-        } else {
-          if (target.color !== color) {
-            moves.push({ rank: r, file: f });
+      if (this.iceskate) {
+        // Ice Skate Chess: the piece must slide to the END of its path in this
+        // direction — only one valid destination per direction.
+        let endRank = null, endFile = null;
+        for (let dist = 1; dist <= 7; dist++) {
+          const r = rank + dr * dist;
+          const f = file + df * dist;
+          if (r < 0 || r > 7 || f < 0 || f > 7) break;
+          const target = this.board[r][f];
+          if (!target) {
+            endRank = r;
+            endFile = f;
+          } else {
+            if (target.color !== color) {
+              endRank = r;
+              endFile = f;
+            }
+            break;
           }
-          break; // blocked
+        }
+        if (endRank !== null) {
+          moves.push({ rank: endRank, file: endFile });
+        }
+      } else {
+        // Standard: piece can stop at any square along its path
+        for (let dist = 1; dist <= maxDist; dist++) {
+          const r = rank + dr * dist;
+          const f = file + df * dist;
+          if (r < 0 || r > 7 || f < 0 || f > 7) break;
+
+          const target = this.board[r][f];
+          if (!target) {
+            moves.push({ rank: r, file: f });
+          } else {
+            if (target.color !== color) {
+              moves.push({ rank: r, file: f });
+            }
+            break; // blocked
+          }
         }
       }
     }
@@ -624,6 +654,7 @@ export class ChessEngine {
       result: this.result,
       resultReason: this.resultReason,
       maxDistance: this.maxDistance,
+      iceskate: this.iceskate,
     };
   }
 
@@ -662,6 +693,7 @@ export class ChessEngine {
     if (state.maxDistance) {
       this.maxDistance = state.maxDistance;
     }
+    this.iceskate = state.iceskate || false;
   }
 
   // Get algebraic notation for a move
