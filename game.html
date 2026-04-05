@@ -163,8 +163,7 @@
       reviewIndex = index;
       engine.deserialize(positionSnapshots[index]);
       ui.interactive = false;
-      const hist = engine.moveHistory;
-      ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
+      ui.setLastMove(null);
       ui.clearSelection(); // renders the board
       updateStatus();
       updateMoveList();
