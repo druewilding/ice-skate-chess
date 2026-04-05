@@ -330,7 +330,8 @@ body {
 
 /* Pieces */
 .piece {
-  font-size: min(7vw, 65px);
+  font-family: 'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols', sans-serif;
+  font-size: min(7vw, 54px);
   line-height: 1;
   align-self: end;
   pointer-events: none;
