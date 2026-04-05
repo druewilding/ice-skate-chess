@@ -14,8 +14,7 @@
       <div class="card">
         <h2>New Game</h2>
         <button id="btn-new-standard" class="btn btn-primary">Ice Skate Chess</button>
-        <!-- Future variant buttons -->
-        <!-- <button id="btn-new-960" class="btn btn-secondary">Chess 960</button> -->
+        <button id="btn-new-960" class="btn btn-secondary">Ice Skate Chess960</button>
         <!-- <button id="btn-new-limited" class="btn btn-secondary">Limited Range</button> -->
       </div>
 
@@ -75,6 +74,23 @@
         localStorage.setItem('chess-color-' + gameId, 'white');
 
         // Navigate using hash so no server redirect can strip the game ID
+        window.location.href = 'game.html#' + gameId;
+      } catch (err) {
+        showError('Failed to create game: ' + err.message);
+      }
+    });
+
+    // New Chess960 + Ice Skate game
+    document.getElementById('btn-new-960').addEventListener('click', async () => {
+      try {
+        await ensureInit();
+        const gameId = await gm.createGame('iceskate-960');
+
+        // Set up a randomised Chess960 back rank with ice skate rules
+        engine.setup960();
+        await gm.sendGameState(engine.serialize());
+
+        localStorage.setItem('chess-color-' + gameId, 'white');
         window.location.href = 'game.html#' + gameId;
       } catch (err) {
         showError('Failed to create game: ' + err.message);
