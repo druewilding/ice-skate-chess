@@ -33,7 +33,15 @@
 
     <!-- Move history -->
     <div class="move-history-panel">
-      <h3>Moves</h3>
+      <div class="move-history-header">
+        <h3>Moves</h3>
+        <div class="review-nav">
+          <button id="btn-review-start" class="btn btn-small btn-secondary review-btn" title="First position">⏮</button>
+          <button id="btn-review-prev" class="btn btn-small btn-secondary review-btn" title="Previous move">◀</button>
+          <button id="btn-review-next" class="btn btn-small btn-secondary review-btn" title="Next move">▶</button>
+          <button id="btn-review-end" class="btn btn-small btn-secondary review-btn" title="Live position">⏭</button>
+        </div>
+      </div>
       <div id="move-list" class="move-list"></div>
     </div>
 
@@ -42,6 +50,11 @@
       <button id="btn-resign" class="btn btn-danger btn-small">Resign</button>
       <button id="btn-draw" class="btn btn-secondary btn-small">Offer Draw</button>
       <button id="btn-flip" class="btn btn-secondary btn-small">Flip Board</button>
+    </div>
+
+    <!-- Confirm move floating button -->
+    <div id="confirm-move-bar" class="confirm-move-bar" hidden>
+      <button id="btn-confirm-move" class="btn btn-confirm" title="Confirm move">✓</button>
     </div>
 
     <!-- Ice Skate rules -->
@@ -103,6 +116,81 @@
     let isMyTurn = false;
     let lastStateJson = '';
 
+    // ---- Position history & move review ----
+    let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
+    let reviewIndex = null;      // null = live; number = reviewing that snapshot
+
+    function captureSnapshot() {
+      return JSON.parse(JSON.stringify(engine.serialize()));
+    }
+
+    function buildPositionSnapshots() {
+      // Rebuilds from scratch using the live engine (must be at live state with full moveHistory)
+      const tempEng = new ChessEngine({ iceskate: engine.iceskate });
+      const snaps = [JSON.parse(JSON.stringify(tempEng.serialize()))];
+      for (const move of engine.moveHistory) {
+        tempEng.makeMove(move.from.rank, move.from.file, move.to.rank, move.to.file, move.promotion || null);
+        snaps.push(JSON.parse(JSON.stringify(tempEng.serialize())));
+      }
+      return snaps;
+    }
+
+    function syncSnapshots() {
+      // Call after engine has been deserialised to the live state.
+      const liveMoveCount = engine.moveHistory.length;
+      const expectedLength = liveMoveCount + 1;
+      if (positionSnapshots.length < expectedLength) {
+        if (positionSnapshots.length === expectedLength - 1) {
+          positionSnapshots.push(captureSnapshot());
+        } else {
+          positionSnapshots = buildPositionSnapshots();
+        }
+      }
+    }
+
+    function goToPosition(index) {
+      if (index < 0 || index >= positionSnapshots.length) return;
+      if (index === positionSnapshots.length - 1) { exitReview(); return; }
+
+      if (ui.pendingMoveConfirm) {
+        ui.cancelPendingMove();
+        document.getElementById('confirm-move-bar').hidden = true;
+      }
+
+      reviewIndex = index;
+      engine.deserialize(positionSnapshots[index]);
+      ui.interactive = false;
+      const hist = engine.moveHistory;
+      ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
+      ui.clearSelection();
+      updateStatus();
+      updateMoveList();
+      updateReviewNavButtons();
+    }
+
+    function exitReview() {
+      reviewIndex = null;
+      engine.deserialize(positionSnapshots[positionSnapshots.length - 1]);
+      isMyTurn = engine.turn === myColor && !engine.gameOver;
+      ui.interactive = isMyTurn;
+      const hist = engine.moveHistory;
+      ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
+      ui.clearSelection();
+      updateStatus();
+      updateMoveList();
+      updateReviewNavButtons();
+    }
+
+    function updateReviewNavButtons() {
+      if (positionSnapshots.length === 0) return;
+      const liveIndex = positionSnapshots.length - 1;
+      const currentIndex = reviewIndex !== null ? reviewIndex : liveIndex;
+      document.getElementById('btn-review-start').disabled = (currentIndex === 0);
+      document.getElementById('btn-review-prev').disabled  = (currentIndex === 0);
+      document.getElementById('btn-review-next').disabled  = (currentIndex >= liveIndex);
+      document.getElementById('btn-review-end').disabled   = (currentIndex >= liveIndex);
+    }
+
     async function initGame() {
       await gm.init();
 
@@ -132,8 +220,14 @@
         flipped,
         interactive: false,
         onMove: handleLocalMove,
+        confirmMove: true,
+        onPendingMoveChange: (pending) => {
+          document.getElementById('confirm-move-bar').hidden = !pending;
+        },
       });
       updateLabels();
+      positionSnapshots = [captureSnapshot()];
+      updateReviewNavButtons();
 
       // Show waiting overlay for white while opponent hasn't joined yet
       if (myColor === 'white') {
@@ -164,9 +258,28 @@
           lastStateJson = stateJson;
 
           const prevMoveCount = engine.moveHistory.length;
+
+          // Always load the live state to build snapshots
           engine.deserialize(state);
+          syncSnapshots();
+
+          if (reviewIndex !== null) {
+            // In review mode: update snapshots & isMyTurn but restore the review position
+            isMyTurn = engine.turn === myColor && !engine.gameOver;
+            engine.deserialize(positionSnapshots[reviewIndex]);
+            updateMoveList();
+            updateReviewNavButtons();
+            return;
+          }
+
           isMyTurn = engine.turn === myColor && !engine.gameOver;
           ui.interactive = isMyTurn;
+
+          // Cancel any stale pending confirm
+          if (ui.pendingMoveConfirm) {
+            ui.cancelPendingMove();
+            document.getElementById('confirm-move-bar').hidden = true;
+          }
 
           const newMoveCount = engine.moveHistory.length;
           const isOpponentMove =
@@ -198,6 +311,7 @@
             updateCaptured();
           }
 
+          updateReviewNavButtons();
           if (engine.gameOver) showGameOver();
         } catch (err) {
           console.error('Error applying game state:', err, state);
@@ -218,6 +332,7 @@
     }
 
     function handleLocalMove(moveData) {
+      syncSnapshots(); // engine already has the new move applied
       // Player made a move locally, send to Firebase
       gm.sendGameState(engine.serialize());
       isMyTurn = false;
@@ -225,6 +340,7 @@
       updateStatus();
       updateMoveList();
       updateCaptured();
+      updateReviewNavButtons();
 
       if (engine.gameOver) {
         showGameOver();
@@ -233,6 +349,12 @@
 
     function updateStatus() {
       const statusEl = document.getElementById('game-status');
+      if (reviewIndex !== null) {
+        const liveIndex = positionSnapshots.length - 1;
+        statusEl.textContent = `Move ${reviewIndex} / ${liveIndex}`;
+        statusEl.className = 'game-status review-mode';
+        return;
+      }
       if (engine.gameOver) {
         statusEl.textContent = '';
         return;
@@ -257,7 +379,18 @@
       const moveList = document.getElementById('move-list');
       moveList.innerHTML = '';
 
-      const history = engine.moveHistory;
+      // Always show the full game history (from the latest snapshot)
+      const liveIndex = positionSnapshots.length - 1;
+      const currentPosition = reviewIndex !== null ? reviewIndex : liveIndex;
+
+      let history;
+      if (positionSnapshots.length > 0) {
+        const h = positionSnapshots[liveIndex].moveHistory;
+        history = Array.isArray(h) ? h : Object.values(h || {});
+      } else {
+        history = engine.moveHistory;
+      }
+
       for (let i = 0; i < history.length; i += 2) {
         const moveNum = Math.floor(i / 2) + 1;
         const row = document.createElement('div');
@@ -271,20 +404,31 @@
         const whiteMove = document.createElement('span');
         whiteMove.className = 'move-notation';
         whiteMove.textContent = engine.getMoveNotation(history[i]);
+        if (currentPosition === i + 1) whiteMove.classList.add('current-move');
+        const wi = i + 1;
+        whiteMove.addEventListener('click', () => goToPosition(wi));
         row.appendChild(whiteMove);
 
         if (history[i + 1]) {
           const blackMove = document.createElement('span');
           blackMove.className = 'move-notation';
           blackMove.textContent = engine.getMoveNotation(history[i + 1]);
+          if (currentPosition === i + 2) blackMove.classList.add('current-move');
+          const bi = i + 2;
+          blackMove.addEventListener('click', () => goToPosition(bi));
           row.appendChild(blackMove);
         }
 
         moveList.appendChild(row);
       }
 
-      // Auto-scroll to bottom
-      moveList.scrollTop = moveList.scrollHeight;
+      // Scroll to current move when reviewing; otherwise scroll to bottom
+      if (reviewIndex !== null) {
+        const currentEl = moveList.querySelector('.current-move');
+        if (currentEl) currentEl.scrollIntoView({ block: 'nearest' });
+      } else {
+        moveList.scrollTop = moveList.scrollHeight;
+      }
     }
 
     function updateCaptured() {
@@ -343,6 +487,42 @@
 
     document.getElementById('btn-flip').addEventListener('click', () => {
       ui.setFlipped(!ui.flipped);
+    });
+
+    // Confirm move
+    document.getElementById('btn-confirm-move').addEventListener('click', () => {
+      ui.confirmPendingMove();
+    });
+
+    // Review navigation
+    document.getElementById('btn-review-start').addEventListener('click', () => {
+      goToPosition(0);
+    });
+    document.getElementById('btn-review-prev').addEventListener('click', () => {
+      const liveIndex = positionSnapshots.length - 1;
+      const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+      goToPosition(cur - 1);
+    });
+    document.getElementById('btn-review-next').addEventListener('click', () => {
+      const liveIndex = positionSnapshots.length - 1;
+      const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+      goToPosition(cur + 1);
+    });
+    document.getElementById('btn-review-end').addEventListener('click', () => {
+      exitReview();
+    });
+
+    // Keyboard: left/right arrows navigate review
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        const liveIndex = positionSnapshots.length - 1;
+        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+        if (cur > 0) goToPosition(cur - 1);
+      } else if (e.key === 'ArrowRight') {
+        const liveIndex = positionSnapshots.length - 1;
+        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+        if (cur < liveIndex) goToPosition(cur + 1);
+      }
     });
 
     // Start

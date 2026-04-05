@@ -13,6 +13,9 @@ export class ChessUI {
     this.legalMoves = [];
     this.lastMove = null;
     this.pendingPromotion = null;
+    this.confirmMove = options.confirmMove !== undefined ? options.confirmMove : true;
+    this.pendingMoveConfirm = null;
+    this.onPendingMoveChange = options.onPendingMoveChange || null;
 
     this.pieceSymbols = {
       white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
@@ -83,7 +86,7 @@ export class ChessUI {
         if (oldPiece) oldPiece.remove();
 
         // Remove state classes
-        square.classList.remove('selected', 'legal-move', 'legal-capture', 'last-move', 'in-check');
+        square.classList.remove('selected', 'legal-move', 'legal-capture', 'last-move', 'in-check', 'pending-from', 'pending-to');
 
         if (piece) {
           const pieceEl = document.createElement('span');
@@ -100,21 +103,33 @@ export class ChessUI {
           }
         }
 
-        // Highlight selected square
-        if (this.selectedSquare && rank === this.selectedSquare.rank && file === this.selectedSquare.file) {
+        // Highlight selected square (suppressed while confirming a pending move)
+        if (!this.pendingMoveConfirm && this.selectedSquare && rank === this.selectedSquare.rank && file === this.selectedSquare.file) {
           square.classList.add('selected');
         }
 
-        // Highlight legal moves
-        const isLegalTarget = this.legalMoves.some(m => m.rank === rank && m.file === file);
-        if (isLegalTarget) {
-          const targetPiece = this.engine.getPiece(rank, file);
-          // Also check en passant
-          const isEnPassant = this.legalMoves.some(m => m.rank === rank && m.file === file && m.enPassant);
-          if (targetPiece || isEnPassant) {
-            square.classList.add('legal-capture');
-          } else {
-            square.classList.add('legal-move');
+        // Highlight legal moves (suppressed while confirming a pending move)
+        if (!this.pendingMoveConfirm) {
+          const isLegalTarget = this.legalMoves.some(m => m.rank === rank && m.file === file);
+          if (isLegalTarget) {
+            const targetPiece = this.engine.getPiece(rank, file);
+            // Also check en passant
+            const isEnPassant = this.legalMoves.some(m => m.rank === rank && m.file === file && m.enPassant);
+            if (targetPiece || isEnPassant) {
+              square.classList.add('legal-capture');
+            } else {
+              square.classList.add('legal-move');
+            }
+          }
+        }
+
+        // Highlight pending move squares
+        if (this.pendingMoveConfirm) {
+          if (rank === this.pendingMoveConfirm.fromRank && file === this.pendingMoveConfirm.fromFile) {
+            square.classList.add('pending-from');
+          }
+          if (rank === this.pendingMoveConfirm.toRank && file === this.pendingMoveConfirm.toFile) {
+            square.classList.add('pending-to');
           }
         }
 
@@ -132,6 +147,16 @@ export class ChessUI {
     // If we have a pending promotion, ignore board clicks
     if (this.pendingPromotion) return;
 
+    // If a pending move is awaiting confirmation, any board click cancels it
+    if (this.pendingMoveConfirm) {
+      this.pendingMoveConfirm = null;
+      this.selectedSquare = null;
+      this.legalMoves = [];
+      if (this.onPendingMoveChange) this.onPendingMoveChange(null);
+      this.render();
+      return;
+    }
+
     const piece = this.engine.getPiece(rank, file);
 
     // If a piece is selected and we clicked on a legal target
@@ -143,6 +168,19 @@ export class ChessUI {
         const promotionMove = this.legalMoves.find(m => m.rank === rank && m.file === file && m.promotion);
         if (promotionMove) {
           this.showPromotionDialog(rank, file);
+          return;
+        }
+
+        // Stage for confirmation instead of executing immediately
+        if (this.confirmMove) {
+          this.pendingMoveConfirm = {
+            fromRank: this.selectedSquare.rank,
+            fromFile: this.selectedSquare.file,
+            toRank: rank,
+            toFile: file,
+          };
+          if (this.onPendingMoveChange) this.onPendingMoveChange(this.pendingMoveConfirm);
+          this.render();
           return;
         }
 
@@ -267,6 +305,23 @@ export class ChessUI {
         this.onMove(moveData); // game.html sets ui.interactive based on whose turn it is
       }
     });
+  }
+
+  confirmPendingMove() {
+    if (!this.pendingMoveConfirm) return;
+    const { fromRank, fromFile, toRank, toFile } = this.pendingMoveConfirm;
+    this.pendingMoveConfirm = null;
+    if (this.onPendingMoveChange) this.onPendingMoveChange(null);
+    this.executeMove(fromRank, fromFile, toRank, toFile);
+  }
+
+  cancelPendingMove() {
+    if (!this.pendingMoveConfirm) return;
+    this.pendingMoveConfirm = null;
+    this.selectedSquare = null;
+    this.legalMoves = [];
+    this.render();
+    if (this.onPendingMoveChange) this.onPendingMoveChange(null);
   }
 
   showPromotionDialog(toRank, toFile) {
