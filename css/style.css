@@ -233,6 +233,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 8px 4px;
+  min-height: 52px; /* reserves space so captured pieces don't shift the board */
 }
 
 .player-label {
