@@ -172,6 +172,7 @@
       ui.clearSelection(); // renders the board
       updateStatus();
       updateMoveList();
+      updateCaptured();
       updateReviewNavButtons();
 
       const afterAnimation = isLive ? exitReview : () => {};
@@ -214,6 +215,7 @@
       ui.clearSelection();
       updateStatus();
       updateMoveList();
+      updateCaptured();
       updateReviewNavButtons();
     }
 
