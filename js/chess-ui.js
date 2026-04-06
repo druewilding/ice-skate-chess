@@ -442,8 +442,23 @@ export class ChessUI {
 
   updateCapturedPieces(capturedDisplayWhite, capturedDisplayBlack) {
     const typeOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
+    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
 
-    const render = (el, pieces, color) => {
+    // Score by live board so promotions count automatically
+    let whiteOnBoard = 0, blackOnBoard = 0;
+    for (let r = 0; r < 8; r++) {
+      for (let f = 0; f < 8; f++) {
+        const p = this.engine.board[r][f];
+        if (!p) continue;
+        const v = pieceValues[p.type] || 0;
+        if (p.color === 'white') whiteOnBoard += v;
+        else blackOnBoard += v;
+      }
+    }
+    const whiteScore = whiteOnBoard;
+    const blackScore = blackOnBoard;
+
+    const render = (el, pieces, color, advantage) => {
       if (!el) return;
       el.innerHTML = '';
       el.dataset.pieceColor = color;
@@ -461,9 +476,25 @@ export class ChessUI {
         }
         el.appendChild(group);
       }
+      // Place advantage label as a sibling outside the captured-pieces container
+      const parent = el.parentElement;
+      if (parent) {
+        let pts = parent.querySelector('.captured-advantage');
+        if (advantage > 0) {
+          if (!pts) {
+            pts = document.createElement('span');
+            pts.className = 'captured-advantage';
+            parent.appendChild(pts);
+          }
+          pts.textContent = `+${advantage}`;
+        } else if (pts) {
+          pts.remove();
+        }
+      }
     };
 
-    render(capturedDisplayWhite, this.engine.capturedPieces.white, 'black');
-    render(capturedDisplayBlack, this.engine.capturedPieces.black, 'white');
+    // capturedDisplayWhite shows pieces captured BY white (i.e. black pieces)
+    render(capturedDisplayWhite, this.engine.capturedPieces.white, 'black', Math.max(0, whiteScore - blackScore));
+    render(capturedDisplayBlack, this.engine.capturedPieces.black, 'white', Math.max(0, blackScore - whiteScore));
   }
 }
