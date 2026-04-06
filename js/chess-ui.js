@@ -444,6 +444,19 @@ export class ChessUI {
     const typeOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
     const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
 
+    // Check for a pending capture from the confirm-move preview
+    let pendingCapture = null; // { capturedBy: 'white'|'black', type: string }
+    if (this.pendingMoveConfirm) {
+      const { fromRank, fromFile, toRank, toFile, enPassant } = this.pendingMoveConfirm;
+      const movingPiece = this.engine.getPiece(fromRank, fromFile);
+      const capturedPiece = enPassant
+        ? this.engine.getPiece(fromRank, toFile)
+        : this.engine.getPiece(toRank, toFile);
+      if (movingPiece && capturedPiece) {
+        pendingCapture = { capturedBy: movingPiece.color, type: capturedPiece.type };
+      }
+    }
+
     // Score by live board so promotions count automatically
     let whiteOnBoard = 0, blackOnBoard = 0;
     for (let r = 0; r < 8; r++) {
@@ -455,22 +468,46 @@ export class ChessUI {
         else blackOnBoard += v;
       }
     }
-    const whiteScore = whiteOnBoard;
-    const blackScore = blackOnBoard;
 
-    const render = (el, pieces, color, advantage) => {
+    // Adjust scores to reflect the pending capture and/or promotion
+    let previewWhiteScore = whiteOnBoard;
+    let previewBlackScore = blackOnBoard;
+    if (pendingCapture) {
+      const val = pieceValues[pendingCapture.type] || 0;
+      if (pendingCapture.capturedBy === 'white') previewBlackScore -= val;
+      else previewWhiteScore -= val;
+    }
+    if (this.pendingMoveConfirm?.promotion) {
+      const { fromRank, fromFile, promotion } = this.pendingMoveConfirm;
+      const movingPiece = this.engine.getPiece(fromRank, fromFile);
+      if (movingPiece) {
+        const promotionGain = (pieceValues[promotion] || 0) - (pieceValues['pawn'] || 0);
+        if (movingPiece.color === 'white') previewWhiteScore += promotionGain;
+        else previewBlackScore += promotionGain;
+      }
+    }
+
+    const render = (el, pieces, previewPieceType, color, advantage, isAdvantagePreview) => {
       if (!el) return;
       el.innerHTML = '';
       el.dataset.pieceColor = color;
       const counts = {};
       for (const type of pieces) counts[type] = (counts[type] || 0) + 1;
       for (const type of typeOrder) {
-        if (!counts[type]) continue;
+        const normalCount = counts[type] || 0;
+        const hasPreview = previewPieceType === type;
+        if (!normalCount && !hasPreview) continue;
         const group = document.createElement('span');
         group.className = 'captured-group';
-        for (let i = 0; i < counts[type]; i++) {
+        for (let i = 0; i < normalCount; i++) {
           const span = document.createElement('span');
           span.className = `captured-piece piece-${color}`;
+          span.textContent = this.pieceSymbols[color][type];
+          group.appendChild(span);
+        }
+        if (hasPreview) {
+          const span = document.createElement('span');
+          span.className = `captured-piece piece-${color} captured-piece--preview`;
           span.textContent = this.pieceSymbols[color][type];
           group.appendChild(span);
         }
@@ -487,14 +524,25 @@ export class ChessUI {
             parent.appendChild(pts);
           }
           pts.textContent = `+${advantage}`;
+          pts.classList.toggle('captured-advantage--preview', isAdvantagePreview);
         } else if (pts) {
           pts.remove();
         }
       }
     };
 
+    const previewWhiteAdv = Math.max(0, previewWhiteScore - previewBlackScore);
+    const previewBlackAdv = Math.max(0, previewBlackScore - previewWhiteScore);
+    const currentWhiteAdv = Math.max(0, whiteOnBoard - blackOnBoard);
+    const currentBlackAdv = Math.max(0, blackOnBoard - whiteOnBoard);
+
+    const whitePreviewType = pendingCapture?.capturedBy === 'white' ? pendingCapture.type : null;
+    const blackPreviewType = pendingCapture?.capturedBy === 'black' ? pendingCapture.type : null;
+
     // capturedDisplayWhite shows pieces captured BY white (i.e. black pieces)
-    render(capturedDisplayWhite, this.engine.capturedPieces.white, 'black', Math.max(0, whiteScore - blackScore));
-    render(capturedDisplayBlack, this.engine.capturedPieces.black, 'white', Math.max(0, blackScore - whiteScore));
+    render(capturedDisplayWhite, this.engine.capturedPieces.white, whitePreviewType, 'black',
+           previewWhiteAdv, previewWhiteAdv !== currentWhiteAdv);
+    render(capturedDisplayBlack, this.engine.capturedPieces.black, blackPreviewType, 'white',
+           previewBlackAdv, previewBlackAdv !== currentBlackAdv);
   }
 }

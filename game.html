@@ -262,6 +262,7 @@
         onPendingMoveChange: (pending) => {
           document.getElementById('confirm-move-bar').hidden = !pending;
           updateMoveList();
+          updateCaptured();
         },
       });
       updateLabels();

@@ -266,6 +266,14 @@ body {
   margin-left: 0;
 }
 
+.captured-group .captured-piece--preview {
+  opacity: 0.4;
+}
+
+.captured-advantage--preview {
+  opacity: 0.5;
+}
+
 /* Single pill background behind all captured pieces */
 .captured-pieces[data-piece-color="black"]:not(:empty) {
   background: rgba(240, 235, 225, 0.88);
