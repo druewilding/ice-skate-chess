@@ -164,6 +164,28 @@ export class GameManager {
     });
   }
 
+  async registerFCMToken(myColor) {
+    if (!firebaseConfig.vapidKey) return;
+    if (!('serviceWorker' in navigator)) return;
+    try {
+      const { getMessaging, getToken } = await import('https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js');
+      const messaging = getMessaging(this.app);
+      const swReg = await navigator.serviceWorker.ready;
+      const token = await getToken(messaging, {
+        vapidKey: firebaseConfig.vapidKey,
+        serviceWorkerRegistration: swReg,
+      });
+      if (!token) return;
+      const { update } = this._fb;
+      await update(this.gameRef, {
+        [`players/${myColor}/fcmToken`]: token,
+        [`players/${myColor}/gameUrl`]: window.location.href,
+      });
+    } catch (err) {
+      console.warn('[FCM] Token registration failed:', err.message);
+    }
+  }
+
   getShareLink() {
     // Use hash routing — the hash is never sent to the server so static hosts
     // (serve, GitHub Pages, Netlify, etc.) cannot strip or redirect it.

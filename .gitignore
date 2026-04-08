@@ -6,3 +6,7 @@ js/firebase-config.js
 
 # start script with real values
 start.sh
+
+# Cloud Functions dependencies
+functions/node_modules/
+firebase-debug.log

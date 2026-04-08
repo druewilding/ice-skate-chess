@@ -293,7 +293,7 @@
       // Ask for notification permission. Browsers show the native prompt;
       // if the user dismisses it they can re-enable from browser settings.
       if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+        await Notification.requestPermission();
       }
 
       const statusEl = document.getElementById('game-status');
@@ -315,6 +315,11 @@
       gm.gameId = gameId;
       gm.playerColor = myColor;
       gm.gameRef = gm._fb.ref(gm.db, `games/${gameId}`);
+
+      // Register this device's FCM token so the Cloud Function can push to us
+      if ('Notification' in window && Notification.permission === 'granted') {
+        gm.registerFCMToken(myColor);
+      }
 
       // Build the UI
       const flipped = myColor === 'black';
