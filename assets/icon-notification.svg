@@ -1,4 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <rect width="192" height="192" rx="24" fill="#1a1a2e"/>
-  <text x="96" y="140" font-family="serif" font-size="140" text-anchor="middle" fill="#4a9eff">♟</text>
+  <!-- head -->
+  <circle cx="96" cy="54" r="30" fill="#4a9eff"/>
+  <!-- neck -->
+  <rect x="84" y="78" width="24" height="18" fill="#4a9eff"/>
+  <!-- body: narrow at top, wide at bottom -->
+  <polygon points="84,96 108,96 132,150 60,150" fill="#4a9eff"/>
+  <!-- base -->
+  <rect x="54" y="150" width="84" height="18" rx="6" fill="#4a9eff"/>
 </svg>
