@@ -123,6 +123,7 @@
     let myColor = myColorStored || null;
     let isMyTurn = false;
     let lastStateJson = '';
+    let initialStateLoaded = false; // suppress notification on page load
 
     // ---- Position history & move review ----
     let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
@@ -132,7 +133,12 @@
 
     function showNotificationViaSW(title, body, tag) {
       return navigator.serviceWorker.ready.then(reg => {
-        return reg.showNotification(title, { body, tag, renotify: true });
+        return reg.showNotification(title, {
+          body,
+          tag,
+          renotify: true,
+          data: { url: window.location.href },
+        });
       });
     }
 
@@ -384,8 +390,9 @@
             newMoveCount === prevMoveCount + 1 &&
             engine.moveHistory[newMoveCount - 1].piece.color !== myColor;
 
-          // Notify the player if they're not looking at the page
-          if (isOpponentMove) notifyTurn();
+          // Notify the player — but not on the initial page load/refresh
+          if (isOpponentMove && initialStateLoaded) notifyTurn();
+          initialStateLoaded = true;
 
           // For the opponent's latest move, render first (piece appears at dest),
           // then slide a ghost from source → dest on top.
