@@ -7,19 +7,27 @@ self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim(
 // --- Push: triggered by a Firebase Cloud Function ---
 self.addEventListener('push', (event) => {
   const payload = event.data?.json() ?? {};
-  // FCM wraps data-only messages as { data: { title, body, url } };
-  // fall back to the flat payload shape just in case.
   const data = payload.data ?? payload;
   const title = data.title ?? 'Ice Skate Chess';
   const options = {
     body: data.body ?? "It's your turn!",
-    tag: 'your-turn',        // replaces any existing notification
+    tag: 'your-turn',
     renotify: true,
     icon: data.icon ?? null,
-    vibrate: [200, 100, 200], // triggers lock-screen display on Android
+    vibrate: [200, 100, 200],
     data: { url: data.url || '/' },
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+
+  // Only show the notification if the user isn't already looking at the game.
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      const gameIsVisible = windowClients.some(
+        (c) => c.visibilityState === 'visible' && c.url === (data.url || '/')
+      );
+      if (gameIsVisible) return;
+      return self.registration.showNotification(title, options);
+    })
+  );
 });
 
 // --- Notification click: focus or open the game tab ---
