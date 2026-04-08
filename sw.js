@@ -16,6 +16,7 @@ self.addEventListener('push', (event) => {
     tag: 'your-turn',        // replaces any existing notification
     renotify: true,
     icon: data.icon ?? null,
+    vibrate: [200, 100, 200], // triggers lock-screen display on Android
     data: { url: data.url || '/' },
   };
   event.waitUntil(self.registration.showNotification(title, options));
