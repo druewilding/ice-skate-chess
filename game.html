@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ice Skate Chess</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4a9eff">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -125,6 +127,19 @@
     let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
     let reviewIndex = null;      // null = live; number = reviewing that snapshot
 
+    // --- Push notifications ---
+
+    function notifyTurn() {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      // Don't interrupt if the player is actively looking at the page
+      if (document.visibilityState === 'visible') return;
+      new Notification('Ice Skate Chess', {
+        body: "It's your turn!",
+        tag: 'your-turn',   // replaces any previous notification instead of stacking
+        renotify: true,
+      });
+    }
+
     function captureSnapshot() {
       return JSON.parse(JSON.stringify(engine.serialize()));
     }
@@ -232,6 +247,17 @@
     async function initGame() {
       await gm.init();
 
+      // Register service worker (needed for push + PWA install prompt)
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+
+      // Ask for notification permission. Browsers show the native prompt;
+      // if the user dismisses it they can re-enable from browser settings.
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+
       const statusEl = document.getElementById('game-status');
       statusEl.textContent = 'Connecting…';
 
@@ -325,6 +351,9 @@
           const isOpponentMove =
             newMoveCount === prevMoveCount + 1 &&
             engine.moveHistory[newMoveCount - 1].piece.color !== myColor;
+
+          // Notify the player if they're not looking at the page
+          if (isOpponentMove) notifyTurn();
 
           // For the opponent's latest move, render first (piece appears at dest),
           // then slide a ghost from source → dest on top.

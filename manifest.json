@@ -1,0 +1,10 @@
+{
+  "name": "Ice Skate Chess",
+  "short_name": "Ice Chess",
+  "description": "Online chess where sliding pieces must travel as far as possible.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4a9eff",
+  "icons": []
+}
