@@ -1,11 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <rect width="192" height="192" rx="24" fill="#1a1a2e"/>
-  <!-- head -->
-  <circle cx="96" cy="54" r="30" fill="#4a9eff"/>
-  <!-- neck -->
-  <rect x="84" y="78" width="24" height="18" fill="#4a9eff"/>
-  <!-- body: narrow at top, wide at bottom -->
-  <polygon points="84,96 108,96 132,150 60,150" fill="#4a9eff"/>
-  <!-- base -->
-  <rect x="54" y="150" width="84" height="18" rx="6" fill="#4a9eff"/>
+  <!-- base: semicircle, flat at bottom -->
+  <path d="M 42,168 A 54,54 0 0,1 150,168 Z" fill="#4a9eff"/>
+  <!-- body: circle overlapping the semicircle -->
+  <circle cx="96" cy="108" r="30" fill="#4a9eff"/>
+  <!-- head: small circle on top -->
+  <circle cx="96" cy="60" r="24" fill="#4a9eff"/>
 </svg>
