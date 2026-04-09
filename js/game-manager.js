@@ -39,17 +39,17 @@ export class GameManager {
     return id;
   }
 
-  async createGame(variant = 'standard') {
+  async createGame(variant = 'standard', creatorColor = 'white') {
     const { ref, set, serverTimestamp } = this._fb;
 
     this.gameId = this.generateGameId();
-    this.playerColor = 'white';
+    this.playerColor = creatorColor;
 
     const gameData = {
       variant,
       status: 'waiting', // waiting, active, finished
       players: {
-        white: { connected: true, joinedAt: Date.now() },
+        [creatorColor]: { connected: true, joinedAt: Date.now() },
       },
       createdAt: Date.now(),
       state: null, // Will be set when game starts
@@ -81,14 +81,18 @@ export class GameManager {
       throw new Error('Game is already finished');
     }
 
-    if (gameData.players?.black) {
+    const hasWhite = !!gameData.players?.white;
+    const hasBlack = !!gameData.players?.black;
+
+    if (hasWhite && hasBlack) {
       throw new Error('Game is full');
     }
 
-    this.playerColor = 'black';
+    const joinColor = hasWhite ? 'black' : 'white';
+    this.playerColor = joinColor;
 
     await update(this.gameRef, {
-      'players/black': { connected: true, joinedAt: Date.now() },
+      [`players/${joinColor}`]: { connected: true, joinedAt: Date.now() },
       status: 'active',
     });
 

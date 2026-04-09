@@ -272,12 +272,12 @@
       const statusEl = document.getElementById('game-status');
       statusEl.textContent = 'Connecting…';
 
-      // If we don't have a stored color, try to join as black
+      // If we don't have a stored color, try to join as the available color
       if (!myColor) {
         try {
           await gm.joinGame(gameId);
-          myColor = 'black';
-          localStorage.setItem('chess-color-' + gameId, 'black');
+          myColor = gm.playerColor;
+          localStorage.setItem('chess-color-' + gameId, myColor);
         } catch (err) {
           statusEl.textContent = err.message;
           return;
@@ -311,8 +311,8 @@
       positionSnapshots = [captureSnapshot()];
       updateReviewNavButtons();
 
-      // Show waiting overlay for white while opponent hasn't joined yet
-      if (myColor === 'white') {
+      // Show waiting overlay for the creator while opponent hasn't joined yet
+      if (localStorage.getItem('chess-creator-' + gameId)) {
         const shareLink = gm.getShareLink();
         document.getElementById('share-link').value = shareLink;
         document.getElementById('game-code-display').textContent = gameId;

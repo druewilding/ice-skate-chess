@@ -168,6 +168,67 @@ body {
   margin-bottom: 0;
 }
 
+/* ===== Color picker (lobby) ===== */
+.color-picker-label {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+
+.color-picker-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-color-choice {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 6px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.btn-color-choice:active {
+  transform: scale(0.97);
+}
+
+.btn-color-choice:hover {
+  border-color: var(--accent);
+}
+
+.color-choice-piece {
+  font-size: 2em;
+  line-height: 1;
+}
+
+.btn-color-white-choice {
+  background: #e8dcc8;
+  color: #1a1a2e;
+}
+
+.btn-color-white-choice:hover {
+  border-color: #a08060;
+}
+
+.btn-color-random-choice {
+  background: #444;
+  color: white;
+}
+
+.btn-color-black-choice {
+  background: #2c2c2c;
+  color: #ddd;
+  border-color: #555;
+}
+
 .share-link-container {
   display: flex;
   gap: 8px;

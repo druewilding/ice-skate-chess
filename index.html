@@ -16,9 +16,28 @@
     <div class="lobby">
       <div class="card">
         <h2>New Game</h2>
-        <button id="btn-new-standard" class="btn btn-primary">Ice Skate Chess</button>
-        <button id="btn-new-960" class="btn btn-secondary">Ice Skate Chess960</button>
-        <!-- <button id="btn-new-limited" class="btn btn-secondary">Limited Range</button> -->
+        <div id="variant-picker">
+          <button id="btn-new-standard" class="btn btn-primary">Ice Skate Chess</button>
+          <button id="btn-new-960" class="btn btn-secondary">Ice Skate Chess960</button>
+        </div>
+        <div id="color-picker" hidden>
+          <p class="color-picker-label">Play as…</p>
+          <div class="color-picker-buttons">
+            <button id="btn-color-white" class="btn btn-color-choice btn-color-white-choice">
+              <span class="color-choice-piece">♔</span>
+              <span>White</span>
+            <button id="btn-color-black" class="btn btn-color-choice btn-color-black-choice">
+              <span class="color-choice-piece">♚</span>
+              <span>Black</span>
+            </button>
+            </button>
+            <button id="btn-color-random" class="btn btn-color-choice btn-color-random-choice">
+              <span class="color-choice-piece">🎲</span>
+              <span>Random</span>
+            </button>
+          </div>
+          <button id="btn-back-to-variants" class="btn btn-small btn-back" style="width:100%;margin-top:8px">← Back</button>
+        </div>
       </div>
 
       <div class="card">
@@ -69,42 +88,49 @@
       window.location.href = 'game.html' + window.location.hash;
     }
 
-    // New standard game — go straight to game.html, no waiting screen here
-    document.getElementById('btn-new-standard').addEventListener('click', async () => {
+    let pendingVariant = null;
+
+    function showColorPicker(variant) {
+      pendingVariant = variant;
+      document.getElementById('variant-picker').hidden = true;
+      document.getElementById('color-picker').hidden = false;
+    }
+
+    document.getElementById('btn-new-standard').addEventListener('click', () => showColorPicker('standard'));
+    document.getElementById('btn-new-960').addEventListener('click', () => showColorPicker('iceskate-960'));
+
+    document.getElementById('btn-back-to-variants').addEventListener('click', () => {
+      document.getElementById('color-picker').hidden = true;
+      document.getElementById('variant-picker').hidden = false;
+      pendingVariant = null;
+    });
+
+    async function startGame(chosenColor) {
+      const color = chosenColor === 'random'
+        ? (Math.random() < 0.5 ? 'white' : 'black')
+        : chosenColor;
       try {
         await ensureInit();
-        const gameId = await gm.createGame('standard');
+        const gameId = await gm.createGame(pendingVariant, color);
 
-        // Write the initial board state right away
-        engine.reset();
+        if (pendingVariant === 'iceskate-960') {
+          engine.setup960();
+        } else {
+          engine.reset();
+        }
         await gm.sendGameState(engine.serialize());
 
-        // Record that this browser is white for this game
-        localStorage.setItem('chess-color-' + gameId, 'white');
-
-        // Navigate using hash so no server redirect can strip the game ID
+        localStorage.setItem('chess-color-' + gameId, color);
+        localStorage.setItem('chess-creator-' + gameId, '1');
         window.location.href = 'game.html#' + gameId;
       } catch (err) {
         showError('Failed to create game: ' + err.message);
       }
-    });
+    }
 
-    // New Chess960 + Ice Skate game
-    document.getElementById('btn-new-960').addEventListener('click', async () => {
-      try {
-        await ensureInit();
-        const gameId = await gm.createGame('iceskate-960');
-
-        // Set up a randomised Chess960 back rank with ice skate rules
-        engine.setup960();
-        await gm.sendGameState(engine.serialize());
-
-        localStorage.setItem('chess-color-' + gameId, 'white');
-        window.location.href = 'game.html#' + gameId;
-      } catch (err) {
-        showError('Failed to create game: ' + err.message);
-      }
-    });
+    document.getElementById('btn-color-white').addEventListener('click', () => startGame('white'));
+    document.getElementById('btn-color-random').addEventListener('click', () => startGame('random'));
+    document.getElementById('btn-color-black').addEventListener('click', () => startGame('black'));
 
     // Join game
     document.getElementById('btn-join').addEventListener('click', async () => {
