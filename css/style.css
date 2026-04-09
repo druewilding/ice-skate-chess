@@ -530,10 +530,14 @@ body {
   overflow-y: auto;
   font-family: monospace;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .move-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 32px 64px 64px;
   gap: 8px;
   padding: 2px 0;
 }
@@ -711,8 +715,9 @@ body {
 /* ===== Move Review Navigation ===== */
 .move-history-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -723,6 +728,7 @@ body {
 .review-nav {
   display: flex;
   gap: 4px;
+  justify-content: center;
 }
 
 .review-btn {
