@@ -30,6 +30,8 @@ export class ChessEngine {
     this.gameOver = false;
     this.result = null; // 'white', 'black', 'draw'
     this.resultReason = null;
+    this.positionHistory = {};
+    this.recordPosition();
   }
 
   getStartingPosition() {
@@ -72,6 +74,8 @@ export class ChessEngine {
     this.gameOver = false;
     this.result = null;
     this.resultReason = null;
+    this.positionHistory = {};
+    this.recordPosition();
 
     // Store original king/rook positions for 960 castling
     this.initialKingFile = backRank.indexOf('king');
@@ -114,6 +118,35 @@ export class ChessEngine {
     pieces[empty[2]] = 'rook';
 
     return pieces;
+  }
+
+  // Build a compact hash of the position for repetition detection.
+  // Encodes: active color, all 64 squares, castling rights, en-passant file.
+  getBoardHash() {
+    let hash = this.turn[0]; // 'w' or 'b'
+    for (let r = 0; r < 8; r++) {
+      for (let f = 0; f < 8; f++) {
+        const p = this.board[r][f];
+        if (p) {
+          const sym = p.type === 'knight' ? 'n' : p.type[0];
+          hash += p.color === 'white' ? sym.toUpperCase() : sym;
+        } else {
+          hash += '_';
+        }
+      }
+    }
+    hash += (this.castlingRights.white.king  ? 'K' : '-')
+          + (this.castlingRights.white.queen ? 'Q' : '-')
+          + (this.castlingRights.black.king  ? 'k' : '-')
+          + (this.castlingRights.black.queen ? 'q' : '-');
+    hash += this.enPassantTarget !== null ? String(this.enPassantTarget.file) : '-';
+    return hash;
+  }
+
+  recordPosition() {
+    const hash = this.getBoardHash();
+    this.positionHistory[hash] = (this.positionHistory[hash] || 0) + 1;
+    return this.positionHistory[hash];
   }
 
   getPiece(rank, file) {
@@ -724,6 +757,13 @@ export class ChessEngine {
       this.resultReason = 'fifty-move rule';
     }
 
+    // Threefold repetition
+    if (!this.gameOver && this.recordPosition() >= 3) {
+      this.gameOver = true;
+      this.result = 'draw';
+      this.resultReason = 'repetition';
+    }
+
     this.moveHistory.push(moveData);
     return moveData;
   }
@@ -744,6 +784,7 @@ export class ChessEngine {
       resultReason: this.resultReason,
       maxDistance: this.maxDistance,
       iceskate: this.iceskate,
+      positionHistory: this.positionHistory,
     };
   }
 
@@ -783,6 +824,9 @@ export class ChessEngine {
       this.maxDistance = state.maxDistance;
     }
     this.iceskate = state.iceskate || false;
+    this.positionHistory = state.positionHistory
+      ? (typeof state.positionHistory === 'object' ? { ...state.positionHistory } : {})
+      : {};
   }
 
   // Find disambiguation string for a piece moving from (fromRank,fromFile) to (toRank,toFile).
