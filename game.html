@@ -777,7 +777,15 @@
       // Scroll to current move when reviewing; otherwise scroll to bottom
       if (reviewIndex !== null) {
         const currentEl = moveList.querySelector('.current-move');
-        if (currentEl) currentEl.scrollIntoView({ block: 'nearest' });
+        if (currentEl) {
+          const listRect = moveList.getBoundingClientRect();
+          const elRect = currentEl.getBoundingClientRect();
+          if (elRect.top < listRect.top) {
+            moveList.scrollTop -= listRect.top - elRect.top;
+          } else if (elRect.bottom > listRect.bottom) {
+            moveList.scrollTop += elRect.bottom - listRect.bottom;
+          }
+        }
       } else {
         moveList.scrollTop = moveList.scrollHeight;
       }
