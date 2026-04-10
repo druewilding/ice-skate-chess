@@ -130,6 +130,9 @@
     let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
     let reviewIndex = null;      // null = live; number = reviewing that snapshot
 
+    // Bot mode: hash looks like #bot:standard:white or #bot:iceskate-960:black
+    const isBotMode = gameId.startsWith('bot:');
+
     // --- Push notifications ---
 
     function showNotificationViaSW(title, body, tag) {
@@ -269,7 +272,119 @@
       document.getElementById('btn-review-end').disabled   = (currentIndex >= liveIndex);
     }
 
+    function initBotGame(variant, playerColor) {
+      myColor = playerColor;
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      }
+
+      // Ice skate rules always on; set up board
+      engine.iceskate = true;
+      if (variant === 'iceskate-960') {
+        engine.setup960();
+      } else {
+        engine.reset();
+      }
+
+      const flipped = myColor === 'black';
+      ui = new ChessUI(document.getElementById('chess-board'), engine, {
+        flipped,
+        interactive: myColor === 'white',
+        onMove: handleLocalMove,
+        confirmMove: true,
+        onPendingMoveChange: (pending) => {
+          document.getElementById('confirm-move-bar').hidden = !pending;
+          updateMoveList();
+          updateCaptured();
+        },
+      });
+
+      isMyTurn = myColor === 'white';
+      positionSnapshots = [captureSnapshot()];
+      updateLabels();
+      updateStatus();
+      updateMoveList();
+      updateCaptured();
+      updateReviewNavButtons();
+
+      // Draw offers don't apply vs. bot
+      document.getElementById('btn-draw').hidden = true;
+
+      // If player chose black, bot (white) moves first
+      if (myColor === 'black') {
+        isMyTurn = false;
+        ui.interactive = false;
+        updateStatus();
+        setTimeout(() => makeBotMove(), 500);
+      }
+    }
+
+    function makeBotMove() {
+      if (engine.gameOver) return;
+      const botColor = myColor === 'white' ? 'black' : 'white';
+      if (engine.turn !== botColor) return;
+
+      // Collect every legal move for the bot's pieces
+      const allMoves = [];
+      for (let rank = 0; rank < 8; rank++) {
+        for (let file = 0; file < 8; file++) {
+          const piece = engine.getPiece(rank, file);
+          if (piece && piece.color === botColor) {
+            const moves = engine.getLegalMoves(rank, file);
+            for (const move of moves) {
+              allMoves.push({ fromRank: rank, fromFile: file, toRank: move.rank, toFile: move.file });
+            }
+          }
+        }
+      }
+
+      if (allMoves.length === 0) return; // already checkmate/stalemate — engine handles it
+
+      const chosen = allMoves[Math.floor(Math.random() * allMoves.length)];
+
+      // Detect pawn promotion; always promote to queen
+      const movingPiece = engine.getPiece(chosen.fromRank, chosen.fromFile);
+      let promotion = null;
+      if (movingPiece && movingPiece.type === 'pawn') {
+        if ((botColor === 'white' && chosen.toRank === 0) || (botColor === 'black' && chosen.toRank === 7)) {
+          promotion = 'queen';
+        }
+      }
+
+      engine.makeMove(chosen.fromRank, chosen.fromFile, chosen.toRank, chosen.toFile, promotion);
+      syncSnapshots();
+
+      isMyTurn = engine.turn === myColor && !engine.gameOver;
+      ui.interactive = isMyTurn;
+
+      const lastMove = engine.moveHistory[engine.moveHistory.length - 1];
+      ui.setLastMove(lastMove);
+      ui.render();
+
+      const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
+      const symbol = ui.pieceSymbols[lastMove.piece.color][pieceType];
+      ui.animateMove(
+        lastMove.from.rank, lastMove.from.file,
+        lastMove.to.rank,   lastMove.to.file,
+        symbol, lastMove.piece.color, () => {}
+      );
+
+      updateStatus();
+      updateMoveList();
+      updateCaptured();
+      updateReviewNavButtons();
+
+      if (engine.gameOver) showGameOver();
+    }
+
     async function initGame() {
+      if (isBotMode) {
+        const [, variant, playerColor] = gameId.split(':');
+        initBotGame(variant, playerColor);
+        return;
+      }
+
       await gm.init();
 
       // Register service worker (needed for push + PWA install prompt)
@@ -450,6 +565,22 @@
 
     function handleLocalMove(moveData) {
       syncSnapshots(); // engine already has the new move applied
+
+      if (isBotMode) {
+        isMyTurn = false;
+        ui.interactive = false;
+        updateStatus();
+        updateMoveList();
+        updateCaptured();
+        updateReviewNavButtons();
+        if (engine.gameOver) {
+          showGameOver();
+        } else {
+          setTimeout(() => makeBotMove(), 400);
+        }
+        return;
+      }
+
       // Player made a move locally, send to Firebase
       gm.sendGameState(engine.serialize());
       isMyTurn = false;
@@ -480,7 +611,7 @@
         statusEl.textContent = 'Your turn';
         statusEl.className = 'game-status your-turn';
       } else {
-        statusEl.textContent = "Opponent's turn";
+        statusEl.textContent = isBotMode ? "Bot's turn…" : "Opponent's turn";
         statusEl.className = 'game-status';
       }
     }
@@ -489,7 +620,9 @@
       const playerLabel = document.getElementById('player-label');
       const opponentLabel = document.getElementById('opponent-label');
       playerLabel.textContent = `You (${myColor})`;
-      opponentLabel.textContent = `Opponent (${myColor === 'white' ? 'black' : 'white'})`;
+      opponentLabel.textContent = isBotMode
+        ? `Bot (${myColor === 'white' ? 'black' : 'white'})`
+        : `Opponent (${myColor === 'white' ? 'black' : 'white'})`;
     }
 
     function updateMoveList() {
@@ -641,7 +774,15 @@
     document.getElementById('btn-resign').addEventListener('click', () => {
       if (engine.gameOver) return;
       if (confirm('Are you sure you want to resign?')) {
-        gm.sendResignation(myColor);
+        if (isBotMode) {
+          engine.gameOver = true;
+          engine.result = myColor === 'white' ? 'black' : 'white';
+          engine.resultReason = 'resignation';
+          ui.interactive = false;
+          showGameOver();
+        } else {
+          gm.sendResignation(myColor);
+        }
       }
     });
 

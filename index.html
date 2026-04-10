@@ -41,6 +41,32 @@
       </div>
 
       <div class="card">
+        <h2>Play against Bot</h2>
+        <div id="bot-variant-picker">
+          <button id="btn-bot-standard" class="btn btn-primary">Ice Skate Chess</button>
+          <button id="btn-bot-960" class="btn btn-secondary">Ice Skate Chess960</button>
+        </div>
+        <div id="bot-color-picker" hidden>
+          <p class="color-picker-label">Play as…</p>
+          <div class="color-picker-buttons">
+            <button id="btn-bot-white" class="btn btn-color-choice btn-color-white-choice">
+              <span class="color-choice-piece">♚</span>
+              <span>White</span>
+            </button>
+            <button id="btn-bot-black" class="btn btn-color-choice btn-color-black-choice">
+              <span class="color-choice-piece">♚</span>
+              <span>Black</span>
+            </button>
+            <button id="btn-bot-random" class="btn btn-color-choice btn-color-random-choice">
+              <span class="color-choice-piece">🎲</span>
+              <span>Random</span>
+            </button>
+          </div>
+          <button id="btn-bot-back" class="btn btn-small btn-back" style="width:100%;margin-top:8px">← Back</button>
+        </div>
+      </div>
+
+      <div class="card">
         <h2>Join Game</h2>
         <div class="join-form">
           <input type="text" id="game-id-input" placeholder="Enter game code" maxlength="8" autocomplete="off">
@@ -153,6 +179,35 @@
     document.getElementById('game-id-input').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') document.getElementById('btn-join').click();
     });
+
+    // Bot game
+    let pendingBotVariant = null;
+
+    function showBotColorPicker(variant) {
+      pendingBotVariant = variant;
+      document.getElementById('bot-variant-picker').hidden = true;
+      document.getElementById('bot-color-picker').hidden = false;
+    }
+
+    document.getElementById('btn-bot-standard').addEventListener('click', () => showBotColorPicker('standard'));
+    document.getElementById('btn-bot-960').addEventListener('click', () => showBotColorPicker('iceskate-960'));
+
+    document.getElementById('btn-bot-back').addEventListener('click', () => {
+      document.getElementById('bot-color-picker').hidden = true;
+      document.getElementById('bot-variant-picker').hidden = false;
+      pendingBotVariant = null;
+    });
+
+    function startBotGame(chosenColor) {
+      const color = chosenColor === 'random'
+        ? (Math.random() < 0.5 ? 'white' : 'black')
+        : chosenColor;
+      window.location.href = `game.html#bot:${pendingBotVariant}:${color}`;
+    }
+
+    document.getElementById('btn-bot-white').addEventListener('click', () => startBotGame('white'));
+    document.getElementById('btn-bot-black').addEventListener('click', () => startBotGame('black'));
+    document.getElementById('btn-bot-random').addEventListener('click', () => startBotGame('random'));
 
     // Register service worker (enables PWA install + push notifications in game.html)
     if ('serviceWorker' in navigator) {
