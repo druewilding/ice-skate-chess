@@ -325,6 +325,9 @@
       const botColor = myColor === 'white' ? 'black' : 'white';
       if (engine.turn !== botColor) return;
 
+      // Fraction of moves played randomly (0 = always scored, 1 = always random)
+      const BOT_RANDOM_RATE = 0.3;
+
       // Piece values for capture scoring
       const PIECE_VALUES = { queen: 9, rook: 5, bishop: 3, knight: 3, pawn: 1 };
 
@@ -388,10 +391,16 @@
 
       if (scoredMoves.length === 0) return; // already checkmate/stalemate — engine handles it
 
-      // Pick the highest-scoring move; break ties randomly
-      const maxScore = Math.max(...scoredMoves.map(m => m.score));
-      const bestMoves = scoredMoves.filter(m => m.score === maxScore);
-      const chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+      // BOT_RANDOM_RATE of the time: ignore scoring and pick any legal move at random
+      // Otherwise: pick the highest-scoring move, breaking ties randomly
+      let chosen;
+      if (Math.random() < BOT_RANDOM_RATE) {
+        chosen = scoredMoves[Math.floor(Math.random() * scoredMoves.length)];
+      } else {
+        const maxScore = Math.max(...scoredMoves.map(m => m.score));
+        const bestMoves = scoredMoves.filter(m => m.score === maxScore);
+        chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+      }
 
       // Detect pawn promotion; always promote to queen
       const movingPiece = engine.getPiece(chosen.fromRank, chosen.fromFile);
