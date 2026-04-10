@@ -379,7 +379,8 @@
             if (piece.type === 'pawn' && Math.abs(move.rank - rank) === 2) score += 1;
 
             // Reward developing knights and bishops off the back rank
-            if ((piece.type === 'knight' || piece.type === 'bishop') && rank === backRank) score += 2;
+            if (piece.type === 'knight' && rank === backRank) score += 1;
+            if (piece.type === 'bishop' && rank === backRank) score += 2;
 
             // Discourage pointless king walks (castling already rewarded above)
             if (piece.type === 'king' && !move.castling) score -= 3;
