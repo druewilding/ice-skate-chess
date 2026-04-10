@@ -904,8 +904,20 @@
       exitReview();
     });
 
-    // Keyboard: left/right arrows navigate review
+    // Keyboard: left/right arrows navigate review; Enter/Escape for move confirm
     document.addEventListener('keydown', (e) => {
+      if (ui && ui.pendingMoveConfirm) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          ui.confirmPendingMove();
+          return;
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          ui.cancelPendingMove();
+          document.getElementById('confirm-move-bar').hidden = true;
+          return;
+        }
+      }
       if (e.key === 'ArrowLeft') {
         const liveIndex = positionSnapshots.length - 1;
         const cur = reviewIndex !== null ? reviewIndex : liveIndex;
