@@ -135,9 +135,9 @@
     // ---- Position history & move review ----
     let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
     let reviewIndex = null;      // null = live; number = reviewing that snapshot
-    let gameVariant = null;      // 'standard', 'iceskate-960', 'angry', 'angry-960'
+    let gameVariant = null;      // 'iceskate', 'iceskate-960', 'angry', 'angry-960'
 
-    // Bot mode: hash looks like #bot:standard:white or #bot:iceskate-960:black
+    // Bot mode: hash looks like #bot:iceskate:white or #bot:iceskate-960:black
     const isBotMode = gameId.startsWith('bot:');
 
     // --- Push notifications ---

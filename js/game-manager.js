@@ -39,7 +39,7 @@ export class GameManager {
     return id;
   }
 
-  async createGame(variant = 'standard', creatorColor = 'white') {
+  async createGame(variant = 'iceskate', creatorColor = 'white') {
     const { ref, set, serverTimestamp } = this._fb;
 
     this.gameId = this.generateGameId();

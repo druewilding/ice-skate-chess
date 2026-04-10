@@ -29,6 +29,16 @@ exports.notifyPlayerTurn = onValueWritten(
     const token = game.players?.[currentTurn]?.fcmToken;
     const gameUrl = game.players?.[currentTurn]?.gameUrl || "";
 
+    const variant = game.variant ?? "iceskate";
+    const isAngry = variant.startsWith("angry");
+    const is960 = variant.endsWith("960") || variant.endsWith("-960");
+    let notifTitle;
+    if (isAngry) {
+      notifTitle = is960 ? "Angry Chess960" : "Angry Chess";
+    } else {
+      notifTitle = is960 ? "Ice Skate Chess960" : "Ice Skate Chess";
+    }
+
     if (!token) return;
 
     try {
@@ -37,7 +47,7 @@ exports.notifyPlayerTurn = onValueWritten(
         // Send as data-only so our sw.js push handler displays the notification
         // (avoids the browser auto-displaying it with no click URL).
         data: {
-          title: "Ice Skate Chess",
+          title: notifTitle,
           body: "It's your turn!",
           url: gameUrl,
         },
