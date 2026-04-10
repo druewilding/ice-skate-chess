@@ -88,7 +88,9 @@ export class ChessUI {
       }
       // Handle castling: also move the rook visually
       if (castling) {
-        const rookFromFile = castling === 'king' ? 7 : 0;
+        const rookFromFile = this.engine.initialRookFiles
+          ? (castling === 'king' ? this.engine.initialRookFiles.king : this.engine.initialRookFiles.queen)
+          : (castling === 'king' ? 7 : 0);
         const rookToFile = castling === 'king' ? 5 : 3;
         if (rank === fromRank && file === rookFromFile) return null;
         if (rank === fromRank && file === rookToFile) return this.engine.getPiece(fromRank, rookFromFile);

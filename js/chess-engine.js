@@ -372,9 +372,8 @@ export class ChessEngine {
   canCastle(color, side) {
     const baseRank = color === 'white' ? 7 : 0;
 
-    // Standard castling
-    const kingFile = 4;
-    const rookFile = side === 'king' ? 7 : 0;
+    const kingFile = this.getInitialKingFile();
+    const rookFile = this.getInitialRookFile(side);
     const kingDest = side === 'king' ? 6 : 2;
     const rookDest = side === 'king' ? 5 : 3;
 
@@ -410,6 +409,16 @@ export class ChessEngine {
       squares.push(f);
     }
     return squares;
+  }
+
+  // Returns the file the king started on (4 for standard, varies for 960).
+  getInitialKingFile() {
+    return this.initialKingFile ?? 4;
+  }
+
+  // Returns the file the king-side or queen-side rook started on.
+  getInitialRookFile(side) {
+    return this.initialRookFiles?.[side] ?? (side === 'king' ? 7 : 0);
   }
 
   isSquareAttacked(rank, file, byColor) {
@@ -501,13 +510,14 @@ export class ChessEngine {
     // Handle castling - move the rook too
     if (move.castling) {
       const baseRank = color === 'white' ? 7 : 0;
-      if (move.castling === 'king') {
-        this.board[baseRank][5] = this.board[baseRank][7];
-        this.board[baseRank][7] = null;
-      } else {
-        this.board[baseRank][3] = this.board[baseRank][0];
-        this.board[baseRank][0] = null;
-      }
+      const rookFromFile = this.getInitialRookFile(move.castling);
+      const rookToFile = move.castling === 'king' ? 5 : 3;
+      // Read rook from the saved (pre-move) board to handle 960 overlap cases
+      // where the rook's start square coincides with the king's destination.
+      const rookPiece = savedBoard[baseRank][rookFromFile];
+      this.board[baseRank][rookFromFile] = null;
+      this.board[baseRank][toFile] = piece;       // re-place king (handles rookFromFile === toFile)
+      this.board[baseRank][rookToFile] = rookPiece;
     }
 
     // Find king position
@@ -588,13 +598,12 @@ export class ChessEngine {
     }
     if (moveObj.castling) {
       const baseRank = piece.color === 'white' ? 7 : 0;
-      if (moveObj.castling === 'king') {
-        this.board[baseRank][5] = this.board[baseRank][7];
-        this.board[baseRank][7] = null;
-      } else {
-        this.board[baseRank][3] = this.board[baseRank][0];
-        this.board[baseRank][0] = null;
-      }
+      const rookFromFile = this.getInitialRookFile(moveObj.castling);
+      const rookToFile = moveObj.castling === 'king' ? 5 : 3;
+      const rookPiece = savedBoard[baseRank][rookFromFile];
+      this.board[baseRank][rookFromFile] = null;
+      this.board[baseRank][toFile] = movedPiece;   // re-place king (handles 960 overlap)
+      this.board[baseRank][rookToFile] = rookPiece;
     }
     if (piece.type === 'pawn' && Math.abs(toRank - fromRank) === 2) {
       this.enPassantTarget = { rank: (fromRank + toRank) / 2, file: fromFile };
@@ -660,6 +669,16 @@ export class ChessEngine {
       this.board[capturedRank][toFile] = null;
     }
 
+    // Pre-save castling rook BEFORE the king moves (avoids 960 overlap issues
+    // where the rook's start square coincides with the king's destination).
+    let castleRookFromFile = null;
+    let castleRookPiece = null;
+    if (matchingMove.castling) {
+      const baseRank = piece.color === 'white' ? 7 : 0;
+      castleRookFromFile = this.getInitialRookFile(matchingMove.castling);
+      castleRookPiece = this.board[baseRank][castleRookFromFile];
+    }
+
     // Move the piece
     this.board[toRank][toFile] = piece;
     this.board[fromRank][fromFile] = null;
@@ -688,13 +707,10 @@ export class ChessEngine {
     // Castling - move the rook
     if (matchingMove.castling) {
       const baseRank = piece.color === 'white' ? 7 : 0;
-      if (matchingMove.castling === 'king') {
-        this.board[baseRank][5] = this.board[baseRank][7];
-        this.board[baseRank][7] = null;
-      } else {
-        this.board[baseRank][3] = this.board[baseRank][0];
-        this.board[baseRank][0] = null;
-      }
+      const rookToFile = matchingMove.castling === 'king' ? 5 : 3;
+      this.board[baseRank][castleRookFromFile] = null;
+      this.board[baseRank][toFile] = piece;       // re-place king (handles 960 rookFromFile === toFile overlap)
+      this.board[baseRank][rookToFile] = castleRookPiece;
     }
 
     // Update en passant target
@@ -714,15 +730,15 @@ export class ChessEngine {
     }
     if (piece.type === 'rook') {
       const baseRank = piece.color === 'white' ? 7 : 0;
-      if (fromRank === baseRank && fromFile === 0) this.castlingRights[piece.color].queen = false;
-      if (fromRank === baseRank && fromFile === 7) this.castlingRights[piece.color].king = false;
+      if (fromRank === baseRank && fromFile === this.getInitialRookFile('queen')) this.castlingRights[piece.color].queen = false;
+      if (fromRank === baseRank && fromFile === this.getInitialRookFile('king'))  this.castlingRights[piece.color].king  = false;
     }
     // If a rook is captured, remove that side's castling rights
     if (moveData.captured && moveData.captured.type === 'rook') {
       const capturedColor = moveData.captured.color;
       const capturedBaseRank = capturedColor === 'white' ? 7 : 0;
-      if (toRank === capturedBaseRank && toFile === 0) this.castlingRights[capturedColor].queen = false;
-      if (toRank === capturedBaseRank && toFile === 7) this.castlingRights[capturedColor].king = false;
+      if (toRank === capturedBaseRank && toFile === this.getInitialRookFile('queen')) this.castlingRights[capturedColor].queen = false;
+      if (toRank === capturedBaseRank && toFile === this.getInitialRookFile('king'))  this.castlingRights[capturedColor].king  = false;
     }
 
     // Update half-move clock
@@ -788,6 +804,8 @@ export class ChessEngine {
       iceskate: this.iceskate,
       positionHistory: this.positionHistory,
       startingBoard: this.startingBoard,
+      initialKingFile: this.initialKingFile ?? null,
+      initialRookFiles: this.initialRookFiles ?? null,
     };
   }
 
@@ -836,6 +854,24 @@ export class ChessEngine {
           return Array.from({ length: 8 }, (_, f) => (row ? row[f] || null : null));
         })
       : this.getStartingPosition();
+
+    // Restore 960 initial positions (serialized directly, or inferred from startingBoard
+    // for backward compatibility with states saved before this field was added).
+    this.initialKingFile = state.initialKingFile ?? null;
+    this.initialRookFiles = state.initialRookFiles ?? null;
+    if (this.initialKingFile === null && this.startingBoard) {
+      const backRank = this.startingBoard[7];
+      const rooks = [];
+      for (let f = 0; f < 8; f++) {
+        const p = backRank[f];
+        if (!p) continue;
+        if (p.type === 'king') this.initialKingFile = f;
+        if (p.type === 'rook') rooks.push(f);
+      }
+      if (rooks.length >= 2) {
+        this.initialRookFiles = { queen: rooks[0], king: rooks[1] };
+      }
+    }
   }
 
   // Find disambiguation string for a piece moving from (fromRank,fromFile) to (toRank,toFile).
