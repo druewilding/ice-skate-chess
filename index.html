@@ -25,7 +25,8 @@
           <button id="btn-new-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
         </div>
         <div id="color-picker" hidden>
-          <p class="color-picker-label">Play as…</p>
+          <p id="color-picker-title" class="color-picker-title"></p>
+          <p class="color-picker-label">Choose your colour…</p>
           <div class="color-picker-buttons">
             <button id="btn-color-white" class="btn btn-color-choice btn-color-white-choice">
               <span class="color-choice-piece">♚</span>
@@ -53,7 +54,7 @@
       </div>
 
       <div class="card">
-        <h2>Play against Bot 🤖</h2>
+        <h2>Play against a Bot 🤖</h2>
         <div id="bot-variant-picker">
           <button id="btn-bot-standard" class="btn btn-primary btn-iceskate">Ice Skate Chess</button>
           <button id="btn-bot-960" class="btn btn-primary btn-iceskate">Ice Skate Chess960</button>
@@ -63,7 +64,8 @@
           <button id="btn-bot-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
         </div>
         <div id="bot-color-picker" hidden>
-          <p class="color-picker-label">Play as…</p>
+          <p id="bot-color-picker-title" class="color-picker-title"></p>
+          <p class="color-picker-label">Choose your colour…</p>
           <div class="color-picker-buttons">
             <button id="btn-bot-white" class="btn btn-color-choice btn-color-white-choice">
               <span class="color-choice-piece">♚</span>
@@ -132,10 +134,21 @@
       window.location.href = 'game.html' + window.location.hash;
     }
 
+    const VARIANT_NAMES = {
+      'iceskate':     'Ice Skate Chess',
+      'iceskate-960': 'Ice Skate Chess960',
+      'angry':        'Angry Chess',
+      'angry-960':    'Angry Chess960',
+      'dark':         'Dark Chess',
+      'dark-960':     'Dark Chess960',
+    };
+
     let pendingVariant = null;
 
     function showColorPicker(variant) {
       pendingVariant = variant;
+      document.getElementById('color-picker-title').textContent =
+        `Play ${VARIANT_NAMES[variant]} against an opponent`;
       document.getElementById('variant-picker').hidden = true;
       document.getElementById('color-picker').hidden = false;
     }
@@ -212,6 +225,8 @@
 
     function showBotColorPicker(variant) {
       pendingBotVariant = variant;
+      document.getElementById('bot-color-picker-title').textContent =
+        `Play ${VARIANT_NAMES[variant]} against a bot`;
       document.getElementById('bot-variant-picker').hidden = true;
       document.getElementById('bot-color-picker').hidden = false;
     }

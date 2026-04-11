@@ -182,9 +182,16 @@ body {
 }
 
 /* ===== Color picker (lobby) ===== */
+.color-picker-title {
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
 .color-picker-label {
   color: var(--text-muted);
-  font-size: 0.9em;
+  font-size: 0.85em;
   margin-bottom: 12px;
 }
 
