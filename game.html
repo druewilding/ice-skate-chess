@@ -504,11 +504,10 @@
       // In Dark Chess, skip bot move animation so we don't reveal the move
       if (!engine.dark) {
         const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
-        const symbol = ui.pieceSymbols[lastMove.piece.color][pieceType];
         ui.animateMove(
           lastMove.from.rank, lastMove.from.file,
           lastMove.to.rank,   lastMove.to.file,
-          symbol, lastMove.piece.color, () => {}
+          pieceType, lastMove.piece.color, () => {}
         );
       }
 
