@@ -31,10 +31,13 @@ exports.notifyPlayerTurn = onValueWritten(
 
     const variant = game.variant ?? "iceskate";
     const isAngry = variant.startsWith("angry");
+    const isDark  = variant.startsWith("dark");
     const is960 = variant.endsWith("960") || variant.endsWith("-960");
     let notifTitle;
     if (isAngry) {
       notifTitle = is960 ? "Angry Chess960" : "Angry Chess";
+    } else if (isDark) {
+      notifTitle = is960 ? "Dark Chess960" : "Dark Chess";
     } else {
       notifTitle = is960 ? "Ice Skate Chess960" : "Ice Skate Chess";
     }
