@@ -923,6 +923,16 @@ body {
   font-style: italic;
 }
 
+/* ===== Angry Chess ===== */
+.btn-angry {
+  background: #3e0f0f !important;
+  border: 1px solid #8e2a2a;
+}
+
+.btn-angry:hover {
+  background: #551515 !important;
+}
+
 /* ===== Dark Chess ===== */
 .btn-dark {
   background: #2a1a3e !important;
