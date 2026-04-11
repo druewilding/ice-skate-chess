@@ -218,9 +218,8 @@ export class ChessUI {
             const targetPiece = this.engine.getPiece(rank, file);
             // Also check en passant
             const isEnPassant = this.legalMoves.some(m => m.rank === rank && m.file === file && m.enPassant);
-            const selectedPiece = this.selectedSquare ? this.engine.getPiece(this.selectedSquare.rank, this.selectedSquare.file) : null;
-            const isFriendlyTarget = targetPiece && selectedPiece && targetPiece.color === selectedPiece.color;
-            if (isFriendlyTarget) {
+            const isCastlingTarget = this.legalMoves.some(m => m.rank === rank && m.file === file && m.castling);
+            if (isCastlingTarget) {
               square.classList.add('legal-friendly');
             } else if (targetPiece || isEnPassant) {
               square.classList.add('legal-capture');

@@ -492,7 +492,7 @@ body {
   pointer-events: none;
 }
 
-/* Legal friendly ring (friendly piece target — blue) */
+/* Legal castling ring (castling target — blue) */
 .square.legal-friendly::after {
   content: '';
   position: absolute;
