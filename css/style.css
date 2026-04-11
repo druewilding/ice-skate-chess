@@ -662,6 +662,15 @@ body {
   margin-top: 10px;
 }
 
+.variant-screenshot {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 14px auto 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
 .rules-panel-angry h3 {
   color: var(--danger);
 }

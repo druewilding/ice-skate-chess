@@ -6,10 +6,22 @@ A vanilla JS progressive web app implementing chess variants with real-time mult
 
 ## Variants
 
-- **Ice Skate Chess** — Sliding pieces (bishop, rook, queen) must travel the maximum possible distance; they cannot stop early.
-- **Angry Chess** — Players may capture their own pieces (except the king).
-- **Dark Chess** — Standard chess, but the board is shrouded in darkness. Tap a piece to shine a torch and reveal enemies in its path.
-- All three variants have a **Chess960** (Fischer Random) mode.
+### Ice Skate Chess
+Sliding pieces (bishop, rook, queen) must travel the maximum possible distance; they cannot stop early.
+
+![Ice Skate Chess](assets/images/ice-skate-chess.png)
+
+### Angry Chess
+Players may capture their own pieces (except the king).
+
+![Angry Chess](assets/images/angry-chess.png)
+
+### Dark Chess
+Standard chess, but the board is shrouded in darkness. Tap a piece to shine a torch and reveal enemies in its path.
+
+![Dark Chess](assets/images/dark-chess.png)
+
+All three variants have a **Chess960** (Fischer Random) mode.
 
 ## Features
 
