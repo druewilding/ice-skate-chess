@@ -613,94 +613,22 @@ export class ChessEngine {
   // permanently modifying game state. Used for move-preview indicators.
   previewMoveResult(fromRank, fromFile, toRank, toFile, promotion = null, castling = undefined) {
     const piece = this.board[fromRank][fromFile];
-    if (!piece) return { check: false, checkmate: false };
+    if (!piece) return { check: false, checkmate: false, stalemate: false, draw: false };
 
-    const legalMoves = this.getLegalMoves(fromRank, fromFile);
-    const moveObj = legalMoves.find(m => {
-      if (m.rank !== toRank || m.file !== toFile) return false;
-      if (promotion) return m.promotion === promotion;
-      if (m.promotion) return false;
-      if (castling !== undefined) return (m.castling || null) === castling;
-      return true;
-    });
-    if (!moveObj) return { check: false, checkmate: false };
+    // Deep-copy the entire engine state, apply the move for real, read the result
+    // flags (check/checkmate/stalemate/draw), then restore. This avoids brittle
+    // manual hash re-computation and correctly handles all draw conditions.
+    const savedState = JSON.parse(JSON.stringify(this.serialize()));
+    const moveData = this.makeMove(fromRank, fromFile, toRank, toFile, promotion, castling);
+    this.deserialize(savedState);
 
-    const opponent = piece.color === 'white' ? 'black' : 'white';
-    const savedBoard = this.board.map(row => row.slice());
-    const savedEnPassant = this.enPassantTarget;
-    const savedTurn = this.turn;
-    const savedCastlingRights = {
-      white: { ...this.castlingRights.white },
-      black: { ...this.castlingRights.black },
+    if (!moveData) return { check: false, checkmate: false, stalemate: false, draw: false };
+    return {
+      check:     !!moveData.check,
+      checkmate: !!moveData.checkmate,
+      stalemate: !!moveData.stalemate,
+      draw:      !!moveData.draw,
     };
-
-    // Apply the move
-    const movedPiece = moveObj.promotion ? { type: moveObj.promotion, color: piece.color } : piece;
-    this.board[toRank][toFile] = movedPiece;
-    this.board[fromRank][fromFile] = null;
-
-    if (moveObj.enPassant) {
-      this.board[fromRank][toFile] = null;
-    }
-    if (moveObj.castling) {
-      const baseRank = piece.color === 'white' ? 7 : 0;
-      const rookFromFile = this.getInitialRookFile(moveObj.castling);
-      const rookToFile = moveObj.castling === 'king' ? 5 : 3;
-      const rookPiece = savedBoard[baseRank][rookFromFile];
-      this.board[baseRank][rookFromFile] = null;
-      this.board[baseRank][toFile] = movedPiece;   // re-place king (handles 960 overlap)
-      this.board[baseRank][rookToFile] = rookPiece;
-    }
-    if (piece.type === 'pawn' && Math.abs(toRank - fromRank) === 2) {
-      this.enPassantTarget = { rank: (fromRank + toRank) / 2, file: fromFile };
-    } else {
-      this.enPassantTarget = null;
-    }
-
-    const inCheck = this.isInCheck(opponent);
-    let checkmate = false;
-    let stalemate = false;
-    this.turn = opponent;
-    if (inCheck) {
-      checkmate = !this.hasLegalMoves(opponent);
-    } else {
-      stalemate = !this.hasLegalMoves(opponent);
-    }
-    this.turn = savedTurn;
-
-    // Preview draw-by-rule conditions
-    const isCapture = !!(savedBoard[toRank][toFile] || moveObj.enPassant);
-    const newHalfMoveClock = (piece.type === 'pawn' || isCapture) ? 0 : this.halfMoveClock + 1;
-    const fiftyMove = newHalfMoveClock >= 100;
-    const insufficientMat = !checkmate && !stalemate && this.hasInsufficientMaterial();
-    // Mirror castling-rights changes so the hash matches what makeMove would record
-    if (piece.type === 'king') {
-      this.castlingRights[piece.color].king = false;
-      this.castlingRights[piece.color].queen = false;
-    }
-    if (piece.type === 'rook') {
-      const baseRank = piece.color === 'white' ? 7 : 0;
-      if (fromRank === baseRank && fromFile === this.getInitialRookFile('queen')) this.castlingRights[piece.color].queen = false;
-      if (fromRank === baseRank && fromFile === this.getInitialRookFile('king'))  this.castlingRights[piece.color].king  = false;
-    }
-    if (isCapture && savedBoard[toRank][toFile] && savedBoard[toRank][toFile].type === 'rook') {
-      const capturedColor = savedBoard[toRank][toFile].color;
-      const capturedBaseRank = capturedColor === 'white' ? 7 : 0;
-      if (toRank === capturedBaseRank && toFile === this.getInitialRookFile('queen')) this.castlingRights[capturedColor].queen = false;
-      if (toRank === capturedBaseRank && toFile === this.getInitialRookFile('king'))  this.castlingRights[capturedColor].king  = false;
-    }
-    // Hash must use the opponent's turn (as it would be after makeMove switches turns)
-    this.turn = opponent;
-    const hash = this.getBoardHash();
-    this.turn = savedTurn;
-    const repetition = !fiftyMove && !insufficientMat && (this.positionHistory[hash] || 0) + 1 >= 3;
-    const draw = fiftyMove || insufficientMat || repetition;
-
-    this.board = savedBoard;
-    this.enPassantTarget = savedEnPassant;
-    this.castlingRights = savedCastlingRights;
-
-    return { check: inCheck, checkmate, stalemate, draw };
   }
 
   // Make a move. Returns move data for sync, or null if illegal.
