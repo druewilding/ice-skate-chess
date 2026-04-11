@@ -944,6 +944,19 @@ body {
 
 .dark-shrouded {
   background: #0a0a12 !important;
+  overflow: visible !important;
+  z-index: 2;
+}
+
+/* Blurry dark-fog overlay — sits above pieces, bleeds softly into adjacent revealed squares */
+.dark-shrouded::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  background: rgba(5, 5, 15, 0.96);
+  filter: blur(5px);
+  z-index: 5;
+  pointer-events: none;
 }
 
 .dark-shrouded .coord {
