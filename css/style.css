@@ -1,3 +1,10 @@
+/* King icon for color picker */
+.color-choice-piece img {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  display: inline-block;
+}
 /* Extra padding for rules panel on game page only */
 .game-container > .rules-panel {
   padding: 20px 24px 20px 24px;
