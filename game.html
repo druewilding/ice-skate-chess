@@ -231,7 +231,7 @@
       reviewIndex = index;
       engine.deserialize(positionSnapshots[index]);
       ui.interactive = false;
-      if (ui.dark) ui.darkRevealed = true;
+      if (ui.dark && !engine.gameOver) ui.darkRevealed = false;
       ui.setLastMove(null);
       ui.clearSelection(); // renders the board
       updateStatus();
@@ -494,13 +494,16 @@
       ui.setLastMove(lastMove);
       ui.render();
 
-      const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
-      const symbol = ui.pieceSymbols[lastMove.piece.color][pieceType];
-      ui.animateMove(
-        lastMove.from.rank, lastMove.from.file,
-        lastMove.to.rank,   lastMove.to.file,
-        symbol, lastMove.piece.color, () => {}
-      );
+      // In Dark Chess, skip bot move animation so we don't reveal the move
+      if (!engine.dark) {
+        const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
+        const symbol = ui.pieceSymbols[lastMove.piece.color][pieceType];
+        ui.animateMove(
+          lastMove.from.rank, lastMove.from.file,
+          lastMove.to.rank,   lastMove.to.file,
+          symbol, lastMove.piece.color, () => {}
+        );
+      }
 
       updateStatus();
       updateMoveList();
@@ -651,6 +654,7 @@
 
           // For the opponent's latest move, render first (piece appears at dest),
           // then slide a ghost from source → dest on top.
+          // In Dark Chess, skip the animation so we don't reveal opponent moves.
           if (isOpponentMove) {
             const lastMove = engine.moveHistory[newMoveCount - 1];
             ui.setLastMove(lastMove);
@@ -658,12 +662,14 @@
             updateStatus();
             updateMoveList();
             updateCaptured();
-            const symbol = ui.pieceSymbols[lastMove.piece.color][lastMove.piece.type];
-            ui.animateMove(
-              lastMove.from.rank, lastMove.from.file,
-              lastMove.to.rank,   lastMove.to.file,
-              symbol, lastMove.piece.color, () => {}
-            );
+            if (!engine.dark) {
+              const symbol = ui.pieceSymbols[lastMove.piece.color][lastMove.piece.type];
+              ui.animateMove(
+                lastMove.from.rank, lastMove.from.file,
+                lastMove.to.rank,   lastMove.to.file,
+                symbol, lastMove.piece.color, () => {}
+              );
+            }
           } else {
             if (engine.moveHistory.length > 0) {
               ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
@@ -781,6 +787,9 @@
         history = engine.moveHistory;
       }
 
+      // Dark Chess: blur opponent moves while the game is still in progress
+      const isDarkLive = engine.dark && !engine.gameOver;
+
       for (let i = 0; i < history.length; i += 2) {
         const moveNum = Math.floor(i / 2) + 1;
         const row = document.createElement('div');
@@ -794,6 +803,7 @@
         const whiteMove = document.createElement('span');
         whiteMove.className = 'move-notation';
         whiteMove.textContent = engine.getMoveNotation(history[i]);
+        if (isDarkLive && myColor === 'black') whiteMove.classList.add('move-notation--dark-hidden');
         if (currentPosition === i + 1) whiteMove.classList.add('current-move');
         const wi = i + 1;
         whiteMove.addEventListener('click', () => goToPosition(wi));
@@ -803,6 +813,7 @@
           const blackMove = document.createElement('span');
           blackMove.className = 'move-notation';
           blackMove.textContent = engine.getMoveNotation(history[i + 1]);
+          if (isDarkLive && myColor === 'white') blackMove.classList.add('move-notation--dark-hidden');
           if (currentPosition === i + 2) blackMove.classList.add('current-move');
           const bi = i + 2;
           blackMove.addEventListener('click', () => goToPosition(bi));

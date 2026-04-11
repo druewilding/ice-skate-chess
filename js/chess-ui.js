@@ -189,11 +189,14 @@ export class ChessUI {
           }
         }
 
-        // Highlight last move
+        // Highlight last move (suppress in dark mode for opponent's move squares)
         if (this.lastMove) {
-          if ((rank === this.lastMove.from.rank && file === this.lastMove.from.file) ||
-              (rank === this.lastMove.to.rank && file === this.lastMove.to.file)) {
-            square.classList.add('last-move');
+          const lastMoveIsOpponent = isDark && this.lastMove.piece.color !== this.playerColor;
+          if (!lastMoveIsOpponent) {
+            if ((rank === this.lastMove.from.rank && file === this.lastMove.from.file) ||
+                (rank === this.lastMove.to.rank && file === this.lastMove.to.file)) {
+              square.classList.add('last-move');
+            }
           }
         }
 
