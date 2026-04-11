@@ -131,9 +131,11 @@ export class ChessUI {
     let previewCheckKing = null; // { rank, file }
     let previewIsCheckmate = false;
     let previewIsStalemate = false;
+    let previewIsDraw = false;
     if (this.pendingMoveConfirm) {
       const { fromRank, fromFile, toRank, toFile, promotion, castling } = this.pendingMoveConfirm;
       const result = this.engine.previewMoveResult(fromRank, fromFile, toRank, toFile, promotion || null, castling);
+      previewIsDraw = result.draw;
       if (result.check || result.checkmate || result.stalemate) {
         const movingPiece = this.engine.getPiece(fromRank, fromFile);
         if (movingPiece) {
@@ -152,6 +154,10 @@ export class ChessUI {
         }
       }
     }
+
+    // Dim board on any draw (live game-over or pending-move preview)
+    const inStalemate = (this.engine.gameOver && this.engine.result === 'draw') || previewIsStalemate || previewIsDraw;
+    this.boardEl.classList.toggle('board-stalemated', inStalemate);
 
     for (let displayRank = 0; displayRank < 8; displayRank++) {
       for (let displayFile = 0; displayFile < 8; displayFile++) {

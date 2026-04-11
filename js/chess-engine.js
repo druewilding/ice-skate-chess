@@ -158,6 +158,30 @@ export class ChessEngine {
     return this.positionHistory[hash];
   }
 
+  // Returns true when neither side has sufficient material to deliver checkmate.
+  // Covers: K-K, K+B-K, K+N-K, and K+B-K+B with same-colour bishops.
+  hasInsufficientMaterial() {
+    const pieces = { white: [], black: [] };
+    for (let r = 0; r < 8; r++) {
+      for (let f = 0; f < 8; f++) {
+        const p = this.board[r][f];
+        if (p && p.type !== 'king') pieces[p.color].push({ type: p.type, rank: r, file: f });
+      }
+    }
+    const w = pieces.white;
+    const b = pieces.black;
+    // K vs K
+    if (w.length === 0 && b.length === 0) return true;
+    // K+minor vs K (either side)
+    if (w.length === 0 && b.length === 1 && (b[0].type === 'bishop' || b[0].type === 'knight')) return true;
+    if (b.length === 0 && w.length === 1 && (w[0].type === 'bishop' || w[0].type === 'knight')) return true;
+    // K+B vs K+B on same square colour
+    if (w.length === 1 && b.length === 1 && w[0].type === 'bishop' && b[0].type === 'bishop') {
+      if ((w[0].rank + w[0].file) % 2 === (b[0].rank + b[0].file) % 2) return true;
+    }
+    return false;
+  }
+
   getPiece(rank, file) {
     if (rank < 0 || rank > 7 || file < 0 || file > 7) return undefined;
     return this.board[rank][file];
@@ -640,10 +664,20 @@ export class ChessEngine {
     }
     this.turn = savedTurn;
 
+    // Preview draw-by-rule conditions
+    const isCapture = !!(savedBoard[toRank][toFile] || moveObj.enPassant);
+    const newHalfMoveClock = (piece.type === 'pawn' || isCapture) ? 0 : this.halfMoveClock + 1;
+    const fiftyMove = newHalfMoveClock >= 100;
+    const insufficientMat = !checkmate && !stalemate && this.hasInsufficientMaterial();
+    // Peek at repetition count without committing
+    const hash = this.getBoardHash();
+    const repetition = !fiftyMove && !insufficientMat && (this.positionHistory[hash] || 0) + 1 >= 3;
+    const draw = fiftyMove || insufficientMat || repetition;
+
     this.board = savedBoard;
     this.enPassantTarget = savedEnPassant;
 
-    return { check: inCheck, checkmate, stalemate };
+    return { check: inCheck, checkmate, stalemate, draw };
   }
 
   // Make a move. Returns move data for sync, or null if illegal.
@@ -812,6 +846,13 @@ export class ChessEngine {
       this.gameOver = true;
       this.result = 'draw';
       this.resultReason = 'repetition';
+    }
+
+    // Insufficient material
+    if (!this.gameOver && this.hasInsufficientMaterial()) {
+      this.gameOver = true;
+      this.result = 'draw';
+      this.resultReason = 'insufficient material';
     }
 
     this.moveHistory.push(moveData);

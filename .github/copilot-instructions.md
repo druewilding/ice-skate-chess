@@ -51,9 +51,10 @@ When a pawn promotes: the opponent gains a pawn in their `capturedPieces` list (
 `getLegalMoves()` applies ice skate restrictions in two stages: first generate all pseudo-legal sliding moves, filter for legality (not leaving king in check), then restrict to `getIceskateEndpointSet()` — but **only when the king is not already in check**. When in check, the full set of legal intermediate squares is kept so the player can block. `getIceskateEndpointSet()` walks each direction to find the last reachable square (including stops on enemy pieces), building a `Set` of `"rank,file"` strings. Modifying sliding move generation or check detection without accounting for this two-phase filter will break the check-blocking exception.
 
 ### Draw detection
-Two automatic draw conditions are tracked alongside the board state:
+Four automatic draw conditions are checked at the end of `makeMove()`, in this order:
 - **50-move rule** — `halfMoveClock` increments on every non-pawn, non-capture move and resets to 0 on a pawn move or capture. When it reaches 100 (50 full moves), the game ends as a draw with `resultReason: 'fifty-move rule'`.
 - **Threefold repetition** — `positionHistory` maps a compact position hash (active color + all 64 squares + castling rights + en passant file) to a count. `recordPosition()` increments the count and returns it; when it hits 3, the game ends as a draw with `resultReason: 'repetition'`. Both are serialised and restored so repetition tracking survives page reloads and Firebase sync.
+- **Insufficient material** — `hasInsufficientMaterial()` scans the board after every move and returns true for K-K, K+B-K, K+N-K, and K+B-K+B with both bishops on the same square colour. Results in `resultReason: 'insufficient material'`. K+N-K+N is intentionally excluded (a helpmate is theoretically possible). This check runs last among the automatic draws, guarded by `!this.gameOver`.
 
 ### Move notation
 `getMoveNotation()` produces standard algebraic notation with custom suffixes:
