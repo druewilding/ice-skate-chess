@@ -923,6 +923,16 @@ body {
   font-style: italic;
 }
 
+/* ===== Ice Skate Chess ===== */
+.btn-iceskate {
+  background: #0a2540 !important;
+  border: 1px solid #7dd4fc;
+}
+
+.btn-iceskate:hover {
+  background: #0f3358 !important;
+}
+
 /* ===== Angry Chess ===== */
 .btn-angry {
   background: #3e0f0f !important;
