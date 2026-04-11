@@ -923,6 +923,38 @@ body {
   font-style: italic;
 }
 
+/* ===== Dark Chess ===== */
+.btn-dark {
+  background: #2a1a3e !important;
+  border: 1px solid #5a3a8e;
+}
+
+.btn-dark:hover {
+  background: #3a2a55 !important;
+}
+
+.variant-label.variant-dark {
+  background: rgba(180, 142, 255, 0.15);
+  color: #b48eff;
+}
+
+.rules-panel-dark h3 {
+  color: #b48eff;
+}
+
+.dark-shrouded {
+  background: #0a0a12 !important;
+}
+
+.dark-shrouded .coord {
+  opacity: 0.12;
+  color: #222 !important;
+}
+
+.dark-illuminated {
+  box-shadow: inset 0 0 18px 4px rgba(255, 170, 50, 0.25);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 520px) {
   body {

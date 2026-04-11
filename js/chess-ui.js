@@ -17,6 +17,11 @@ export class ChessUI {
     this.pendingMoveConfirm = null;
     this.onPendingMoveChange = options.onPendingMoveChange || null;
 
+    // Dark Chess: hide enemy pieces unless a selected piece illuminates them
+    this.dark = options.dark || false;
+    this.playerColor = options.playerColor || 'white';
+    this.darkRevealed = false;
+
     this.pieceSymbols = {
       white: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' },
       black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' },
@@ -109,6 +114,19 @@ export class ChessUI {
   }
 
   render() {
+    // Dark Chess: pre-compute which squares are illuminated (torch mechanic)
+    const isDark = this.dark && !this.darkRevealed;
+    let illuminatedSquares = null;
+    if (isDark) {
+      illuminatedSquares = new Set();
+      if (this.selectedSquare) {
+        illuminatedSquares.add(`${this.selectedSquare.rank},${this.selectedSquare.file}`);
+      }
+      for (const m of this.legalMoves) {
+        illuminatedSquares.add(`${m.rank},${m.file}`);
+      }
+    }
+
     // Pre-compute whether the pending move results in check/checkmate/stalemate
     let previewCheckKing = null; // { rank, file }
     let previewIsCheckmate = false;
@@ -147,13 +165,28 @@ export class ChessUI {
         if (oldPiece) oldPiece.remove();
 
         // Remove state classes
-        square.classList.remove('selected', 'legal-move', 'legal-capture', 'legal-friendly', 'last-move', 'in-check', 'in-checkmate', 'in-stalemate', 'pending-from', 'pending-to', 'preview-check', 'preview-checkmate', 'preview-stalemate');
+        square.classList.remove('selected', 'legal-move', 'legal-capture', 'legal-friendly', 'last-move', 'in-check', 'in-checkmate', 'in-stalemate', 'pending-from', 'pending-to', 'preview-check', 'preview-checkmate', 'preview-stalemate', 'dark-shrouded', 'dark-illuminated');
 
-        if (piece) {
+        // Dark Chess: determine if this piece is hidden in darkness
+        const hidePiece = isDark && piece && piece.color !== this.playerColor &&
+          !(illuminatedSquares && illuminatedSquares.has(`${rank},${file}`));
+
+        if (piece && !hidePiece) {
           const pieceEl = document.createElement('span');
           pieceEl.className = `piece piece-${piece.color}`;
           pieceEl.textContent = this.pieceSymbols[piece.color][piece.type];
           square.appendChild(pieceEl);
+        }
+
+        // Dark Chess: apply darkness / illumination classes
+        if (isDark) {
+          const isOwnPiece = piece && piece.color === this.playerColor;
+          const isIlluminated = illuminatedSquares && illuminatedSquares.has(`${rank},${file}`);
+          if (!isOwnPiece && !isIlluminated) {
+            square.classList.add('dark-shrouded');
+          } else if (isIlluminated) {
+            square.classList.add('dark-illuminated');
+          }
         }
 
         // Highlight last move

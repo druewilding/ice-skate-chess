@@ -21,6 +21,8 @@
           <button id="btn-new-960" class="btn btn-primary">Ice Skate Chess960</button>
           <button id="btn-new-angry" class="btn btn-primary btn-angry">Angry Chess</button>
           <button id="btn-new-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
+          <button id="btn-new-dark" class="btn btn-primary btn-dark">Dark Chess</button>
+          <button id="btn-new-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
         </div>
         <div id="color-picker" hidden>
           <p class="color-picker-label">Play as…</p>
@@ -57,6 +59,8 @@
           <button id="btn-bot-960" class="btn btn-secondary">Ice Skate Chess960</button>
           <button id="btn-bot-angry" class="btn btn-secondary btn-angry">Angry Chess</button>
           <button id="btn-bot-angry-960" class="btn btn-secondary btn-angry">Angry Chess960</button>
+          <button id="btn-bot-dark" class="btn btn-secondary btn-dark">Dark Chess</button>
+          <button id="btn-bot-dark-960" class="btn btn-secondary btn-dark">Dark Chess960</button>
         </div>
         <div id="bot-color-picker" hidden>
           <p class="color-picker-label">Play as…</p>
@@ -90,6 +94,11 @@
     <div class="rules-panel rules-panel-angry">
       <h3>How to Play Angry Chess</h3>
       <p>Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid target, except your own king. Be careful: sacrificing your own material can open lines, but it can also backfire spectacularly.</p>
+    </div>
+
+    <div class="rules-panel rules-panel-dark">
+      <h3>How to Play Dark Chess</h3>
+      <p>Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces, but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.</p>
     </div>
 
     <!-- Waiting screen shown after creating a game -->
@@ -135,6 +144,8 @@
     document.getElementById('btn-new-960').addEventListener('click', () => showColorPicker('iceskate-960'));
     document.getElementById('btn-new-angry').addEventListener('click', () => showColorPicker('angry'));
     document.getElementById('btn-new-angry-960').addEventListener('click', () => showColorPicker('angry-960'));
+    document.getElementById('btn-new-dark').addEventListener('click', () => showColorPicker('dark'));
+    document.getElementById('btn-new-dark-960').addEventListener('click', () => showColorPicker('dark-960'));
 
     document.getElementById('btn-back-to-variants').addEventListener('click', () => {
       document.getElementById('color-picker').hidden = true;
@@ -151,9 +162,11 @@
         const gameId = await gm.createGame(pendingVariant, color);
 
         const isAngry = pendingVariant === 'angry' || pendingVariant === 'angry-960';
-        engine.iceskate = !isAngry;
+        const isDark = pendingVariant === 'dark' || pendingVariant === 'dark-960';
+        engine.iceskate = !isAngry && !isDark;
         engine.angry = isAngry;
-        if (pendingVariant === 'iceskate-960' || pendingVariant === 'angry-960') {
+        engine.dark = isDark;
+        if (pendingVariant.endsWith('-960')) {
           engine.setup960();
         } else {
           engine.reset();
@@ -207,6 +220,8 @@
     document.getElementById('btn-bot-960').addEventListener('click', () => showBotColorPicker('iceskate-960'));
     document.getElementById('btn-bot-angry').addEventListener('click', () => showBotColorPicker('angry'));
     document.getElementById('btn-bot-angry-960').addEventListener('click', () => showBotColorPicker('angry-960'));
+    document.getElementById('btn-bot-dark').addEventListener('click', () => showBotColorPicker('dark'));
+    document.getElementById('btn-bot-dark-960').addEventListener('click', () => showBotColorPicker('dark-960'));
 
     document.getElementById('btn-bot-back').addEventListener('click', () => {
       document.getElementById('bot-color-picker').hidden = true;

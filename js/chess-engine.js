@@ -18,6 +18,10 @@ export class ChessEngine {
     // Angry Chess: pieces can capture their own pieces (except the king).
     this.angry = options.angry || false;
 
+    // Dark Chess: board is shrouded in darkness; enemy pieces hidden until
+    // a friendly piece "shines a torch" (is selected) to reveal its targets.
+    this.dark = options.dark || false;
+
     this.reset();
   }
 
@@ -831,6 +835,7 @@ export class ChessEngine {
       maxDistance: this.maxDistance,
       iceskate: this.iceskate,
       angry: this.angry,
+      dark: this.dark,
       positionHistory: this.positionHistory,
       startingBoard: this.startingBoard,
       initialKingFile: this.initialKingFile ?? null,
@@ -875,6 +880,7 @@ export class ChessEngine {
     }
     this.iceskate = state.iceskate || false;
     this.angry = state.angry || false;
+    this.dark = state.dark || false;
     this.positionHistory = state.positionHistory
       ? (typeof state.positionHistory === 'object' ? { ...state.positionHistory } : {})
       : {};

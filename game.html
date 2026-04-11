@@ -74,6 +74,11 @@
       <p>Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid target, except your own king. Be careful: sacrificing your own material can open lines, but it can also backfire spectacularly.</p>
     </div>
 
+    <div class="rules-panel rules-panel-dark" id="rules-dark" hidden>
+      <h3>Dark Chess Rules</h3>
+      <p>Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces, but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.</p>
+    </div>
+
     <!-- Draw offer banner -->
     <div id="draw-offer-banner" class="draw-offer-banner" hidden>
       <span>Your opponent offers a draw.</span>
@@ -226,6 +231,7 @@
       reviewIndex = index;
       engine.deserialize(positionSnapshots[index]);
       ui.interactive = false;
+      if (ui.dark) ui.darkRevealed = true;
       ui.setLastMove(null);
       ui.clearSelection(); // renders the board
       updateStatus();
@@ -268,6 +274,7 @@
       engine.deserialize(positionSnapshots[positionSnapshots.length - 1]);
       isMyTurn = engine.turn === myColor && !engine.gameOver;
       ui.interactive = isMyTurn;
+      if (ui.dark) ui.darkRevealed = engine.gameOver;
       const hist = engine.moveHistory;
       ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
       ui.clearSelection();
@@ -288,25 +295,32 @@
     }
 
     function updateVariantDisplay() {
+      const isDark = engine.dark;
       const isAngry = engine.angry;
-      const is960 = gameVariant === 'iceskate-960' || gameVariant === 'angry-960';
+      const is960 = gameVariant === 'iceskate-960' || gameVariant === 'angry-960' || gameVariant === 'dark-960';
       let label;
-      if (isAngry) {
+      if (isDark) {
+        label = is960 ? 'Dark Chess960' : 'Dark Chess';
+      } else if (isAngry) {
         label = is960 ? 'Angry Chess960' : 'Angry Chess';
       } else {
         label = is960 ? 'Ice Skate Chess960' : 'Ice Skate Chess';
       }
       const labelEl = document.getElementById('variant-label');
       labelEl.textContent = label;
-      if (isAngry) {
+      if (isDark) {
+        labelEl.classList.add('variant-dark');
+        labelEl.classList.remove('variant-iceskate', 'variant-angry');
+      } else if (isAngry) {
         labelEl.classList.add('variant-angry');
-        labelEl.classList.remove('variant-iceskate');
+        labelEl.classList.remove('variant-iceskate', 'variant-dark');
       } else {
         labelEl.classList.add('variant-iceskate');
-        labelEl.classList.remove('variant-angry');
+        labelEl.classList.remove('variant-angry', 'variant-dark');
       }
-      document.getElementById('rules-iceskate').hidden = isAngry;
+      document.getElementById('rules-iceskate').hidden = isAngry || isDark;
       document.getElementById('rules-angry').hidden = !isAngry;
+      document.getElementById('rules-dark').hidden = !isDark;
       document.title = label;
     }
 
@@ -320,9 +334,11 @@
 
       // Set up rules based on variant
       const isAngry = variant === 'angry' || variant === 'angry-960';
-      const is960 = variant === 'iceskate-960' || variant === 'angry-960';
-      engine.iceskate = !isAngry;
+      const isDark = variant === 'dark' || variant === 'dark-960';
+      const is960 = variant.endsWith('-960');
+      engine.iceskate = !isAngry && !isDark;
       engine.angry = isAngry;
+      engine.dark = isDark;
       if (is960) {
         engine.setup960();
       } else {
@@ -337,6 +353,8 @@
         interactive: myColor === 'white',
         onMove: handleLocalMove,
         confirmMove: true,
+        dark: isDark,
+        playerColor: myColor,
         onPendingMoveChange: (pending) => {
           document.getElementById('confirm-move-bar').hidden = !pending;
           updateMoveList();
@@ -544,6 +562,7 @@
         interactive: false,
         onMove: handleLocalMove,
         confirmMove: true,
+        playerColor: myColor,
         onPendingMoveChange: (pending) => {
           document.getElementById('confirm-move-bar').hidden = !pending;
           updateMoveList();
@@ -600,6 +619,7 @@
           if (!initialStateLoaded) {
             if (fullData.variant) gameVariant = fullData.variant;
             updateVariantDisplay();
+            if (ui) ui.dark = engine.dark;
           }
 
           if (reviewIndex !== null) {
@@ -868,6 +888,7 @@
     }
 
     function showGameOver() {
+      if (ui && ui.dark) { ui.darkRevealed = true; ui.render(); }
       const overlay = document.getElementById('game-over-overlay');
       const title = document.getElementById('game-over-title');
       const reason = document.getElementById('game-over-reason');

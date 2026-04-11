@@ -1,12 +1,13 @@
 # Chess Variants PWA
 
-A vanilla JS progressive web app implementing four chess variants with real-time multiplayer (Firebase) and local bot play.
+A vanilla JS progressive web app implementing chess variants with real-time multiplayer (Firebase) and local bot play.
 
 ## Variants
 
 - **Ice Skate Chess** — Sliding pieces (bishop, rook, queen) must travel maximum distance; cannot stop early. Exception: when in check, a piece may stop at an intermediate square that blocks the check.
 - **Angry Chess** — Players can capture their own pieces (except king). Friendly captures are marked with `*` in notation and blue highlights in the UI.
-- **Chess960 (Fischer Random)** — Randomised back-rank setup. Both variants above have a 960 mode.
+- **Dark Chess** — Standard chess rules, but the board is shrouded in darkness. Own pieces are always visible; enemy pieces are hidden. Selecting (tapping) a friendly piece "shines a torch", illuminating its legal move squares and revealing any enemy pieces there. The `dark` flag on the engine is purely informational (no rule changes); all hiding is handled by `ChessUI` via the `dark`, `playerColor`, and `darkRevealed` properties.
+- **Chess960 (Fischer Random)** — Randomised back-rank setup. All three variants above have a 960 mode.
 
 ## Architecture
 

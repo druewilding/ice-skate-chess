@@ -1,6 +1,6 @@
 # Chess Variants
 
-A vanilla JS progressive web app implementing four chess variants with real-time multiplayer and local bot play.
+A vanilla JS progressive web app implementing chess variants with real-time multiplayer and local bot play.
 
 **Play now at [druewilding.com/chess](https://www.druewilding.com/chess/)**
 
@@ -8,8 +8,8 @@ A vanilla JS progressive web app implementing four chess variants with real-time
 
 - **Ice Skate Chess** — Sliding pieces (bishop, rook, queen) must travel the maximum possible distance; they cannot stop early.
 - **Angry Chess** — Players may capture their own pieces (except the king).
-- **Ice Skate Chess 960** — Ice Skate rules on a Fischer Random (Chess960) starting position.
-- **Angry Chess 960** — Angry Chess rules on a Fischer Random starting position.
+- **Dark Chess** — Standard chess, but the board is shrouded in darkness. Tap a piece to shine a torch and reveal enemies in its path.
+- All three variants have a **Chess960** (Fischer Random) mode.
 
 ## Features
 
