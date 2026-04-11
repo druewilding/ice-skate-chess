@@ -45,3 +45,29 @@ cp .env.example .env
 ```
 
 No build step required. Multiplayer and push notifications require a Firebase project configured via `.env`.
+
+## Deploying the Push Notification Function
+
+The Cloud Function in [functions/index.js](functions/index.js) sends push notifications when it's a player's turn. To deploy it:
+
+1. **Install Firebase CLI** (if not already installed):
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. **Authenticate with Firebase**:
+   ```bash
+   firebase login
+   ```
+
+3. **Deploy the function**:
+   ```bash
+   firebase deploy --only functions
+   ```
+
+**Requirements:**
+- Your Firebase project must have **Blaze (pay-as-you-go) billing enabled** — the Cloud Function cannot send FCM messages on the free Spark plan
+- The function is deployed to `europe-west1` to match the Realtime Database region
+- It triggers on writes to `games/{gameId}/lastMoveAt` and sends a data-only FCM message to the player whose turn it is
+
+For more details, see the [functions/index.js](functions/index.js) implementation.
