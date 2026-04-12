@@ -32,6 +32,7 @@ export class ChessUI {
         bishop:'assets/pieces/white/bishop.webp',
         knight:'assets/pieces/white/knight.webp',
         pawn:  'assets/pieces/white/pawn.webp',
+        amazon: 'assets/pieces/white/amazon.webp',
       },
       black: {
         king:  'assets/pieces/black/king.webp',
@@ -40,6 +41,7 @@ export class ChessUI {
         bishop:'assets/pieces/black/bishop.webp',
         knight:'assets/pieces/black/knight.webp',
         pawn:  'assets/pieces/black/pawn.webp',
+        amazon: 'assets/pieces/black/amazon.webp',
       }
     };
 
@@ -537,7 +539,9 @@ export class ChessUI {
     const dialog = document.createElement('div');
     dialog.className = `promotion-dialog${color === 'black' ? ' promotion-dialog--black' : ''}`;
 
-    const pieces = ['queen', 'rook', 'bishop', 'knight'];
+    let pieces = ['queen', 'rook', 'bishop', 'knight'];
+    // If Superchess, add Amazon as a promotion option
+    if (this.engine.superchess) pieces.unshift('amazon');
     for (const pieceType of pieces) {
       const btn = document.createElement('button');
       btn.className = 'promotion-choice';
@@ -585,8 +589,8 @@ export class ChessUI {
   }
 
   updateCapturedPieces(capturedDisplayWhite, capturedDisplayBlack) {
-    const typeOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
-    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9 };
+    const typeOrder = ['pawn', 'knight', 'bishop', 'rook', 'queen', 'amazon'];
+    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, amazon: 13 };
 
     // Check for a pending capture from the confirm-move preview
     let pendingCapture = null; // { capturedBy: 'white'|'black', type: string }

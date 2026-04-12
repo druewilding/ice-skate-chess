@@ -58,7 +58,7 @@
     </div>
 
     <!-- Variant rules: spans both columns -->
-    <div class="rules-panel" id="rules-iceskate">
+    <div class="rules-panel" id="rules-iceskate" hidden>
       <h3>Ice Skate Rules</h3>
       <p>Like regular chess, except sliding pieces (bishops, rooks, and queens) <strong>cannot stop early</strong> — they must travel as far as possible in their chosen direction, stopping only when they hit the edge of the board or a friendly piece, or capture an enemy piece. They <em>may</em> stop at an intermediate square to block check, as this is the furthest they can go in this situation.</p>
       <p>This variant was made up by my sibling Luna.</p>
@@ -70,6 +70,10 @@
     <div class="rules-panel rules-panel-dark" id="rules-dark" hidden>
       <h3>Dark Chess Rules</h3>
       <p>Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces, but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.</p>
+    </div>
+    <div class="rules-panel rules-panel-superchess" id="rules-superchess" hidden>
+      <h3>Superchess Rules</h3>
+      <p>The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a powerful piece combining the abilities of both a queen and a knight, making it a formidable addition to your arsenal.</p>
     </div>
 
     <!-- Draw offer banner -->
@@ -133,7 +137,7 @@
     // ---- Position history & move review ----
     let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
     let reviewIndex = null;      // null = live; number = reviewing that snapshot
-    let gameVariant = null;      // 'iceskate', 'iceskate-960', 'angry', 'angry-960'
+    let gameVariant = null;      // 'iceskate', 'iceskate-960', 'angry', 'angry-960', 'dark', 'dark-960', 'superchess', 'superchess-960'
 
     // Bot mode: hash looks like #bot:iceskate:white or #bot:iceskate-960:black
     const isBotMode = gameId.startsWith('bot:');
@@ -302,32 +306,40 @@
     }
 
     function updateVariantDisplay() {
+      const isIceskate = engine.iceskate;
       const isDark = engine.dark;
       const isAngry = engine.angry;
-      const is960 = gameVariant === 'iceskate-960' || gameVariant === 'angry-960' || gameVariant === 'dark-960';
+      const isSuperchess = engine.superchess;
+      const is960 = gameVariant.endsWith('-960');
       let label;
       if (isDark) {
         label = is960 ? 'Dark Chess960' : 'Dark Chess';
       } else if (isAngry) {
         label = is960 ? 'Angry Chess960' : 'Angry Chess';
+      } else if (isSuperchess) {
+        label = is960 ? 'Superchess960' : 'Superchess';
       } else {
         label = is960 ? 'Ice Skate Chess960' : 'Ice Skate Chess';
       }
       const labelEl = document.getElementById('variant-label');
       labelEl.textContent = label;
-      if (isDark) {
+      if (isIceskate) {
+        labelEl.classList.add('variant-iceskate');
+        labelEl.classList.remove('variant-dark', 'variant-angry', 'variant-superchess');
+      } else if (isDark) {
         labelEl.classList.add('variant-dark');
-        labelEl.classList.remove('variant-iceskate', 'variant-angry');
+        labelEl.classList.remove('variant-iceskate', 'variant-angry', 'variant-superchess');
       } else if (isAngry) {
         labelEl.classList.add('variant-angry');
-        labelEl.classList.remove('variant-iceskate', 'variant-dark');
-      } else {
-        labelEl.classList.add('variant-iceskate');
-        labelEl.classList.remove('variant-angry', 'variant-dark');
+        labelEl.classList.remove('variant-iceskate', 'variant-dark', 'variant-superchess');
+      } else if (isSuperchess) {
+        labelEl.classList.add('variant-superchess');
+        labelEl.classList.remove('variant-iceskate', 'variant-dark', 'variant-angry');
       }
-      document.getElementById('rules-iceskate').hidden = isAngry || isDark;
+      document.getElementById('rules-iceskate').hidden = !isIceskate;
       document.getElementById('rules-angry').hidden = !isAngry;
       document.getElementById('rules-dark').hidden = !isDark;
+      document.getElementById('rules-superchess').hidden = !isSuperchess;
       document.title = label;
     }
 
@@ -340,12 +352,15 @@
       }
 
       // Set up rules based on variant
+      const isIceskate = variant === 'iceskate' || variant === 'iceskate-960';
       const isAngry = variant === 'angry' || variant === 'angry-960';
       const isDark = variant === 'dark' || variant === 'dark-960';
+      const isSuperchess = variant === 'superchess' || variant === 'superchess-960';
       const is960 = variant.endsWith('-960');
-      engine.iceskate = !isAngry && !isDark;
+      engine.iceskate = isIceskate;
       engine.angry = isAngry;
       engine.dark = isDark;
+      engine.superchess = isSuperchess;
       if (is960) {
         engine.setup960();
       } else {
@@ -398,13 +413,14 @@
       const BOT_RANDOM_RATE = 0.3;
 
       // Piece values for capture scoring
-      const PIECE_VALUES = { queen: 9, rook: 5, bishop: 3, knight: 3, pawn: 1 };
+      const PIECE_VALUES = { queen: 9, rook: 5, bishop: 3, knight: 3, pawn: 1, amazon: 13 };
 
       // Collect every legal move for the bot's pieces, scored by desirability:
       //   capture by piece rank: queen=9, rook=5, bishop/knight=3, pawn=1
       //   en passant: 2  |  castling: 4  |  check: 10  |  checkmate: 20
       //   opening bonuses: center landing +2/+1, development +2, pawn 2-sq +1
       //   king non-castling penalty: -3
+      //   Superchess: strongly favour pawn advances and promotions
       //   scores stack (e.g. capture queen + check = 19)
       const backRank = botColor === 'white' ? 7 : 0;
       const scoredMoves = [];
@@ -414,8 +430,11 @@
           if (!piece || piece.color !== botColor) continue;
           const moves = engine.getLegalMoves(rank, file);
           for (const move of moves) {
-            // Skip non-queen promotions — the queen variant already scores for this square
-            if (move.promotion && move.promotion !== 'queen') continue;
+            // In Superchess, allow Amazon promotion; otherwise, only queen
+            if (move.promotion && (
+              (gameVariant.startsWith('superchess') && move.promotion !== 'amazon' && move.promotion !== 'queen') ||
+              (!gameVariant.startsWith('superchess') && move.promotion !== 'queen')
+            )) continue;
 
             let score = 0;
 
@@ -454,6 +473,36 @@
             // Prefer pawn two-square advance over one square
             if (piece.type === 'pawn' && Math.abs(move.rank - rank) === 2) score += 1;
 
+            // --- Superchess: strongly favour pawn advances and promotions ---
+            if (gameVariant.startsWith('superchess') && piece.type === 'pawn') {
+              // Bonus for advancing pawns closer to promotion
+              // For white: ranks 6,5,4,3 (from 6 to 0 is promotion)
+              // For black: ranks 1,2,3,4 (from 1 to 7 is promotion)
+              let advanceBonus = 0;
+              if (botColor === 'white') {
+                if (rank > move.rank) { // moving forward
+                  if (move.rank === 0) advanceBonus += 12; // promotion square
+                  else if (move.rank === 1) advanceBonus += 6;
+                  else if (move.rank === 2) advanceBonus += 4;
+                  else if (move.rank === 3) advanceBonus += 2;
+                  else if (move.rank === 4) advanceBonus += 1;
+                }
+              } else {
+                if (rank < move.rank) { // moving forward
+                  if (move.rank === 7) advanceBonus += 12; // promotion square
+                  else if (move.rank === 6) advanceBonus += 6;
+                  else if (move.rank === 5) advanceBonus += 4;
+                  else if (move.rank === 4) advanceBonus += 2;
+                  else if (move.rank === 3) advanceBonus += 1;
+                }
+              }
+              score += advanceBonus;
+              // Extra bonus for actual promotion
+              if (move.promotion === 'amazon') score += 20;
+              else if (move.promotion === 'queen') score += 14;
+              else if (move.promotion) score += 10;
+            }
+
             // Reward developing knights and bishops off the back rank
             if (piece.type === 'knight' && rank === backRank) score += 1;
             if (piece.type === 'bishop' && rank === backRank) score += 2;
@@ -461,7 +510,7 @@
             // Discourage pointless king walks (castling already rewarded above)
             if (piece.type === 'king' && !move.castling) score -= 3;
 
-            scoredMoves.push({ fromRank: rank, fromFile: file, toRank: move.rank, toFile: move.file, score, castling: move.castling || null });
+            scoredMoves.push({ fromRank: rank, fromFile: file, toRank: move.rank, toFile: move.file, score, castling: move.castling || null, promotion: move.promotion || null });
           }
         }
       }
@@ -482,12 +531,12 @@
         chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
       }
 
-      // Detect pawn promotion; always promote to queen
+      // Detect pawn promotion; use the move's promotion property (already filtered above)
       const movingPiece = engine.getPiece(chosen.fromRank, chosen.fromFile);
       let promotion = null;
       if (movingPiece && movingPiece.type === 'pawn') {
         if ((botColor === 'white' && chosen.toRank === 0) || (botColor === 'black' && chosen.toRank === 7)) {
-          promotion = 'queen';
+          promotion = chosen.promotion || null;
         }
       }
 

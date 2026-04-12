@@ -1179,6 +1179,27 @@ body {
   pointer-events: none;
 }
 
+
+
+/* ===== Superchess ===== */
+.btn-superchess {
+  background: #163f29 !important;
+  border: 1px solid #2aa75f;
+}
+
+.btn-superchess:hover {
+  background: #299c5c !important;
+}
+
+.variant-label.variant-superchess {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2aa75f;
+}
+
+.rules-panel-superchess h3 {
+  color: #2aa75f;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
   .lobby-layout {

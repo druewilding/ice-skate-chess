@@ -25,6 +25,8 @@
           <button id="btn-new-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
           <button id="btn-new-dark" class="btn btn-primary btn-dark">Dark Chess</button>
           <button id="btn-new-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
+          <button id="btn-new-superchess" class="btn btn-primary btn-superchess">Superchess</button>
+          <button id="btn-new-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
         </div>
         <div id="color-picker" hidden>
           <p id="color-picker-title" class="color-picker-title"></p>
@@ -64,6 +66,8 @@
           <button id="btn-bot-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
           <button id="btn-bot-dark" class="btn btn-primary btn-dark">Dark Chess</button>
           <button id="btn-bot-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
+          <button id="btn-bot-superchess" class="btn btn-primary btn-superchess">Superchess</button>
+          <button id="btn-bot-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
         </div>
         <div id="bot-color-picker" hidden>
           <p id="bot-color-picker-title" class="color-picker-title"></p>
@@ -121,6 +125,16 @@
         </details>
       </section>
 
+      <section class="rules-panel rules-panel-superchess">
+         <details>
+          <summary><h3>How to Play Superchess</h3></summary>
+          <div>
+            <p>The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a powerful piece combining the abilities of both a queen and a knight, making it a formidable addition to your arsenal.</p>
+            <img src="assets/images/superchess.png" alt="Superchess screenshot" class="variant-screenshot">
+          </div>
+        </details>
+      </section>
+
       <section class="rules-panel rules-panel-960">
         <details>
           <summary><h3>How to Play Chess960</h3></summary>
@@ -166,12 +180,14 @@
     }
 
     const VARIANT_NAMES = {
-      'iceskate':     'Ice Skate Chess',
-      'iceskate-960': 'Ice Skate Chess960',
-      'angry':        'Angry Chess',
-      'angry-960':    'Angry Chess960',
-      'dark':         'Dark Chess',
-      'dark-960':     'Dark Chess960',
+      'iceskate':       'Ice Skate Chess',
+      'iceskate-960':   'Ice Skate Chess960',
+      'angry':          'Angry Chess',
+      'angry-960':      'Angry Chess960',
+      'dark':           'Dark Chess',
+      'dark-960':       'Dark Chess960',
+      'superchess':     'Superchess',
+      'superchess-960': 'Superchess960',
     };
 
     let pendingVariant = null;
@@ -190,6 +206,8 @@
     document.getElementById('btn-new-angry-960').addEventListener('click', () => showColorPicker('angry-960'));
     document.getElementById('btn-new-dark').addEventListener('click', () => showColorPicker('dark'));
     document.getElementById('btn-new-dark-960').addEventListener('click', () => showColorPicker('dark-960'));
+    document.getElementById('btn-new-superchess').addEventListener('click', () => showColorPicker('superchess'));
+    document.getElementById('btn-new-superchess-960').addEventListener('click', () => showColorPicker('superchess-960'));
 
     document.getElementById('btn-back-to-variants').addEventListener('click', () => {
       document.getElementById('color-picker').hidden = true;
@@ -205,11 +223,14 @@
         await ensureInit();
         const gameId = await gm.createGame(pendingVariant, color);
 
+        const isIceskate = pendingVariant === 'iceskate' || pendingVariant === 'iceskate-960';
         const isAngry = pendingVariant === 'angry' || pendingVariant === 'angry-960';
         const isDark = pendingVariant === 'dark' || pendingVariant === 'dark-960';
-        engine.iceskate = !isAngry && !isDark;
+        const isSuperchess = pendingVariant === 'superchess' || pendingVariant === 'superchess-960';
+        engine.iceskate = isIceskate;
         engine.angry = isAngry;
         engine.dark = isDark;
+        engine.superchess = isSuperchess;
         if (pendingVariant.endsWith('-960')) {
           engine.setup960();
         } else {
@@ -268,6 +289,8 @@
     document.getElementById('btn-bot-angry-960').addEventListener('click', () => showBotColorPicker('angry-960'));
     document.getElementById('btn-bot-dark').addEventListener('click', () => showBotColorPicker('dark'));
     document.getElementById('btn-bot-dark-960').addEventListener('click', () => showBotColorPicker('dark-960'));
+    document.getElementById('btn-bot-superchess').addEventListener('click', () => showBotColorPicker('superchess'));
+    document.getElementById('btn-bot-superchess-960').addEventListener('click', () => showBotColorPicker('superchess-960'));
 
     document.getElementById('btn-bot-back').addEventListener('click', () => {
       document.getElementById('bot-color-picker').hidden = true;
