@@ -420,6 +420,7 @@
       //   en passant: 2  |  castling: 4  |  check: 10  |  checkmate: 20
       //   opening bonuses: center landing +2/+1, development +2, pawn 2-sq +1
       //   king non-castling penalty: -3
+      //   Superchess: strongly favour pawn advances and promotions
       //   scores stack (e.g. capture queen + check = 19)
       const backRank = botColor === 'white' ? 7 : 0;
       const scoredMoves = [];
@@ -471,6 +472,36 @@
 
             // Prefer pawn two-square advance over one square
             if (piece.type === 'pawn' && Math.abs(move.rank - rank) === 2) score += 1;
+
+            // --- Superchess: strongly favour pawn advances and promotions ---
+            if (gameVariant.startsWith('superchess') && piece.type === 'pawn') {
+              // Bonus for advancing pawns closer to promotion
+              // For white: ranks 6,5,4,3 (from 6 to 0 is promotion)
+              // For black: ranks 1,2,3,4 (from 1 to 7 is promotion)
+              let advanceBonus = 0;
+              if (botColor === 'white') {
+                if (rank > move.rank) { // moving forward
+                  if (move.rank === 0) advanceBonus += 12; // promotion square
+                  else if (move.rank === 1) advanceBonus += 6;
+                  else if (move.rank === 2) advanceBonus += 4;
+                  else if (move.rank === 3) advanceBonus += 2;
+                  else if (move.rank === 4) advanceBonus += 1;
+                }
+              } else {
+                if (rank < move.rank) { // moving forward
+                  if (move.rank === 7) advanceBonus += 12; // promotion square
+                  else if (move.rank === 6) advanceBonus += 6;
+                  else if (move.rank === 5) advanceBonus += 4;
+                  else if (move.rank === 4) advanceBonus += 2;
+                  else if (move.rank === 3) advanceBonus += 1;
+                }
+              }
+              score += advanceBonus;
+              // Extra bonus for actual promotion
+              if (move.promotion === 'amazon') score += 20;
+              else if (move.promotion === 'queen') score += 14;
+              else if (move.promotion) score += 10;
+            }
 
             // Reward developing knights and bishops off the back rank
             if (piece.type === 'knight' && rank === backRank) score += 1;
