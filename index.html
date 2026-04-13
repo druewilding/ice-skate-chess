@@ -94,7 +94,7 @@
     </div><!-- /.lobby-left -->
 
     <div class="lobby-right">
-      <section class="rules-panel">
+      <section class="rules-panel rules-panel-iceskate">
         <details open>
           <summary><h3>How to Play Ice Skate Chess</h3></summary>
           <div>
@@ -190,6 +190,26 @@
       'superchess-960': 'Superchess960',
     };
 
+    const VARIANT_PANEL_MAP = {
+      'iceskate':       ['.rules-panel-iceskate'],
+      'iceskate-960':   ['.rules-panel-iceskate', '.rules-panel-960'],
+      'angry':          ['.rules-panel-angry'],
+      'angry-960':      ['.rules-panel-angry', '.rules-panel-960'],
+      'dark':           ['.rules-panel-dark'],
+      'dark-960':       ['.rules-panel-dark', '.rules-panel-960'],
+      'superchess':     ['.rules-panel-superchess'],
+      'superchess-960': ['.rules-panel-superchess', '.rules-panel-960'],
+    };
+
+    function openRulesForVariant(variant) {
+      document.querySelectorAll('.rules-panel details').forEach(d => d.removeAttribute('open'));
+      const selectors = VARIANT_PANEL_MAP[variant] || [];
+      selectors.forEach(sel => {
+        const details = document.querySelector(sel + ' details');
+        if (details) details.setAttribute('open', '');
+      });
+    }
+
     let pendingVariant = null;
 
     function showColorPicker(variant) {
@@ -198,6 +218,7 @@
         `Play ${VARIANT_NAMES[variant]} against an opponent`;
       document.getElementById('variant-picker').hidden = true;
       document.getElementById('color-picker').hidden = false;
+      openRulesForVariant(variant);
     }
 
     document.getElementById('btn-new-standard').addEventListener('click', () => showColorPicker('iceskate'));
@@ -281,6 +302,7 @@
         `Play ${VARIANT_NAMES[variant]} against a bot`;
       document.getElementById('bot-variant-picker').hidden = true;
       document.getElementById('bot-color-picker').hidden = false;
+      openRulesForVariant(variant);
     }
 
     document.getElementById('btn-bot-standard').addEventListener('click', () => showBotColorPicker('iceskate'));
