@@ -1,8 +1,56 @@
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
+import { ChessEngine } from "../js/chess-engine.js";
 import { chessFromPosition } from "./harness.js";
 
 describe("Superchess", () => {
+  // ── Constructor option ─────────────────────────────────────────────
+
+  it("new ChessEngine({ superchess: true }) enables superchess mode", () => {
+    const engine = new ChessEngine({ superchess: true });
+    expect(engine.superchess).toBe(true);
+  });
+
+  it("amazon promotion is available when constructed with superchess: true", () => {
+    const engine = new ChessEngine({ superchess: true });
+    // Place a white pawn on e7, black king on d8, white king on e1
+    engine.board = Array.from({ length: 8 }, () => Array(8).fill(null));
+    engine.board[0][3] = { type: "king", color: "black" }; // d8
+    engine.board[1][4] = { type: "pawn", color: "white" }; // e7
+    engine.board[7][4] = { type: "king", color: "white" }; // e1
+    engine.turn = "white";
+    const moves = engine.getLegalMoves(1, 4); // pawn on e7
+    const promotions = moves.map((m) => m.promotion).filter(Boolean);
+    expect(promotions).toContain("amazon");
+  });
+
+  it("superchess flag survives serialize() / deserialize() roundtrip", () => {
+    const engine = new ChessEngine({ superchess: true });
+    const state = engine.serialize();
+    expect(state.superchess).toBe(true);
+
+    const engine2 = new ChessEngine();
+    engine2.deserialize(state);
+    expect(engine2.superchess).toBe(true);
+  });
+
+  it("pawn has amazon promotion after deserialize() into fresh engine", () => {
+    const engine = new ChessEngine({ superchess: true });
+    engine.board = Array.from({ length: 8 }, () => Array(8).fill(null));
+    engine.board[0][3] = { type: "king", color: "black" }; // d8
+    engine.board[1][4] = { type: "pawn", color: "white" }; // e7
+    engine.board[7][4] = { type: "king", color: "white" }; // e1
+    engine.turn = "white";
+
+    // Round-trip through serialize/deserialize (as happens after a page reload)
+    const engine2 = new ChessEngine({ superchess: true });
+    engine2.deserialize(engine.serialize());
+
+    const moves = engine2.getLegalMoves(1, 4);
+    const promotions = moves.map((m) => m.promotion).filter(Boolean);
+    expect(promotions).toContain("amazon");
+  });
+
   // ── Amazon promotion ───────────────────────────────────────────────
 
   it("pawn can promote to amazon", () => {

@@ -249,6 +249,7 @@ class ChessTestGame {
         iceskate: this.engine.iceskate,
         angry: this.engine.angry,
         dark: this.engine.dark,
+        superchess: this.engine.superchess,
       });
       tmp.deserialize(JSON.parse(JSON.stringify(snap)));
       return tmp;
