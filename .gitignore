@@ -10,3 +10,6 @@ firebase-debug.log
 
 # Ignore node_modules for the main project as well
 node_modules/
+
+# Ignore test-results
+test-results/

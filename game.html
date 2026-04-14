@@ -146,6 +146,11 @@
       }
 
       const engine = new ChessEngine();
+      // Only expose engine globally in local dev/test environments (e.g. Playwright).
+      // Never export it in production to prevent tampering via DevTools or injected scripts.
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        window.engine = engine;
+      }
       const gm = new GameManager();
 
       let ui;
