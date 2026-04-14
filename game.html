@@ -1,1114 +1,1209 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chess Variants</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4a9eff">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-  <div class="game-container">
-    <div class="game-header">
-      <a href="index.html" class="btn btn-small btn-back">← Back</a>
-      <span id="variant-label" class="variant-label"></span>
-      <div id="game-status" class="game-status">Connecting...</div>
-    </div>
-
-    <div class="game-main">
-      <div class="game-main-left">
-        <div class="player-bar player-top">
-          <span class="player-label" id="opponent-label">Opponent</span>
-          <div class="captured-pieces" id="captured-top"></div>
-        </div>
-        <div class="board-wrapper">
-          <div id="chess-board"></div>
-        </div>
-        <div class="player-bar player-bottom">
-          <span class="player-label" id="player-label">You</span>
-          <div class="captured-pieces" id="captured-bottom"></div>
-        </div>
-        <div class="game-controls">
-          <button id="btn-resign" class="btn btn-danger btn-small">Resign</button>
-          <button id="btn-draw" class="btn btn-secondary btn-small">Offer Draw</button>
-          <button id="btn-flip" class="btn btn-secondary btn-small">Flip Board</button>
-        </div>
-        <div id="confirm-move-bar" class="confirm-move-bar" hidden>
-          <button id="btn-cancel-move" class="btn btn-cancel-move" title="Cancel move">✕</button>
-          <button id="btn-confirm-move" class="btn btn-confirm" title="Confirm move">✓</button>
-        </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Variants</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#4a9eff" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="game-header">
+        <a href="index.html" class="btn btn-small btn-back">← Back</a>
+        <span id="variant-label" class="variant-label"></span>
+        <div id="game-status" class="game-status">Connecting...</div>
       </div>
-      <div class="game-main-right">
-        <div class="move-history-panel">
-          <div class="move-history-header">
-            <h3>Moves</h3>
-            <div class="review-nav">
-              <button id="btn-review-start" class="btn btn-small btn-secondary review-btn" title="First position">⏮</button>
-              <button id="btn-review-prev" class="btn btn-small btn-secondary review-btn" title="Previous move">◀</button>
-              <button id="btn-review-next" class="btn btn-small btn-secondary review-btn" title="Next move">▶</button>
-              <button id="btn-review-end" class="btn btn-small btn-secondary review-btn" title="Live position">⏭</button>
-            </div>
+
+      <div class="game-main">
+        <div class="game-main-left">
+          <div class="player-bar player-top">
+            <span class="player-label" id="opponent-label">Opponent</span>
+            <div class="captured-pieces" id="captured-top"></div>
           </div>
-          <div id="move-list" class="move-list"></div>
+          <div class="board-wrapper">
+            <div id="chess-board"></div>
+          </div>
+          <div class="player-bar player-bottom">
+            <span class="player-label" id="player-label">You</span>
+            <div class="captured-pieces" id="captured-bottom"></div>
+          </div>
+          <div class="game-controls">
+            <button id="btn-resign" class="btn btn-danger btn-small">Resign</button>
+            <button id="btn-draw" class="btn btn-secondary btn-small">Offer Draw</button>
+            <button id="btn-flip" class="btn btn-secondary btn-small">Flip Board</button>
+          </div>
+          <div id="confirm-move-bar" class="confirm-move-bar" hidden>
+            <button id="btn-cancel-move" class="btn btn-cancel-move" title="Cancel move">✕</button>
+            <button id="btn-confirm-move" class="btn btn-confirm" title="Confirm move">✓</button>
+          </div>
+        </div>
+        <div class="game-main-right">
+          <div class="move-history-panel">
+            <div class="move-history-header">
+              <h3>Moves</h3>
+              <div class="review-nav">
+                <button id="btn-review-start" class="btn btn-small btn-secondary review-btn" title="First position">
+                  ⏮
+                </button>
+                <button id="btn-review-prev" class="btn btn-small btn-secondary review-btn" title="Previous move">
+                  ◀
+                </button>
+                <button id="btn-review-next" class="btn btn-small btn-secondary review-btn" title="Next move">▶</button>
+                <button id="btn-review-end" class="btn btn-small btn-secondary review-btn" title="Live position">
+                  ⏭
+                </button>
+              </div>
+            </div>
+            <div id="move-list" class="move-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variant rules: spans both columns -->
+      <div class="rules-panel" id="rules-iceskate" hidden>
+        <h3>Ice Skate Rules</h3>
+        <p>
+          Like regular chess, except sliding pieces (bishops, rooks, and queens) <strong>cannot stop early</strong> —
+          they must travel as far as possible in their chosen direction, stopping only when they hit the edge of the
+          board or a friendly piece, or capture an enemy piece. They <em>may</em> stop at an intermediate square to
+          block check, as this is the furthest they can go in this situation.
+        </p>
+        <p>This variant was made up by my sibling Luna.</p>
+      </div>
+      <div class="rules-panel rules-panel-angry" id="rules-angry" hidden>
+        <h3>Angry Chess Rules</h3>
+        <p>
+          Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid target,
+          except your own king. Be careful: sacrificing your own material can open lines, but it can also backfire
+          spectacularly.
+        </p>
+      </div>
+      <div class="rules-panel rules-panel-dark" id="rules-dark" hidden>
+        <h3>Dark Chess Rules</h3>
+        <p>
+          Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces,
+          but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal
+          moves light up, revealing any enemies lurking in the path.
+        </p>
+      </div>
+      <div class="rules-panel rules-panel-superchess" id="rules-superchess" hidden>
+        <h3>Superchess Rules</h3>
+        <p>
+          The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a powerful
+          piece combining the abilities of both a queen and a knight, making it a formidable addition to your arsenal.
+        </p>
+      </div>
+
+      <!-- Draw offer banner -->
+      <div id="draw-offer-banner" class="draw-offer-banner" hidden>
+        <span>Your opponent offers a draw.</span>
+        <button id="btn-accept-draw" class="btn btn-small btn-primary">Accept</button>
+        <button id="btn-decline-draw" class="btn btn-small btn-secondary">Decline</button>
+      </div>
+
+      <!-- Waiting for opponent overlay (shown for white before black joins) -->
+      <div id="waiting-overlay" class="game-over-overlay" hidden>
+        <div class="game-over-content">
+          <h2>Waiting for opponent…</h2>
+          <p>Share this link:</p>
+          <div class="share-link-container" style="margin: 12px 0">
+            <input type="text" id="share-link" readonly style="color: #4a9eff" />
+            <button id="btn-copy-link" class="btn btn-small btn-secondary">Copy</button>
+          </div>
+          <p class="game-code">Code: <strong id="game-code-display"></strong></p>
+        </div>
+      </div>
+
+      <!-- Game over overlay -->
+      <div id="game-over-overlay" class="game-over-overlay" hidden>
+        <div class="game-over-content">
+          <h2 id="game-over-title">Game Over</h2>
+          <p id="game-over-reason"></p>
+          <div class="game-over-actions">
+            <button id="btn-review-game" class="btn btn-secondary">Review Game</button>
+            <a href="index.html" class="btn btn-primary">New Game</a>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Variant rules: spans both columns -->
-    <div class="rules-panel" id="rules-iceskate" hidden>
-      <h3>Ice Skate Rules</h3>
-      <p>Like regular chess, except sliding pieces (bishops, rooks, and queens) <strong>cannot stop early</strong> — they must travel as far as possible in their chosen direction, stopping only when they hit the edge of the board or a friendly piece, or capture an enemy piece. They <em>may</em> stop at an intermediate square to block check, as this is the furthest they can go in this situation.</p>
-      <p>This variant was made up by my sibling Luna.</p>
-    </div>
-    <div class="rules-panel rules-panel-angry" id="rules-angry" hidden>
-      <h3>Angry Chess Rules</h3>
-      <p>Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid target, except your own king. Be careful: sacrificing your own material can open lines, but it can also backfire spectacularly.</p>
-    </div>
-    <div class="rules-panel rules-panel-dark" id="rules-dark" hidden>
-      <h3>Dark Chess Rules</h3>
-      <p>Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces, but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.</p>
-    </div>
-    <div class="rules-panel rules-panel-superchess" id="rules-superchess" hidden>
-      <h3>Superchess Rules</h3>
-      <p>The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a powerful piece combining the abilities of both a queen and a knight, making it a formidable addition to your arsenal.</p>
-    </div>
+    <script type="module">
+      import { ChessEngine } from "./js/chess-engine.js";
+      import { ChessUI } from "./js/chess-ui.js";
+      import { GameManager } from "./js/game-manager.js";
 
-    <!-- Draw offer banner -->
-    <div id="draw-offer-banner" class="draw-offer-banner" hidden>
-      <span>Your opponent offers a draw.</span>
-      <button id="btn-accept-draw" class="btn btn-small btn-primary">Accept</button>
-      <button id="btn-decline-draw" class="btn btn-small btn-secondary">Decline</button>
-    </div>
+      // --- Hash-based routing: the hash is never sent to the server,
+      //     so static hosts (serve, GitHub Pages, etc.) can never strip it.
+      const gameId = window.location.hash.slice(1); // e.g. #gjtzu452 → 'gjtzu452'
+      const myColorStored = gameId ? localStorage.getItem("chess-color-" + gameId) : null;
 
-    <!-- Waiting for opponent overlay (shown for white before black joins) -->
-    <div id="waiting-overlay" class="game-over-overlay" hidden>
-      <div class="game-over-content">
-        <h2>Waiting for opponent…</h2>
-        <p>Share this link:</p>
-        <div class="share-link-container" style="margin:12px 0">
-          <input type="text" id="share-link" readonly style="color:#4a9eff">
-          <button id="btn-copy-link" class="btn btn-small btn-secondary">Copy</button>
-        </div>
-        <p class="game-code">Code: <strong id="game-code-display"></strong></p>
-      </div>
-    </div>
-
-    <!-- Game over overlay -->
-    <div id="game-over-overlay" class="game-over-overlay" hidden>
-      <div class="game-over-content">
-        <h2 id="game-over-title">Game Over</h2>
-        <p id="game-over-reason"></p>
-        <div class="game-over-actions">
-          <button id="btn-review-game" class="btn btn-secondary">Review Game</button>
-          <a href="index.html" class="btn btn-primary">New Game</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
-    import { ChessEngine } from './js/chess-engine.js';
-    import { ChessUI } from './js/chess-ui.js';
-    import { GameManager } from './js/game-manager.js';
-
-    // --- Hash-based routing: the hash is never sent to the server,
-    //     so static hosts (serve, GitHub Pages, etc.) can never strip it.
-    const gameId = window.location.hash.slice(1); // e.g. #gjtzu452 → 'gjtzu452'
-    const myColorStored = gameId ? localStorage.getItem('chess-color-' + gameId) : null;
-
-    if (!gameId) {
-      // No game ID at all — go back to lobby
-      window.location.href = 'index.html';
-    }
-
-    const engine = new ChessEngine();
-    const gm = new GameManager();
-
-    let ui;
-    let myColor = myColorStored || null;
-    let isMyTurn = false;
-    let lastStateJson = '';
-    let initialStateLoaded = false; // suppress notification on page load
-    let playerJoinedNotified = false;  // fire once when opponent joins
-
-    // ---- Position history & move review ----
-    let positionSnapshots = [];  // snapshots[i] = serialised engine state after i moves
-    let reviewIndex = null;      // null = live; number = reviewing that snapshot
-    let gameVariant = null;      // 'iceskate', 'iceskate-960', 'angry', 'angry-960', 'dark', 'dark-960', 'superchess', 'superchess-960'
-
-    // Bot mode: hash looks like #bot:iceskate:white or #bot:iceskate-960:black
-    const isBotMode = gameId.startsWith('bot:');
-
-    // --- Push notifications ---
-
-    function showNotificationViaSW(title, body, tag) {
-      return navigator.serviceWorker.ready.then(reg => {
-        return reg.showNotification(title, {
-          body,
-          tag,
-          renotify: true,
-          data: { url: window.location.href },
-        });
-      });
-    }
-
-    function getVariantName() {
-      const labelEl = document.getElementById('variant-label');
-      return labelEl.textContent || 'Chess Variants';
-    }
-
-    function notifyTurn() {
-      if (!('Notification' in window)) return;
-      if (Notification.permission !== 'granted') return;
-      if (document.visibilityState === 'visible') return;
-      showNotificationViaSW(getVariantName(), "It's your turn!", 'your-turn')
-        .catch(err => console.error('[notify] showNotification failed:', err));
-    }
-
-    function captureSnapshot() {
-      return JSON.parse(JSON.stringify(engine.serialize()));
-    }
-
-    function buildPositionSnapshots() {
-      // Rebuilds from scratch using the live engine (must be at live state with full moveHistory)
-      const tempEng = new ChessEngine({ iceskate: engine.iceskate, angry: engine.angry });
-      // Use the engine's actual starting board so Chess960 positions are preserved.
-      // engine.startingBoard is always set (standard or 960 layout).
-      if (engine.startingBoard) {
-        tempEng.reset(JSON.parse(JSON.stringify(engine.startingBoard)));
-      }
-      // Copy 960 initial king/rook positions so castling logic works correctly
-      tempEng.initialKingFile = engine.initialKingFile;
-      tempEng.initialRookFiles = engine.initialRookFiles ? { ...engine.initialRookFiles } : null;
-      const snaps = [JSON.parse(JSON.stringify(tempEng.serialize()))];
-      for (const move of engine.moveHistory) {
-        tempEng.makeMove(move.from.rank, move.from.file, move.to.rank, move.to.file, move.promotion || null, move.castling || undefined);
-        snaps.push(JSON.parse(JSON.stringify(tempEng.serialize())));
-      }
-      return snaps;
-    }
-
-    function syncSnapshots() {
-      // Call after engine has been deserialised to the live state.
-      const liveMoveCount = engine.moveHistory.length;
-      const expectedLength = liveMoveCount + 1;
-      if (positionSnapshots.length < expectedLength) {
-        if (positionSnapshots.length === expectedLength - 1 && positionSnapshots.length > 1) {
-          // Fast path: one snapshot behind and snapshot[0] is already valid.
-          // positionSnapshots.length > 1 ensures we're not using the placeholder
-          // standard-position snapshot set in initGame() before Firebase data arrived.
-          positionSnapshots.push(captureSnapshot());
-        } else {
-          // Full rebuild — also used on page reload to ensure snapshot[0] reflects
-          // the actual starting position (e.g. Chess960 layout, not standard chess).
-          positionSnapshots = buildPositionSnapshots();
-        }
-      } else if (liveMoveCount === 0 && positionSnapshots.length === 1) {
-        // 0-move game: update the placeholder snapshot[0] that was captured in
-        // initGame() before Firebase data arrived (was standard position).
-        positionSnapshots[0] = captureSnapshot();
-      }
-    }
-
-    function goToPosition(index) {
-      if (index < 0 || index >= positionSnapshots.length) return;
-
-      if (ui.pendingMoveConfirm) {
-        ui.cancelPendingMove();
-        document.getElementById('confirm-move-bar').hidden = true;
+      if (!gameId) {
+        // No game ID at all — go back to lobby
+        window.location.href = "index.html";
       }
 
-      const fromIndex = reviewIndex !== null ? reviewIndex : positionSnapshots.length - 1;
-      const step = index - fromIndex;
-      const isLive = index === positionSnapshots.length - 1;
+      const engine = new ChessEngine();
+      const gm = new GameManager();
 
-      reviewIndex = index;
-      engine.deserialize(positionSnapshots[index]);
-      ui.interactive = false;
-      // Dark Chess: check live state (not reviewed snapshot) to decide visibility
-      const liveGameOver = positionSnapshots.length > 0 && positionSnapshots[positionSnapshots.length - 1].gameOver;
-      if (ui.dark) ui.darkRevealed = liveGameOver;
-      ui.setLastMove(null);
-      ui.clearSelection(); // renders the board
-      updateStatus();
-      updateMoveList();
-      updateCaptured();
-      updateReviewNavButtons();
+      let ui;
+      let myColor = myColorStored || null;
+      let isMyTurn = false;
+      let lastStateJson = "";
+      let initialStateLoaded = false; // suppress notification on page load
+      let playerJoinedNotified = false; // fire once when opponent joins
 
-      const afterAnimation = isLive ? exitReview : () => {};
+      // ---- Position history & move review ----
+      let positionSnapshots = []; // snapshots[i] = serialised engine state after i moves
+      let reviewIndex = null; // null = live; number = reviewing that snapshot
+      let gameVariant = null; // 'iceskate', 'iceskate-960', 'angry', 'angry-960', 'dark', 'dark-960', 'superchess', 'superchess-960'
 
-      // Animate single-step transitions
-      if (step === 1) {
-        // Forward: animate the move just applied
-        const snap = positionSnapshots[index];
-        const history = Array.isArray(snap.moveHistory) ? snap.moveHistory : Object.values(snap.moveHistory || {});
-        if (history.length > 0) {
-          const move = history[history.length - 1];
-          // Dark Chess: skip enemy animations during review if game is still in progress
-          const suppressAnim = ui.dark && !liveGameOver && move.piece.color !== myColor;
-          if (!suppressAnim) {
-            const pieceType = move.promotion ? move.promotion : move.piece.type;
-            ui.animateMove(
-              move.from.rank, move.from.file, move.to.rank, move.to.file,
-              pieceType, move.piece.color, afterAnimation
-            );
-            return;
-          }
-        }
-      } else if (step === -1) {
-        // Backward: animate reverse of the undone move
-        const snap = positionSnapshots[fromIndex];
-        const history = Array.isArray(snap.moveHistory) ? snap.moveHistory : Object.values(snap.moveHistory || {});
-        if (history.length > 0) {
-          const move = history[history.length - 1];
-          // Dark Chess: skip enemy animations during review if game is still in progress
-          const suppressAnim = ui.dark && !liveGameOver && move.piece.color !== myColor;
-          if (!suppressAnim) {
-            ui.animateMove(
-              move.to.rank, move.to.file, move.from.rank, move.from.file,
-              move.piece.type, move.piece.color, afterAnimation
-            );
-            return;
-          }
-        }
-      }
+      // Bot mode: hash looks like #bot:iceskate:white or #bot:iceskate-960:black
+      const isBotMode = gameId.startsWith("bot:");
 
-      // No animation (multi-step jump or no history): exit review immediately if at live position
-      if (isLive) exitReview();
-    }
+      // --- Push notifications ---
 
-    function exitReview() {
-      reviewIndex = null;
-      engine.deserialize(positionSnapshots[positionSnapshots.length - 1]);
-      isMyTurn = engine.turn === myColor && !engine.gameOver;
-      ui.interactive = isMyTurn;
-      if (ui.dark) ui.darkRevealed = engine.gameOver;
-      const hist = engine.moveHistory;
-      ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
-      ui.clearSelection();
-      updateStatus();
-      updateMoveList();
-      updateCaptured();
-      updateReviewNavButtons();
-    }
-
-    function updateReviewNavButtons() {
-      if (positionSnapshots.length === 0) return;
-      const liveIndex = positionSnapshots.length - 1;
-      const currentIndex = reviewIndex !== null ? reviewIndex : liveIndex;
-      document.getElementById('btn-review-start').disabled = (currentIndex === 0);
-      document.getElementById('btn-review-prev').disabled  = (currentIndex === 0);
-      document.getElementById('btn-review-next').disabled  = (currentIndex >= liveIndex);
-      document.getElementById('btn-review-end').disabled   = (currentIndex >= liveIndex);
-    }
-
-    function updateVariantDisplay() {
-      const isIceskate = engine.iceskate;
-      const isDark = engine.dark;
-      const isAngry = engine.angry;
-      const isSuperchess = engine.superchess;
-      const is960 = gameVariant.endsWith('-960');
-      let label;
-      if (isDark) {
-        label = is960 ? 'Dark Chess960' : 'Dark Chess';
-      } else if (isAngry) {
-        label = is960 ? 'Angry Chess960' : 'Angry Chess';
-      } else if (isSuperchess) {
-        label = is960 ? 'Superchess960' : 'Superchess';
-      } else {
-        label = is960 ? 'Ice Skate Chess960' : 'Ice Skate Chess';
-      }
-      const labelEl = document.getElementById('variant-label');
-      labelEl.textContent = label;
-      if (isIceskate) {
-        labelEl.classList.add('variant-iceskate');
-        labelEl.classList.remove('variant-dark', 'variant-angry', 'variant-superchess');
-      } else if (isDark) {
-        labelEl.classList.add('variant-dark');
-        labelEl.classList.remove('variant-iceskate', 'variant-angry', 'variant-superchess');
-      } else if (isAngry) {
-        labelEl.classList.add('variant-angry');
-        labelEl.classList.remove('variant-iceskate', 'variant-dark', 'variant-superchess');
-      } else if (isSuperchess) {
-        labelEl.classList.add('variant-superchess');
-        labelEl.classList.remove('variant-iceskate', 'variant-dark', 'variant-angry');
-      }
-      document.getElementById('rules-iceskate').hidden = !isIceskate;
-      document.getElementById('rules-angry').hidden = !isAngry;
-      document.getElementById('rules-dark').hidden = !isDark;
-      document.getElementById('rules-superchess').hidden = !isSuperchess;
-      document.title = label;
-    }
-
-    function initBotGame(variant, playerColor) {
-      myColor = playerColor;
-      gameVariant = variant;
-
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      }
-
-      // Set up rules based on variant
-      const isIceskate = variant === 'iceskate' || variant === 'iceskate-960';
-      const isAngry = variant === 'angry' || variant === 'angry-960';
-      const isDark = variant === 'dark' || variant === 'dark-960';
-      const isSuperchess = variant === 'superchess' || variant === 'superchess-960';
-      const is960 = variant.endsWith('-960');
-      engine.iceskate = isIceskate;
-      engine.angry = isAngry;
-      engine.dark = isDark;
-      engine.superchess = isSuperchess;
-      if (is960) {
-        engine.setup960();
-      } else {
-        engine.reset();
-      }
-
-      updateVariantDisplay();
-
-      const flipped = myColor === 'black';
-      ui = new ChessUI(document.getElementById('chess-board'), engine, {
-        flipped,
-        interactive: myColor === 'white',
-        onMove: handleLocalMove,
-        confirmMove: true,
-        dark: isDark,
-        playerColor: myColor,
-        onPendingMoveChange: (pending) => {
-          document.getElementById('confirm-move-bar').hidden = !pending;
-          updateMoveList();
-          updateCaptured();
-        },
-      });
-
-      isMyTurn = myColor === 'white';
-      positionSnapshots = [captureSnapshot()];
-      updateLabels();
-      updateStatus();
-      updateMoveList();
-      updateCaptured();
-      updateReviewNavButtons();
-
-      // Draw offers don't apply vs. bot
-      document.getElementById('btn-draw').hidden = true;
-
-      // If player chose black, bot (white) moves first
-      if (myColor === 'black') {
-        isMyTurn = false;
-        ui.interactive = false;
-        updateStatus();
-        setTimeout(() => makeBotMove(), 500);
-      }
-    }
-
-    function makeBotMove() {
-      if (engine.gameOver) return;
-      const botColor = myColor === 'white' ? 'black' : 'white';
-      if (engine.turn !== botColor) return;
-
-      // Fraction of moves played randomly (0 = always scored, 1 = always random)
-      const BOT_RANDOM_RATE = 0.3;
-
-      // Piece values for capture scoring
-      const PIECE_VALUES = { queen: 9, rook: 5, bishop: 3, knight: 3, pawn: 1, amazon: 13 };
-
-      // Collect every legal move for the bot's pieces, scored by desirability:
-      //   capture by piece rank: queen=9, rook=5, bishop/knight=3, pawn=1
-      //   en passant: 2  |  castling: 4  |  check: 10  |  checkmate: 20
-      //   opening bonuses: center landing +2/+1, development +2, pawn 2-sq +1
-      //   king non-castling penalty: -3
-      //   Superchess: strongly favour pawn advances and promotions
-      //   scores stack (e.g. capture queen + check = 19)
-      const backRank = botColor === 'white' ? 7 : 0;
-      const scoredMoves = [];
-      for (let rank = 0; rank < 8; rank++) {
-        for (let file = 0; file < 8; file++) {
-          const piece = engine.getPiece(rank, file);
-          if (!piece || piece.color !== botColor) continue;
-          const moves = engine.getLegalMoves(rank, file);
-          for (const move of moves) {
-            // In Superchess, allow Amazon promotion; otherwise, only queen
-            if (move.promotion && (
-              (gameVariant.startsWith('superchess') && move.promotion !== 'amazon' && move.promotion !== 'queen') ||
-              (!gameVariant.startsWith('superchess') && move.promotion !== 'queen')
-            )) continue;
-
-            let score = 0;
-
-            // Normal capture (target square occupied by opponent)
-            const target = engine.getPiece(move.rank, move.file);
-            if (target) {
-              if (target.color === botColor) {
-                // Friendly capture (angry chess) — penalize
-                score -= PIECE_VALUES[target.type] || 0;
-              } else {
-                score += PIECE_VALUES[target.type] || 0;
-              }
-            }
-
-            // En passant — destination square is empty, but a pawn is captured
-            if (move.enPassant) score += 2;
-
-            // Castling
-            if (move.castling) score += 4;
-
-            // Check / checkmate
-            const preview = engine.previewMoveResult(rank, file, move.rank, move.file,
-              move.promotion || null, move.castling);
-            if (preview.checkmate) score += 20;
-            else if (preview.check) score += 10;
-
-            // --- Opening / positional heuristics ---
-
-            // Center control: d4/e4/d5/e5 = +2, extended center (c3–f6 ring) = +1
-            const toR = move.rank, toF = move.file;
-            const inCenter   = (toR === 3 || toR === 4) && (toF === 3 || toF === 4);
-            const inExtended = toR >= 2 && toR <= 5 && toF >= 2 && toF <= 5;
-            if (inCenter) score += 2;
-            else if (inExtended) score += 1;
-
-            // Prefer pawn two-square advance over one square
-            if (piece.type === 'pawn' && Math.abs(move.rank - rank) === 2) score += 1;
-
-            // --- Superchess: strongly favour pawn advances and promotions ---
-            if (gameVariant.startsWith('superchess') && piece.type === 'pawn') {
-              // Bonus for advancing pawns closer to promotion
-              // For white: ranks 6,5,4,3 (from 6 to 0 is promotion)
-              // For black: ranks 1,2,3,4 (from 1 to 7 is promotion)
-              let advanceBonus = 0;
-              if (botColor === 'white') {
-                if (rank > move.rank) { // moving forward
-                  if (move.rank === 0) advanceBonus += 12; // promotion square
-                  else if (move.rank === 1) advanceBonus += 6;
-                  else if (move.rank === 2) advanceBonus += 4;
-                  else if (move.rank === 3) advanceBonus += 2;
-                  else if (move.rank === 4) advanceBonus += 1;
-                }
-              } else {
-                if (rank < move.rank) { // moving forward
-                  if (move.rank === 7) advanceBonus += 12; // promotion square
-                  else if (move.rank === 6) advanceBonus += 6;
-                  else if (move.rank === 5) advanceBonus += 4;
-                  else if (move.rank === 4) advanceBonus += 2;
-                  else if (move.rank === 3) advanceBonus += 1;
-                }
-              }
-              score += advanceBonus;
-              // Extra bonus for actual promotion
-              if (move.promotion === 'amazon') score += 20;
-              else if (move.promotion === 'queen') score += 14;
-              else if (move.promotion) score += 10;
-            }
-
-            // Reward developing knights and bishops off the back rank
-            if (piece.type === 'knight' && rank === backRank) score += 1;
-            if (piece.type === 'bishop' && rank === backRank) score += 2;
-
-            // Discourage pointless king walks (castling already rewarded above)
-            if (piece.type === 'king' && !move.castling) score -= 3;
-
-            scoredMoves.push({ fromRank: rank, fromFile: file, toRank: move.rank, toFile: move.file, score, castling: move.castling || null, promotion: move.promotion || null });
-          }
-        }
-      }
-
-      if (scoredMoves.length === 0) return; // already checkmate/stalemate — engine handles it
-
-      // BOT_RANDOM_RATE of the time: ignore scoring and pick any legal move at random
-      // Otherwise: pick the highest-scoring move, breaking ties randomly
-      // For random selection, exclude moves with negative scores (e.g. friendly captures in Angry Chess)
-      const nonNegativeMoves = scoredMoves.filter(m => m.score >= 0);
-      const randomPool = nonNegativeMoves.length > 0 ? nonNegativeMoves : scoredMoves;
-      let chosen;
-      if (Math.random() < BOT_RANDOM_RATE) {
-        chosen = randomPool[Math.floor(Math.random() * randomPool.length)];
-      } else {
-        const maxScore = Math.max(...scoredMoves.map(m => m.score));
-        const bestMoves = scoredMoves.filter(m => m.score === maxScore);
-        chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
-      }
-
-      // Detect pawn promotion; use the move's promotion property (already filtered above)
-      const movingPiece = engine.getPiece(chosen.fromRank, chosen.fromFile);
-      let promotion = null;
-      if (movingPiece && movingPiece.type === 'pawn') {
-        if ((botColor === 'white' && chosen.toRank === 0) || (botColor === 'black' && chosen.toRank === 7)) {
-          promotion = chosen.promotion || null;
-        }
-      }
-
-      engine.makeMove(chosen.fromRank, chosen.fromFile, chosen.toRank, chosen.toFile, promotion, chosen.castling || undefined);
-      syncSnapshots();
-
-      isMyTurn = engine.turn === myColor && !engine.gameOver;
-      ui.interactive = isMyTurn;
-
-      const lastMove = engine.moveHistory[engine.moveHistory.length - 1];
-      ui.setLastMove(lastMove);
-      ui.render();
-
-      // In Dark Chess, skip bot move animation so we don't reveal the move
-      if (!engine.dark) {
-        const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
-        ui.animateMove(
-          lastMove.from.rank, lastMove.from.file,
-          lastMove.to.rank,   lastMove.to.file,
-          pieceType, lastMove.piece.color, () => {}
-        );
-      }
-
-      updateStatus();
-      updateMoveList();
-      updateCaptured();
-      updateReviewNavButtons();
-
-      if (engine.gameOver) showGameOver();
-    }
-
-    async function initGame() {
-      if (isBotMode) {
-        const [, variant, playerColor] = gameId.split(':');
-        initBotGame(variant, playerColor);
-        return;
-      }
-
-      await gm.init();
-
-      // Register service worker (needed for push + PWA install prompt)
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      }
-
-      // Ask for notification permission. Browsers show the native prompt;
-      // if the user dismisses it they can re-enable from browser settings.
-      if ('Notification' in window && Notification.permission === 'default') {
-        await Notification.requestPermission();
-      }
-
-      const statusEl = document.getElementById('game-status');
-      statusEl.textContent = 'Connecting…';
-
-      // If we don't have a stored color, try to join as the available color
-      if (!myColor) {
-        try {
-          await gm.joinGame(gameId);
-          myColor = gm.playerColor;
-          localStorage.setItem('chess-color-' + gameId, myColor);
-        } catch (err) {
-          statusEl.textContent = err.message;
-          return;
-        }
-      }
-
-      // Set up the Firebase game reference
-      gm.gameId = gameId;
-      gm.playerColor = myColor;
-      gm.gameRef = gm._fb.ref(gm.db, `games/${gameId}`);
-
-      // Register this device's FCM token so the Cloud Function can push to us
-      if ('Notification' in window && Notification.permission === 'granted') {
-        gm.registerFCMToken(myColor);
-      }
-
-      // Build the UI
-      const flipped = myColor === 'black';
-      ui = new ChessUI(document.getElementById('chess-board'), engine, {
-        flipped,
-        interactive: false,
-        onMove: handleLocalMove,
-        confirmMove: true,
-        playerColor: myColor,
-        onPendingMoveChange: (pending) => {
-          document.getElementById('confirm-move-bar').hidden = !pending;
-          updateMoveList();
-          updateCaptured();
-        },
-      });
-      updateLabels();
-      positionSnapshots = [captureSnapshot()];
-      updateReviewNavButtons();
-      updateGameOverButtons();
-
-      // Show waiting overlay for the creator while opponent hasn't joined yet
-      if (localStorage.getItem('chess-creator-' + gameId)) {
-        const shareLink = gm.getShareLink();
-        document.getElementById('share-link').value = shareLink;
-        document.getElementById('game-code-display').textContent = gameId;
-        document.getElementById('waiting-overlay').hidden = false;
-
-        document.getElementById('btn-copy-link').addEventListener('click', () => {
-          navigator.clipboard.writeText(shareLink).then(() => {
-            document.getElementById('btn-copy-link').textContent = 'Copied!';
-            setTimeout(() => { document.getElementById('btn-copy-link').textContent = 'Copy'; }, 2000);
+      function showNotificationViaSW(title, body, tag) {
+        return navigator.serviceWorker.ready.then((reg) => {
+          return reg.showNotification(title, {
+            body,
+            tag,
+            renotify: true,
+            data: { url: window.location.href },
           });
         });
       }
 
-      // Set up Firebase callbacks BEFORE starting the listener
-      gm.onGameStateChanged = (state, fullData) => {
-        try {
-          if (fullData.drawOffer && fullData.drawOffer !== myColor) {
-            const banner = document.getElementById('draw-offer-banner');
-            if (banner.hidden) {
-              // Banner was previously hidden — this is a new draw offer
-              if ('Notification' in window && Notification.permission === 'granted' && document.visibilityState !== 'visible') {
-                showNotificationViaSW(getVariantName(), 'Your opponent offers a draw.', 'draw-offer')
-                  .catch(err => console.error('[notify] showNotification failed:', err));
-              }
-            }
-            banner.hidden = false;
+      function getVariantName() {
+        const labelEl = document.getElementById("variant-label");
+        return labelEl.textContent || "Chess Variants";
+      }
+
+      function notifyTurn() {
+        if (!("Notification" in window)) return;
+        if (Notification.permission !== "granted") return;
+        if (document.visibilityState === "visible") return;
+        showNotificationViaSW(getVariantName(), "It's your turn!", "your-turn").catch((err) =>
+          console.error("[notify] showNotification failed:", err)
+        );
+      }
+
+      function captureSnapshot() {
+        return JSON.parse(JSON.stringify(engine.serialize()));
+      }
+
+      function buildPositionSnapshots() {
+        // Rebuilds from scratch using the live engine (must be at live state with full moveHistory)
+        const tempEng = new ChessEngine({ iceskate: engine.iceskate, angry: engine.angry });
+        // Use the engine's actual starting board so Chess960 positions are preserved.
+        // engine.startingBoard is always set (standard or 960 layout).
+        if (engine.startingBoard) {
+          tempEng.reset(JSON.parse(JSON.stringify(engine.startingBoard)));
+        }
+        // Copy 960 initial king/rook positions so castling logic works correctly
+        tempEng.initialKingFile = engine.initialKingFile;
+        tempEng.initialRookFiles = engine.initialRookFiles ? { ...engine.initialRookFiles } : null;
+        const snaps = [JSON.parse(JSON.stringify(tempEng.serialize()))];
+        for (const move of engine.moveHistory) {
+          tempEng.makeMove(
+            move.from.rank,
+            move.from.file,
+            move.to.rank,
+            move.to.file,
+            move.promotion || null,
+            move.castling || undefined
+          );
+          snaps.push(JSON.parse(JSON.stringify(tempEng.serialize())));
+        }
+        return snaps;
+      }
+
+      function syncSnapshots() {
+        // Call after engine has been deserialised to the live state.
+        const liveMoveCount = engine.moveHistory.length;
+        const expectedLength = liveMoveCount + 1;
+        if (positionSnapshots.length < expectedLength) {
+          if (positionSnapshots.length === expectedLength - 1 && positionSnapshots.length > 1) {
+            // Fast path: one snapshot behind and snapshot[0] is already valid.
+            // positionSnapshots.length > 1 ensures we're not using the placeholder
+            // standard-position snapshot set in initGame() before Firebase data arrived.
+            positionSnapshots.push(captureSnapshot());
           } else {
-            document.getElementById('draw-offer-banner').hidden = true;
+            // Full rebuild — also used on page reload to ensure snapshot[0] reflects
+            // the actual starting position (e.g. Chess960 layout, not standard chess).
+            positionSnapshots = buildPositionSnapshots();
           }
+        } else if (liveMoveCount === 0 && positionSnapshots.length === 1) {
+          // 0-move game: update the placeholder snapshot[0] that was captured in
+          // initGame() before Firebase data arrived (was standard position).
+          positionSnapshots[0] = captureSnapshot();
+        }
+      }
 
-          const stateJson = JSON.stringify(state);
-          if (stateJson === lastStateJson) return;
-          lastStateJson = stateJson;
+      function goToPosition(index) {
+        if (index < 0 || index >= positionSnapshots.length) return;
 
-          const prevMoveCount = engine.moveHistory.length;
+        if (ui.pendingMoveConfirm) {
+          ui.cancelPendingMove();
+          document.getElementById("confirm-move-bar").hidden = true;
+        }
 
-          // Always load the live state to build snapshots
-          engine.deserialize(state);
-          syncSnapshots();
-          updateGameOverButtons();
+        const fromIndex = reviewIndex !== null ? reviewIndex : positionSnapshots.length - 1;
+        const step = index - fromIndex;
+        const isLive = index === positionSnapshots.length - 1;
 
-          // Update variant display on first load (flags come from deserialized state)
-          if (!initialStateLoaded) {
-            if (fullData.variant) gameVariant = fullData.variant;
-            updateVariantDisplay();
-            if (ui) ui.dark = engine.dark;
+        reviewIndex = index;
+        engine.deserialize(positionSnapshots[index]);
+        ui.interactive = false;
+        // Dark Chess: check live state (not reviewed snapshot) to decide visibility
+        const liveGameOver = positionSnapshots.length > 0 && positionSnapshots[positionSnapshots.length - 1].gameOver;
+        if (ui.dark) ui.darkRevealed = liveGameOver;
+        ui.setLastMove(null);
+        ui.clearSelection(); // renders the board
+        updateStatus();
+        updateMoveList();
+        updateCaptured();
+        updateReviewNavButtons();
+
+        const afterAnimation = isLive ? exitReview : () => {};
+
+        // Animate single-step transitions
+        if (step === 1) {
+          // Forward: animate the move just applied
+          const snap = positionSnapshots[index];
+          const history = Array.isArray(snap.moveHistory) ? snap.moveHistory : Object.values(snap.moveHistory || {});
+          if (history.length > 0) {
+            const move = history[history.length - 1];
+            // Dark Chess: skip enemy animations during review if game is still in progress
+            const suppressAnim = ui.dark && !liveGameOver && move.piece.color !== myColor;
+            if (!suppressAnim) {
+              const pieceType = move.promotion ? move.promotion : move.piece.type;
+              ui.animateMove(
+                move.from.rank,
+                move.from.file,
+                move.to.rank,
+                move.to.file,
+                pieceType,
+                move.piece.color,
+                afterAnimation
+              );
+              return;
+            }
           }
+        } else if (step === -1) {
+          // Backward: animate reverse of the undone move
+          const snap = positionSnapshots[fromIndex];
+          const history = Array.isArray(snap.moveHistory) ? snap.moveHistory : Object.values(snap.moveHistory || {});
+          if (history.length > 0) {
+            const move = history[history.length - 1];
+            // Dark Chess: skip enemy animations during review if game is still in progress
+            const suppressAnim = ui.dark && !liveGameOver && move.piece.color !== myColor;
+            if (!suppressAnim) {
+              ui.animateMove(
+                move.to.rank,
+                move.to.file,
+                move.from.rank,
+                move.from.file,
+                move.piece.type,
+                move.piece.color,
+                afterAnimation
+              );
+              return;
+            }
+          }
+        }
 
-          if (reviewIndex !== null) {
-            // In review mode: update snapshots & isMyTurn but restore the review position
-            isMyTurn = engine.turn === myColor && !engine.gameOver;
-            engine.deserialize(positionSnapshots[reviewIndex]);
+        // No animation (multi-step jump or no history): exit review immediately if at live position
+        if (isLive) exitReview();
+      }
+
+      function exitReview() {
+        reviewIndex = null;
+        engine.deserialize(positionSnapshots[positionSnapshots.length - 1]);
+        isMyTurn = engine.turn === myColor && !engine.gameOver;
+        ui.interactive = isMyTurn;
+        if (ui.dark) ui.darkRevealed = engine.gameOver;
+        const hist = engine.moveHistory;
+        ui.setLastMove(hist.length > 0 ? hist[hist.length - 1] : null);
+        ui.clearSelection();
+        updateStatus();
+        updateMoveList();
+        updateCaptured();
+        updateReviewNavButtons();
+      }
+
+      function updateReviewNavButtons() {
+        if (positionSnapshots.length === 0) return;
+        const liveIndex = positionSnapshots.length - 1;
+        const currentIndex = reviewIndex !== null ? reviewIndex : liveIndex;
+        document.getElementById("btn-review-start").disabled = currentIndex === 0;
+        document.getElementById("btn-review-prev").disabled = currentIndex === 0;
+        document.getElementById("btn-review-next").disabled = currentIndex >= liveIndex;
+        document.getElementById("btn-review-end").disabled = currentIndex >= liveIndex;
+      }
+
+      function updateVariantDisplay() {
+        const isIceskate = engine.iceskate;
+        const isDark = engine.dark;
+        const isAngry = engine.angry;
+        const isSuperchess = engine.superchess;
+        const is960 = gameVariant.endsWith("-960");
+        let label;
+        if (isDark) {
+          label = is960 ? "Dark Chess960" : "Dark Chess";
+        } else if (isAngry) {
+          label = is960 ? "Angry Chess960" : "Angry Chess";
+        } else if (isSuperchess) {
+          label = is960 ? "Superchess960" : "Superchess";
+        } else {
+          label = is960 ? "Ice Skate Chess960" : "Ice Skate Chess";
+        }
+        const labelEl = document.getElementById("variant-label");
+        labelEl.textContent = label;
+        if (isIceskate) {
+          labelEl.classList.add("variant-iceskate");
+          labelEl.classList.remove("variant-dark", "variant-angry", "variant-superchess");
+        } else if (isDark) {
+          labelEl.classList.add("variant-dark");
+          labelEl.classList.remove("variant-iceskate", "variant-angry", "variant-superchess");
+        } else if (isAngry) {
+          labelEl.classList.add("variant-angry");
+          labelEl.classList.remove("variant-iceskate", "variant-dark", "variant-superchess");
+        } else if (isSuperchess) {
+          labelEl.classList.add("variant-superchess");
+          labelEl.classList.remove("variant-iceskate", "variant-dark", "variant-angry");
+        }
+        document.getElementById("rules-iceskate").hidden = !isIceskate;
+        document.getElementById("rules-angry").hidden = !isAngry;
+        document.getElementById("rules-dark").hidden = !isDark;
+        document.getElementById("rules-superchess").hidden = !isSuperchess;
+        document.title = label;
+      }
+
+      function initBotGame(variant, playerColor) {
+        myColor = playerColor;
+        gameVariant = variant;
+
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        }
+
+        // Set up rules based on variant
+        const isIceskate = variant === "iceskate" || variant === "iceskate-960";
+        const isAngry = variant === "angry" || variant === "angry-960";
+        const isDark = variant === "dark" || variant === "dark-960";
+        const isSuperchess = variant === "superchess" || variant === "superchess-960";
+        const is960 = variant.endsWith("-960");
+        engine.iceskate = isIceskate;
+        engine.angry = isAngry;
+        engine.dark = isDark;
+        engine.superchess = isSuperchess;
+        if (is960) {
+          engine.setup960();
+        } else {
+          engine.reset();
+        }
+
+        updateVariantDisplay();
+
+        const flipped = myColor === "black";
+        ui = new ChessUI(document.getElementById("chess-board"), engine, {
+          flipped,
+          interactive: myColor === "white",
+          onMove: handleLocalMove,
+          confirmMove: true,
+          dark: isDark,
+          playerColor: myColor,
+          onPendingMoveChange: (pending) => {
+            document.getElementById("confirm-move-bar").hidden = !pending;
             updateMoveList();
-            updateReviewNavButtons();
+            updateCaptured();
+          },
+        });
+
+        isMyTurn = myColor === "white";
+        positionSnapshots = [captureSnapshot()];
+        updateLabels();
+        updateStatus();
+        updateMoveList();
+        updateCaptured();
+        updateReviewNavButtons();
+
+        // Draw offers don't apply vs. bot
+        document.getElementById("btn-draw").hidden = true;
+
+        // If player chose black, bot (white) moves first
+        if (myColor === "black") {
+          isMyTurn = false;
+          ui.interactive = false;
+          updateStatus();
+          setTimeout(() => makeBotMove(), 500);
+        }
+      }
+
+      function makeBotMove() {
+        if (engine.gameOver) return;
+        const botColor = myColor === "white" ? "black" : "white";
+        if (engine.turn !== botColor) return;
+
+        // Fraction of moves played randomly (0 = always scored, 1 = always random)
+        const BOT_RANDOM_RATE = 0.3;
+
+        // Piece values for capture scoring
+        const PIECE_VALUES = { queen: 9, rook: 5, bishop: 3, knight: 3, pawn: 1, amazon: 13 };
+
+        // Collect every legal move for the bot's pieces, scored by desirability:
+        //   capture by piece rank: queen=9, rook=5, bishop/knight=3, pawn=1
+        //   en passant: 2  |  castling: 4  |  check: 10  |  checkmate: 20
+        //   opening bonuses: center landing +2/+1, development +2, pawn 2-sq +1
+        //   king non-castling penalty: -3
+        //   Superchess: strongly favour pawn advances and promotions
+        //   scores stack (e.g. capture queen + check = 19)
+        const backRank = botColor === "white" ? 7 : 0;
+        const scoredMoves = [];
+        for (let rank = 0; rank < 8; rank++) {
+          for (let file = 0; file < 8; file++) {
+            const piece = engine.getPiece(rank, file);
+            if (!piece || piece.color !== botColor) continue;
+            const moves = engine.getLegalMoves(rank, file);
+            for (const move of moves) {
+              // In Superchess, allow Amazon promotion; otherwise, only queen
+              if (
+                move.promotion &&
+                ((gameVariant.startsWith("superchess") && move.promotion !== "amazon" && move.promotion !== "queen") ||
+                  (!gameVariant.startsWith("superchess") && move.promotion !== "queen"))
+              )
+                continue;
+
+              let score = 0;
+
+              // Normal capture (target square occupied by opponent)
+              const target = engine.getPiece(move.rank, move.file);
+              if (target) {
+                if (target.color === botColor) {
+                  // Friendly capture (angry chess) — penalize
+                  score -= PIECE_VALUES[target.type] || 0;
+                } else {
+                  score += PIECE_VALUES[target.type] || 0;
+                }
+              }
+
+              // En passant — destination square is empty, but a pawn is captured
+              if (move.enPassant) score += 2;
+
+              // Castling
+              if (move.castling) score += 4;
+
+              // Check / checkmate
+              const preview = engine.previewMoveResult(
+                rank,
+                file,
+                move.rank,
+                move.file,
+                move.promotion || null,
+                move.castling
+              );
+              if (preview.checkmate) score += 20;
+              else if (preview.check) score += 10;
+
+              // --- Opening / positional heuristics ---
+
+              // Center control: d4/e4/d5/e5 = +2, extended center (c3–f6 ring) = +1
+              const toR = move.rank,
+                toF = move.file;
+              const inCenter = (toR === 3 || toR === 4) && (toF === 3 || toF === 4);
+              const inExtended = toR >= 2 && toR <= 5 && toF >= 2 && toF <= 5;
+              if (inCenter) score += 2;
+              else if (inExtended) score += 1;
+
+              // Prefer pawn two-square advance over one square
+              if (piece.type === "pawn" && Math.abs(move.rank - rank) === 2) score += 1;
+
+              // --- Superchess: strongly favour pawn advances and promotions ---
+              if (gameVariant.startsWith("superchess") && piece.type === "pawn") {
+                // Bonus for advancing pawns closer to promotion
+                // For white: ranks 6,5,4,3 (from 6 to 0 is promotion)
+                // For black: ranks 1,2,3,4 (from 1 to 7 is promotion)
+                let advanceBonus = 0;
+                if (botColor === "white") {
+                  if (rank > move.rank) {
+                    // moving forward
+                    if (move.rank === 0)
+                      advanceBonus += 12; // promotion square
+                    else if (move.rank === 1) advanceBonus += 6;
+                    else if (move.rank === 2) advanceBonus += 4;
+                    else if (move.rank === 3) advanceBonus += 2;
+                    else if (move.rank === 4) advanceBonus += 1;
+                  }
+                } else {
+                  if (rank < move.rank) {
+                    // moving forward
+                    if (move.rank === 7)
+                      advanceBonus += 12; // promotion square
+                    else if (move.rank === 6) advanceBonus += 6;
+                    else if (move.rank === 5) advanceBonus += 4;
+                    else if (move.rank === 4) advanceBonus += 2;
+                    else if (move.rank === 3) advanceBonus += 1;
+                  }
+                }
+                score += advanceBonus;
+                // Extra bonus for actual promotion
+                if (move.promotion === "amazon") score += 20;
+                else if (move.promotion === "queen") score += 14;
+                else if (move.promotion) score += 10;
+              }
+
+              // Reward developing knights and bishops off the back rank
+              if (piece.type === "knight" && rank === backRank) score += 1;
+              if (piece.type === "bishop" && rank === backRank) score += 2;
+
+              // Discourage pointless king walks (castling already rewarded above)
+              if (piece.type === "king" && !move.castling) score -= 3;
+
+              scoredMoves.push({
+                fromRank: rank,
+                fromFile: file,
+                toRank: move.rank,
+                toFile: move.file,
+                score,
+                castling: move.castling || null,
+                promotion: move.promotion || null,
+              });
+            }
+          }
+        }
+
+        if (scoredMoves.length === 0) return; // already checkmate/stalemate — engine handles it
+
+        // BOT_RANDOM_RATE of the time: ignore scoring and pick any legal move at random
+        // Otherwise: pick the highest-scoring move, breaking ties randomly
+        // For random selection, exclude moves with negative scores (e.g. friendly captures in Angry Chess)
+        const nonNegativeMoves = scoredMoves.filter((m) => m.score >= 0);
+        const randomPool = nonNegativeMoves.length > 0 ? nonNegativeMoves : scoredMoves;
+        let chosen;
+        if (Math.random() < BOT_RANDOM_RATE) {
+          chosen = randomPool[Math.floor(Math.random() * randomPool.length)];
+        } else {
+          const maxScore = Math.max(...scoredMoves.map((m) => m.score));
+          const bestMoves = scoredMoves.filter((m) => m.score === maxScore);
+          chosen = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+        }
+
+        // Detect pawn promotion; use the move's promotion property (already filtered above)
+        const movingPiece = engine.getPiece(chosen.fromRank, chosen.fromFile);
+        let promotion = null;
+        if (movingPiece && movingPiece.type === "pawn") {
+          if ((botColor === "white" && chosen.toRank === 0) || (botColor === "black" && chosen.toRank === 7)) {
+            promotion = chosen.promotion || null;
+          }
+        }
+
+        engine.makeMove(
+          chosen.fromRank,
+          chosen.fromFile,
+          chosen.toRank,
+          chosen.toFile,
+          promotion,
+          chosen.castling || undefined
+        );
+        syncSnapshots();
+
+        isMyTurn = engine.turn === myColor && !engine.gameOver;
+        ui.interactive = isMyTurn;
+
+        const lastMove = engine.moveHistory[engine.moveHistory.length - 1];
+        ui.setLastMove(lastMove);
+        ui.render();
+
+        // In Dark Chess, skip bot move animation so we don't reveal the move
+        if (!engine.dark) {
+          const pieceType = lastMove.promotion ? lastMove.promotion : lastMove.piece.type;
+          ui.animateMove(
+            lastMove.from.rank,
+            lastMove.from.file,
+            lastMove.to.rank,
+            lastMove.to.file,
+            pieceType,
+            lastMove.piece.color,
+            () => {}
+          );
+        }
+
+        updateStatus();
+        updateMoveList();
+        updateCaptured();
+        updateReviewNavButtons();
+
+        if (engine.gameOver) showGameOver();
+      }
+
+      async function initGame() {
+        if (isBotMode) {
+          const [, variant, playerColor] = gameId.split(":");
+          initBotGame(variant, playerColor);
+          return;
+        }
+
+        await gm.init();
+
+        // Register service worker (needed for push + PWA install prompt)
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
+        }
+
+        // Ask for notification permission. Browsers show the native prompt;
+        // if the user dismisses it they can re-enable from browser settings.
+        if ("Notification" in window && Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+
+        const statusEl = document.getElementById("game-status");
+        statusEl.textContent = "Connecting…";
+
+        // If we don't have a stored color, try to join as the available color
+        if (!myColor) {
+          try {
+            await gm.joinGame(gameId);
+            myColor = gm.playerColor;
+            localStorage.setItem("chess-color-" + gameId, myColor);
+          } catch (err) {
+            statusEl.textContent = err.message;
             return;
           }
-
-          isMyTurn = engine.turn === myColor && !engine.gameOver;
-          ui.interactive = isMyTurn;
-
-          // Cancel any stale pending confirm
-          if (ui.pendingMoveConfirm) {
-            ui.cancelPendingMove();
-            document.getElementById('confirm-move-bar').hidden = true;
-          }
-
-          const newMoveCount = engine.moveHistory.length;
-          const isOpponentMove =
-            newMoveCount === prevMoveCount + 1 &&
-            engine.moveHistory[newMoveCount - 1].piece.color !== myColor;
-
-          // Notify the player — but not on the initial page load/refresh
-          if (isOpponentMove && initialStateLoaded) notifyTurn();
-          initialStateLoaded = true;
-
-          // For the opponent's latest move, render first (piece appears at dest),
-          // then slide a ghost from source → dest on top.
-          // In Dark Chess, skip the animation so we don't reveal opponent moves.
-          if (isOpponentMove) {
-            const lastMove = engine.moveHistory[newMoveCount - 1];
-            ui.setLastMove(lastMove);
-            ui.render();
-            updateStatus();
-            updateMoveList();
-            updateCaptured();
-            if (!engine.dark) {
-              ui.animateMove(
-                lastMove.from.rank, lastMove.from.file,
-                lastMove.to.rank,   lastMove.to.file,
-                lastMove.piece.type, lastMove.piece.color, () => {}
-              );
-            }
-          } else {
-            if (engine.moveHistory.length > 0) {
-              ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
-            }
-            ui.render();
-            updateStatus();
-            updateMoveList();
-            updateCaptured();
-          }
-
-          updateReviewNavButtons();
-          if (engine.gameOver) showGameOver();
-        } catch (err) {
-          console.error('Error applying game state:', err, state);
         }
-      };
 
-      gm.onPlayerJoined = (data) => {
-        if (data.status === 'active') {
-          // Opponent joined — hide the waiting overlay
-          document.getElementById('waiting-overlay').hidden = true;
-          statusEl.textContent = '';
+        // Set up the Firebase game reference
+        gm.gameId = gameId;
+        gm.playerColor = myColor;
+        gm.gameRef = gm._fb.ref(gm.db, `games/${gameId}`);
+
+        // Register this device's FCM token so the Cloud Function can push to us
+        if ("Notification" in window && Notification.permission === "granted") {
+          gm.registerFCMToken(myColor);
+        }
+
+        // Build the UI
+        const flipped = myColor === "black";
+        ui = new ChessUI(document.getElementById("chess-board"), engine, {
+          flipped,
+          interactive: false,
+          onMove: handleLocalMove,
+          confirmMove: true,
+          playerColor: myColor,
+          onPendingMoveChange: (pending) => {
+            document.getElementById("confirm-move-bar").hidden = !pending;
+            updateMoveList();
+            updateCaptured();
+          },
+        });
+        updateLabels();
+        positionSnapshots = [captureSnapshot()];
+        updateReviewNavButtons();
+        updateGameOverButtons();
+
+        // Show waiting overlay for the creator while opponent hasn't joined yet
+        if (localStorage.getItem("chess-creator-" + gameId)) {
+          const shareLink = gm.getShareLink();
+          document.getElementById("share-link").value = shareLink;
+          document.getElementById("game-code-display").textContent = gameId;
+          document.getElementById("waiting-overlay").hidden = false;
+
+          document.getElementById("btn-copy-link").addEventListener("click", () => {
+            navigator.clipboard.writeText(shareLink).then(() => {
+              document.getElementById("btn-copy-link").textContent = "Copied!";
+              setTimeout(() => {
+                document.getElementById("btn-copy-link").textContent = "Copy";
+              }, 2000);
+            });
+          });
+        }
+
+        // Set up Firebase callbacks BEFORE starting the listener
+        gm.onGameStateChanged = (state, fullData) => {
+          try {
+            if (fullData.drawOffer && fullData.drawOffer !== myColor) {
+              const banner = document.getElementById("draw-offer-banner");
+              if (banner.hidden) {
+                // Banner was previously hidden — this is a new draw offer
+                if (
+                  "Notification" in window &&
+                  Notification.permission === "granted" &&
+                  document.visibilityState !== "visible"
+                ) {
+                  showNotificationViaSW(getVariantName(), "Your opponent offers a draw.", "draw-offer").catch((err) =>
+                    console.error("[notify] showNotification failed:", err)
+                  );
+                }
+              }
+              banner.hidden = false;
+            } else {
+              document.getElementById("draw-offer-banner").hidden = true;
+            }
+
+            const stateJson = JSON.stringify(state);
+            if (stateJson === lastStateJson) return;
+            lastStateJson = stateJson;
+
+            const prevMoveCount = engine.moveHistory.length;
+
+            // Always load the live state to build snapshots
+            engine.deserialize(state);
+            syncSnapshots();
+            updateGameOverButtons();
+
+            // Update variant display on first load (flags come from deserialized state)
+            if (!initialStateLoaded) {
+              if (fullData.variant) gameVariant = fullData.variant;
+              updateVariantDisplay();
+              if (ui) ui.dark = engine.dark;
+            }
+
+            if (reviewIndex !== null) {
+              // In review mode: update snapshots & isMyTurn but restore the review position
+              isMyTurn = engine.turn === myColor && !engine.gameOver;
+              engine.deserialize(positionSnapshots[reviewIndex]);
+              updateMoveList();
+              updateReviewNavButtons();
+              return;
+            }
+
+            isMyTurn = engine.turn === myColor && !engine.gameOver;
+            ui.interactive = isMyTurn;
+
+            // Cancel any stale pending confirm
+            if (ui.pendingMoveConfirm) {
+              ui.cancelPendingMove();
+              document.getElementById("confirm-move-bar").hidden = true;
+            }
+
+            const newMoveCount = engine.moveHistory.length;
+            const isOpponentMove =
+              newMoveCount === prevMoveCount + 1 && engine.moveHistory[newMoveCount - 1].piece.color !== myColor;
+
+            // Notify the player — but not on the initial page load/refresh
+            if (isOpponentMove && initialStateLoaded) notifyTurn();
+            initialStateLoaded = true;
+
+            // For the opponent's latest move, render first (piece appears at dest),
+            // then slide a ghost from source → dest on top.
+            // In Dark Chess, skip the animation so we don't reveal opponent moves.
+            if (isOpponentMove) {
+              const lastMove = engine.moveHistory[newMoveCount - 1];
+              ui.setLastMove(lastMove);
+              ui.render();
+              updateStatus();
+              updateMoveList();
+              updateCaptured();
+              if (!engine.dark) {
+                ui.animateMove(
+                  lastMove.from.rank,
+                  lastMove.from.file,
+                  lastMove.to.rank,
+                  lastMove.to.file,
+                  lastMove.piece.type,
+                  lastMove.piece.color,
+                  () => {}
+                );
+              }
+            } else {
+              if (engine.moveHistory.length > 0) {
+                ui.setLastMove(engine.moveHistory[engine.moveHistory.length - 1]);
+              }
+              ui.render();
+              updateStatus();
+              updateMoveList();
+              updateCaptured();
+            }
+
+            updateReviewNavButtons();
+            if (engine.gameOver) showGameOver();
+          } catch (err) {
+            console.error("Error applying game state:", err, state);
+          }
+        };
+
+        gm.onPlayerJoined = (data) => {
+          if (data.status === "active") {
+            // Opponent joined — hide the waiting overlay
+            document.getElementById("waiting-overlay").hidden = true;
+            statusEl.textContent = "";
+            updateStatus();
+
+            // Notify white that the game has started and it's their turn
+            if (myColor === "white" && !playerJoinedNotified) {
+              playerJoinedNotified = true;
+              if (
+                "Notification" in window &&
+                Notification.permission === "granted" &&
+                document.visibilityState !== "visible"
+              ) {
+                showNotificationViaSW(getVariantName(), "Game on! It's your turn.", "your-turn").catch((err) =>
+                  console.error("[notify] showNotification failed:", err)
+                );
+              }
+            }
+          }
+        };
+
+        // NOW start listening — callbacks are guaranteed to be set above
+        gm.listenForChanges();
+      }
+
+      function handleLocalMove(moveData) {
+        syncSnapshots(); // engine already has the new move applied
+
+        if (isBotMode) {
+          isMyTurn = false;
+          ui.interactive = false;
           updateStatus();
-
-          // Notify white that the game has started and it's their turn
-          if (myColor === 'white' && !playerJoinedNotified) {
-            playerJoinedNotified = true;
-            if ('Notification' in window && Notification.permission === 'granted' && document.visibilityState !== 'visible') {
-              showNotificationViaSW(getVariantName(), "Game on! It's your turn.", 'your-turn')
-                .catch(err => console.error('[notify] showNotification failed:', err));
-            }
+          updateMoveList();
+          updateCaptured();
+          updateReviewNavButtons();
+          if (engine.gameOver) {
+            showGameOver();
+          } else {
+            setTimeout(() => makeBotMove(), 400);
           }
+          return;
         }
-      };
 
-      // NOW start listening — callbacks are guaranteed to be set above
-      gm.listenForChanges();
-    }
-
-    function handleLocalMove(moveData) {
-      syncSnapshots(); // engine already has the new move applied
-
-      if (isBotMode) {
+        // Player made a move locally, send to Firebase
+        gm.sendGameState(engine.serialize());
         isMyTurn = false;
         ui.interactive = false;
         updateStatus();
         updateMoveList();
         updateCaptured();
         updateReviewNavButtons();
+
         if (engine.gameOver) {
           showGameOver();
+        }
+      }
+
+      function updateStatus() {
+        const statusEl = document.getElementById("game-status");
+        if (reviewIndex !== null) {
+          const liveIndex = positionSnapshots.length - 1;
+          statusEl.textContent = `Move ${reviewIndex} / ${liveIndex}`;
+          statusEl.className = "game-status review-mode";
+          updateGameOverButtons();
+          return;
+        }
+        if (engine.gameOver) {
+          statusEl.textContent = "";
+          updateGameOverButtons();
+          return;
+        }
+        if (isMyTurn) {
+          statusEl.textContent = "Your turn";
+          statusEl.className = "game-status your-turn";
         } else {
-          setTimeout(() => makeBotMove(), 400);
+          statusEl.textContent = isBotMode ? "Bot's turn…" : "Opponent's turn";
+          statusEl.className = "game-status";
         }
-        return;
+        updateGameOverButtons();
       }
 
-      // Player made a move locally, send to Firebase
-      gm.sendGameState(engine.serialize());
-      isMyTurn = false;
-      ui.interactive = false;
-      updateStatus();
-      updateMoveList();
-      updateCaptured();
-      updateReviewNavButtons();
-
-      if (engine.gameOver) {
-        showGameOver();
+      function updateGameOverButtons() {
+        const resignBtn = document.getElementById("btn-resign");
+        const drawBtn = document.getElementById("btn-draw");
+        if (!resignBtn || !drawBtn) return;
+        if (engine.gameOver) {
+          resignBtn.disabled = true;
+          drawBtn.disabled = true;
+          resignBtn.classList.add("btn-disabled");
+          drawBtn.classList.add("btn-disabled");
+        } else {
+          resignBtn.disabled = false;
+          drawBtn.disabled = false;
+          resignBtn.classList.remove("btn-disabled");
+          drawBtn.classList.remove("btn-disabled");
+        }
       }
-    }
 
-    function updateStatus() {
-      const statusEl = document.getElementById('game-status');
-      if (reviewIndex !== null) {
+      function updateLabels() {
+        const playerLabel = document.getElementById("player-label");
+        const opponentLabel = document.getElementById("opponent-label");
+        playerLabel.textContent = `You (${myColor})`;
+        opponentLabel.textContent = isBotMode
+          ? `Bot (${myColor === "white" ? "black" : "white"})`
+          : `Opponent (${myColor === "white" ? "black" : "white"})`;
+      }
+
+      function updateMoveList() {
+        const moveList = document.getElementById("move-list");
+        moveList.innerHTML = "";
+
+        // Always show the full game history (from the latest snapshot)
         const liveIndex = positionSnapshots.length - 1;
-        statusEl.textContent = `Move ${reviewIndex} / ${liveIndex}`;
-        statusEl.className = 'game-status review-mode';
-        updateGameOverButtons();
-        return;
-      }
-      if (engine.gameOver) {
-        statusEl.textContent = '';
-        updateGameOverButtons();
-        return;
-      }
-      if (isMyTurn) {
-        statusEl.textContent = 'Your turn';
-        statusEl.className = 'game-status your-turn';
-      } else {
-        statusEl.textContent = isBotMode ? "Bot's turn…" : "Opponent's turn";
-        statusEl.className = 'game-status';
-      }
-      updateGameOverButtons();
-    }
+        const currentPosition = reviewIndex !== null ? reviewIndex : liveIndex;
 
-    function updateGameOverButtons() {
-      const resignBtn = document.getElementById('btn-resign');
-      const drawBtn = document.getElementById('btn-draw');
-      if (!resignBtn || !drawBtn) return;
-      if (engine.gameOver) {
-        resignBtn.disabled = true;
-        drawBtn.disabled = true;
-        resignBtn.classList.add('btn-disabled');
-        drawBtn.classList.add('btn-disabled');
-      } else {
-        resignBtn.disabled = false;
-        drawBtn.disabled = false;
-        resignBtn.classList.remove('btn-disabled');
-        drawBtn.classList.remove('btn-disabled');
-      }
-    }
-
-    function updateLabels() {
-      const playerLabel = document.getElementById('player-label');
-      const opponentLabel = document.getElementById('opponent-label');
-      playerLabel.textContent = `You (${myColor})`;
-      opponentLabel.textContent = isBotMode
-        ? `Bot (${myColor === 'white' ? 'black' : 'white'})`
-        : `Opponent (${myColor === 'white' ? 'black' : 'white'})`;
-    }
-
-    function updateMoveList() {
-      const moveList = document.getElementById('move-list');
-      moveList.innerHTML = '';
-
-      // Always show the full game history (from the latest snapshot)
-      const liveIndex = positionSnapshots.length - 1;
-      const currentPosition = reviewIndex !== null ? reviewIndex : liveIndex;
-
-      let history;
-      if (positionSnapshots.length > 0) {
-        const h = positionSnapshots[liveIndex].moveHistory;
-        history = Array.isArray(h) ? h : Object.values(h || {});
-      } else {
-        history = engine.moveHistory;
-      }
-
-      // Dark Chess: blur opponent moves while the game is still in progress
-      // Check live state, not the reviewed snapshot, to decide visibility
-      const liveGameOver = positionSnapshots.length > 0 && positionSnapshots[liveIndex].gameOver;
-      const isDarkLive = engine.dark && !liveGameOver;
-
-      for (let i = 0; i < history.length; i += 2) {
-        const moveNum = Math.floor(i / 2) + 1;
-        const row = document.createElement('div');
-        row.className = 'move-row';
-
-        const numSpan = document.createElement('span');
-        numSpan.className = 'move-number';
-        numSpan.textContent = `${moveNum}.`;
-        row.appendChild(numSpan);
-
-        const whiteMove = document.createElement('span');
-        whiteMove.className = 'move-notation';
-        whiteMove.textContent = engine.getMoveNotation(history[i]);
-        if (isDarkLive && myColor === 'black') whiteMove.classList.add('move-notation--dark-hidden');
-        if (currentPosition === i + 1) whiteMove.classList.add('current-move');
-        const wi = i + 1;
-        whiteMove.addEventListener('click', () => goToPosition(wi));
-        row.appendChild(whiteMove);
-
-        if (history[i + 1]) {
-          const blackMove = document.createElement('span');
-          blackMove.className = 'move-notation';
-          blackMove.textContent = engine.getMoveNotation(history[i + 1]);
-          if (isDarkLive && myColor === 'white') blackMove.classList.add('move-notation--dark-hidden');
-          if (currentPosition === i + 2) blackMove.classList.add('current-move');
-          const bi = i + 2;
-          blackMove.addEventListener('click', () => goToPosition(bi));
-          row.appendChild(blackMove);
+        let history;
+        if (positionSnapshots.length > 0) {
+          const h = positionSnapshots[liveIndex].moveHistory;
+          history = Array.isArray(h) ? h : Object.values(h || {});
+        } else {
+          history = engine.moveHistory;
         }
 
-        moveList.appendChild(row);
+        // Dark Chess: blur opponent moves while the game is still in progress
+        // Check live state, not the reviewed snapshot, to decide visibility
+        const liveGameOver = positionSnapshots.length > 0 && positionSnapshots[liveIndex].gameOver;
+        const isDarkLive = engine.dark && !liveGameOver;
+
+        for (let i = 0; i < history.length; i += 2) {
+          const moveNum = Math.floor(i / 2) + 1;
+          const row = document.createElement("div");
+          row.className = "move-row";
+
+          const numSpan = document.createElement("span");
+          numSpan.className = "move-number";
+          numSpan.textContent = `${moveNum}.`;
+          row.appendChild(numSpan);
+
+          const whiteMove = document.createElement("span");
+          whiteMove.className = "move-notation";
+          whiteMove.textContent = engine.getMoveNotation(history[i]);
+          if (isDarkLive && myColor === "black") whiteMove.classList.add("move-notation--dark-hidden");
+          if (currentPosition === i + 1) whiteMove.classList.add("current-move");
+          const wi = i + 1;
+          whiteMove.addEventListener("click", () => goToPosition(wi));
+          row.appendChild(whiteMove);
+
+          if (history[i + 1]) {
+            const blackMove = document.createElement("span");
+            blackMove.className = "move-notation";
+            blackMove.textContent = engine.getMoveNotation(history[i + 1]);
+            if (isDarkLive && myColor === "white") blackMove.classList.add("move-notation--dark-hidden");
+            if (currentPosition === i + 2) blackMove.classList.add("current-move");
+            const bi = i + 2;
+            blackMove.addEventListener("click", () => goToPosition(bi));
+            row.appendChild(blackMove);
+          }
+
+          moveList.appendChild(row);
+        }
+
+        // Show pending (preview) move notation faded at the end of the list
+        if (ui && ui.pendingMoveConfirm && reviewIndex === null) {
+          const { fromRank, fromFile, toRank, toFile, castling, enPassant, promotion } = ui.pendingMoveConfirm;
+          const piece = engine.getPiece(fromRank, fromFile);
+          if (piece) {
+            const capturedPiece = enPassant ? engine.getPiece(fromRank, toFile) : engine.getPiece(toRank, toFile);
+            const isFriendlyCapture = capturedPiece && capturedPiece.color === piece.color;
+            const { check, checkmate, stalemate, draw } = engine.previewMoveResult(
+              fromRank,
+              fromFile,
+              toRank,
+              toFile,
+              promotion || null,
+              castling !== undefined ? castling : undefined
+            );
+            const pendingMoveData = {
+              piece,
+              from: { rank: fromRank, file: fromFile },
+              to: { rank: toRank, file: toFile },
+              captured: capturedPiece,
+              castling: castling || null,
+              enPassant: enPassant || false,
+              friendlyCapture: isFriendlyCapture || false,
+              promotion: promotion || null,
+              check,
+              checkmate,
+              stalemate,
+              draw,
+              disambiguation: engine.computeDisambiguation(fromRank, fromFile, toRank, toFile, piece),
+            };
+            const pendingNotation = engine.getMoveNotation(pendingMoveData);
+            const pendingSpan = document.createElement("span");
+            pendingSpan.className = "move-notation move-notation--pending";
+            pendingSpan.textContent = pendingNotation;
+
+            if (history.length % 2 === 0) {
+              const moveNum = history.length / 2 + 1;
+              const row = document.createElement("div");
+              row.className = "move-row";
+              const numSpan = document.createElement("span");
+              numSpan.className = "move-number";
+              numSpan.textContent = `${moveNum}.`;
+              row.appendChild(numSpan);
+              row.appendChild(pendingSpan);
+              moveList.appendChild(row);
+            } else {
+              const lastRow = moveList.lastChild;
+              if (lastRow) lastRow.appendChild(pendingSpan);
+            }
+          }
+        }
+
+        // Scroll to current move when reviewing; otherwise scroll to bottom
+        if (reviewIndex !== null) {
+          const currentEl = moveList.querySelector(".current-move");
+          if (currentEl) {
+            const listRect = moveList.getBoundingClientRect();
+            const elRect = currentEl.getBoundingClientRect();
+            if (elRect.top < listRect.top) {
+              moveList.scrollTop -= listRect.top - elRect.top;
+            } else if (elRect.bottom > listRect.bottom) {
+              moveList.scrollTop += elRect.bottom - listRect.bottom;
+            }
+          }
+        } else {
+          moveList.scrollTop = moveList.scrollHeight;
+        }
       }
 
-      // Show pending (preview) move notation faded at the end of the list
-      if (ui && ui.pendingMoveConfirm && reviewIndex === null) {
-        const { fromRank, fromFile, toRank, toFile, castling, enPassant, promotion } = ui.pendingMoveConfirm;
-        const piece = engine.getPiece(fromRank, fromFile);
-        if (piece) {
-          const capturedPiece = enPassant
-            ? engine.getPiece(fromRank, toFile)
-            : engine.getPiece(toRank, toFile);
-          const isFriendlyCapture = capturedPiece && capturedPiece.color === piece.color;
-          const { check, checkmate, stalemate, draw } = engine.previewMoveResult(fromRank, fromFile, toRank, toFile, promotion || null, castling !== undefined ? castling : undefined);
-          const pendingMoveData = {
-            piece,
-            from: { rank: fromRank, file: fromFile },
-            to: { rank: toRank, file: toFile },
-            captured: capturedPiece,
-            castling: castling || null,
-            enPassant: enPassant || false,
-            friendlyCapture: isFriendlyCapture || false,
-            promotion: promotion || null,
-            check,
-            checkmate,
-            stalemate,
-            draw,
-            disambiguation: engine.computeDisambiguation(fromRank, fromFile, toRank, toFile, piece),
-          };
-          const pendingNotation = engine.getMoveNotation(pendingMoveData);
-          const pendingSpan = document.createElement('span');
-          pendingSpan.className = 'move-notation move-notation--pending';
-          pendingSpan.textContent = pendingNotation;
+      function updateCaptured() {
+        // Top = opponent's captures, Bottom = our captures
+        const topEl = document.getElementById("captured-top");
+        const bottomEl = document.getElementById("captured-bottom");
 
-          if (history.length % 2 === 0) {
-            const moveNum = history.length / 2 + 1;
-            const row = document.createElement('div');
-            row.className = 'move-row';
-            const numSpan = document.createElement('span');
-            numSpan.className = 'move-number';
-            numSpan.textContent = `${moveNum}.`;
-            row.appendChild(numSpan);
-            row.appendChild(pendingSpan);
-            moveList.appendChild(row);
+        if (myColor === "white") {
+          ui.updateCapturedPieces(bottomEl, topEl);
+        } else {
+          ui.updateCapturedPieces(topEl, bottomEl);
+        }
+      }
+
+      function showGameOver() {
+        if (ui && ui.dark) {
+          ui.darkRevealed = true;
+          ui.render();
+        }
+        const overlay = document.getElementById("game-over-overlay");
+        const title = document.getElementById("game-over-title");
+        const reason = document.getElementById("game-over-reason");
+
+        overlay.hidden = false;
+
+        let titleText, reasonText;
+        if (engine.result === "draw") {
+          titleText = "Draw";
+          reasonText = engine.resultReason ? `by ${engine.resultReason}` : "";
+        } else if (engine.result === myColor) {
+          titleText = "You Win!";
+          reasonText = engine.resultReason ? `by ${engine.resultReason}` : "";
+        } else {
+          titleText = "You Lose";
+          reasonText = engine.resultReason ? `by ${engine.resultReason}` : "";
+        }
+
+        title.textContent = titleText;
+        reason.textContent = reasonText;
+
+        updateGameOverButtons();
+        notifyGameOver(titleText, reasonText);
+      }
+
+      function notifyGameOver(titleText, reasonText) {
+        if (!("Notification" in window)) return;
+        if (Notification.permission !== "granted") return;
+        if (document.visibilityState === "visible") return;
+        const body = reasonText ? `${reasonText}` : "The game has ended.";
+        showNotificationViaSW(getVariantName() + " — " + titleText, body, "game-over").catch((err) =>
+          console.error("[notify] showNotification failed:", err)
+        );
+      }
+
+      // Control buttons
+      document.getElementById("btn-resign").addEventListener("click", () => {
+        if (engine.gameOver) return;
+        if (confirm("Are you sure you want to resign?")) {
+          if (isBotMode) {
+            engine.gameOver = true;
+            engine.result = myColor === "white" ? "black" : "white";
+            engine.resultReason = "resignation";
+            ui.interactive = false;
+            showGameOver();
           } else {
-            const lastRow = moveList.lastChild;
-            if (lastRow) lastRow.appendChild(pendingSpan);
+            gm.sendResignation(myColor);
           }
         }
-      }
+      });
 
-      // Scroll to current move when reviewing; otherwise scroll to bottom
-      if (reviewIndex !== null) {
-        const currentEl = moveList.querySelector('.current-move');
-        if (currentEl) {
-          const listRect = moveList.getBoundingClientRect();
-          const elRect = currentEl.getBoundingClientRect();
-          if (elRect.top < listRect.top) {
-            moveList.scrollTop -= listRect.top - elRect.top;
-          } else if (elRect.bottom > listRect.bottom) {
-            moveList.scrollTop += elRect.bottom - listRect.bottom;
+      document.getElementById("btn-draw").addEventListener("click", () => {
+        if (engine.gameOver) return;
+        gm.offerDraw(myColor);
+        document.getElementById("game-status").textContent = "Draw offered...";
+      });
+
+      document.getElementById("btn-accept-draw").addEventListener("click", () => {
+        gm.acceptDraw();
+      });
+
+      document.getElementById("btn-decline-draw").addEventListener("click", () => {
+        gm.declineDraw();
+        document.getElementById("draw-offer-banner").hidden = true;
+      });
+
+      document.getElementById("btn-review-game").addEventListener("click", () => {
+        document.getElementById("game-over-overlay").hidden = true;
+      });
+
+      document.getElementById("btn-flip").addEventListener("click", () => {
+        ui.setFlipped(!ui.flipped);
+      });
+
+      // Confirm move
+      document.getElementById("btn-confirm-move").addEventListener("click", () => {
+        ui.confirmPendingMove();
+      });
+      document.getElementById("btn-cancel-move").addEventListener("click", () => {
+        ui.cancelPendingMove();
+        document.getElementById("confirm-move-bar").hidden = true;
+      });
+
+      // Review navigation
+      document.getElementById("btn-review-start").addEventListener("click", () => {
+        goToPosition(0);
+      });
+      document.getElementById("btn-review-prev").addEventListener("click", () => {
+        const liveIndex = positionSnapshots.length - 1;
+        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+        goToPosition(cur - 1);
+      });
+      document.getElementById("btn-review-next").addEventListener("click", () => {
+        const liveIndex = positionSnapshots.length - 1;
+        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+        goToPosition(cur + 1);
+      });
+      document.getElementById("btn-review-end").addEventListener("click", () => {
+        exitReview();
+      });
+
+      // Keyboard: left/right arrows navigate review; Enter/Escape for move confirm
+      document.addEventListener("keydown", (e) => {
+        if (ui && ui.pendingMoveConfirm) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            ui.confirmPendingMove();
+            return;
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            ui.cancelPendingMove();
+            document.getElementById("confirm-move-bar").hidden = true;
+            return;
           }
         }
-      } else {
-        moveList.scrollTop = moveList.scrollHeight;
-      }
-    }
-
-    function updateCaptured() {
-      // Top = opponent's captures, Bottom = our captures
-      const topEl = document.getElementById('captured-top');
-      const bottomEl = document.getElementById('captured-bottom');
-
-      if (myColor === 'white') {
-        ui.updateCapturedPieces(bottomEl, topEl);
-      } else {
-        ui.updateCapturedPieces(topEl, bottomEl);
-      }
-    }
-
-    function showGameOver() {
-      if (ui && ui.dark) { ui.darkRevealed = true; ui.render(); }
-      const overlay = document.getElementById('game-over-overlay');
-      const title = document.getElementById('game-over-title');
-      const reason = document.getElementById('game-over-reason');
-
-      overlay.hidden = false;
-
-      let titleText, reasonText;
-      if (engine.result === 'draw') {
-        titleText = 'Draw';
-        reasonText = engine.resultReason ? `by ${engine.resultReason}` : '';
-      } else if (engine.result === myColor) {
-        titleText = 'You Win!';
-        reasonText = engine.resultReason ? `by ${engine.resultReason}` : '';
-      } else {
-        titleText = 'You Lose';
-        reasonText = engine.resultReason ? `by ${engine.resultReason}` : '';
-      }
-
-      title.textContent = titleText;
-      reason.textContent = reasonText;
-
-      updateGameOverButtons();
-      notifyGameOver(titleText, reasonText);
-    }
-
-    function notifyGameOver(titleText, reasonText) {
-      if (!('Notification' in window)) return;
-      if (Notification.permission !== 'granted') return;
-      if (document.visibilityState === 'visible') return;
-      const body = reasonText ? `${reasonText}` : 'The game has ended.';
-      showNotificationViaSW(getVariantName() + ' — ' + titleText, body, 'game-over')
-        .catch(err => console.error('[notify] showNotification failed:', err));
-    }
-
-    // Control buttons
-    document.getElementById('btn-resign').addEventListener('click', () => {
-      if (engine.gameOver) return;
-      if (confirm('Are you sure you want to resign?')) {
-        if (isBotMode) {
-          engine.gameOver = true;
-          engine.result = myColor === 'white' ? 'black' : 'white';
-          engine.resultReason = 'resignation';
-          ui.interactive = false;
-          showGameOver();
-        } else {
-          gm.sendResignation(myColor);
+        if (e.key === "ArrowLeft") {
+          const liveIndex = positionSnapshots.length - 1;
+          const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+          if (cur > 0) goToPosition(cur - 1);
+        } else if (e.key === "ArrowRight") {
+          const liveIndex = positionSnapshots.length - 1;
+          const cur = reviewIndex !== null ? reviewIndex : liveIndex;
+          if (cur < liveIndex) goToPosition(cur + 1);
         }
-      }
-    });
+      });
 
-    document.getElementById('btn-draw').addEventListener('click', () => {
-      if (engine.gameOver) return;
-      gm.offerDraw(myColor);
-      document.getElementById('game-status').textContent = 'Draw offered...';
-    });
-
-    document.getElementById('btn-accept-draw').addEventListener('click', () => {
-      gm.acceptDraw();
-    });
-
-    document.getElementById('btn-decline-draw').addEventListener('click', () => {
-      gm.declineDraw();
-      document.getElementById('draw-offer-banner').hidden = true;
-    });
-
-    document.getElementById('btn-review-game').addEventListener('click', () => {
-      document.getElementById('game-over-overlay').hidden = true;
-    });
-
-    document.getElementById('btn-flip').addEventListener('click', () => {
-      ui.setFlipped(!ui.flipped);
-    });
-
-    // Confirm move
-    document.getElementById('btn-confirm-move').addEventListener('click', () => {
-      ui.confirmPendingMove();
-    });
-    document.getElementById('btn-cancel-move').addEventListener('click', () => {
-      ui.cancelPendingMove();
-      document.getElementById('confirm-move-bar').hidden = true;
-    });
-
-    // Review navigation
-    document.getElementById('btn-review-start').addEventListener('click', () => {
-      goToPosition(0);
-    });
-    document.getElementById('btn-review-prev').addEventListener('click', () => {
-      const liveIndex = positionSnapshots.length - 1;
-      const cur = reviewIndex !== null ? reviewIndex : liveIndex;
-      goToPosition(cur - 1);
-    });
-    document.getElementById('btn-review-next').addEventListener('click', () => {
-      const liveIndex = positionSnapshots.length - 1;
-      const cur = reviewIndex !== null ? reviewIndex : liveIndex;
-      goToPosition(cur + 1);
-    });
-    document.getElementById('btn-review-end').addEventListener('click', () => {
-      exitReview();
-    });
-
-    // Keyboard: left/right arrows navigate review; Enter/Escape for move confirm
-    document.addEventListener('keydown', (e) => {
-      if (ui && ui.pendingMoveConfirm) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          ui.confirmPendingMove();
-          return;
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
-          ui.cancelPendingMove();
-          document.getElementById('confirm-move-bar').hidden = true;
-          return;
-        }
-      }
-      if (e.key === 'ArrowLeft') {
-        const liveIndex = positionSnapshots.length - 1;
-        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
-        if (cur > 0) goToPosition(cur - 1);
-      } else if (e.key === 'ArrowRight') {
-        const liveIndex = positionSnapshots.length - 1;
-        const cur = reviewIndex !== null ? reviewIndex : liveIndex;
-        if (cur < liveIndex) goToPosition(cur + 1);
-      }
-    });
-
-    // Start
-    initGame().catch(err => {
-      console.error('Failed to initialize game:', err);
-      document.getElementById('game-status').textContent = 'Failed to connect. Check your Firebase config.';
-    });
-  </script>
-</body>
+      // Start
+      initGame().catch((err) => {
+        console.error("Failed to initialize game:", err);
+        document.getElementById("game-status").textContent = "Failed to connect. Check your Firebase config.";
+      });
+    </script>
+  </body>
 </html>

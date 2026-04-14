@@ -28,8 +28,8 @@ exports.notifyPlayerTurn = onValueWritten(
     const variant = game.variant ?? "iceskate";
     const isIceskate = variant.startsWith("iceskate");
     const isAngry = variant.startsWith("angry");
-    const isDark  = variant.startsWith("dark");
-    const isSuperchess  = variant.startsWith("superchess");
+    const isDark = variant.startsWith("dark");
+    const isSuperchess = variant.startsWith("superchess");
     const is960 = variant.endsWith("960") || variant.endsWith("-960");
     let notifTitle;
     if (isIceskate) {
@@ -46,9 +46,9 @@ exports.notifyPlayerTurn = onValueWritten(
 
     if (game.state.gameOver) {
       // Game is over — notify both players with a win/loss/draw message.
-      const result = game.state.result;         // 'white', 'black', or 'draw'
-      const resultReason = game.state.resultReason || '';
-      const reasonLabel = resultReason ? ` by ${resultReason}` : '';
+      const result = game.state.result; // 'white', 'black', or 'draw'
+      const resultReason = game.state.resultReason || "";
+      const reasonLabel = resultReason ? ` by ${resultReason}` : "";
 
       const sends = [];
       for (const color of ["white", "black"]) {
@@ -66,20 +66,20 @@ exports.notifyPlayerTurn = onValueWritten(
         }
 
         sends.push(
-          getMessaging().send({
-            token,
-            data: {
-              title: notifTitle,
-              body,
-              url: gameUrl,
-              tag: "game-over",
-            },
-            webpush: {
-              headers: { Urgency: "high" },
-            },
-          }).catch((err) =>
-            console.error(`Failed to send game-over notification to ${color}:`, err.message)
-          )
+          getMessaging()
+            .send({
+              token,
+              data: {
+                title: notifTitle,
+                body,
+                url: gameUrl,
+                tag: "game-over",
+              },
+              webpush: {
+                headers: { Urgency: "high" },
+              },
+            })
+            .catch((err) => console.error(`Failed to send game-over notification to ${color}:`, err.message))
         );
       }
       await Promise.all(sends);

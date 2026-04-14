@@ -18,14 +18,18 @@ button:disabled {
   padding: 20px 24px 20px 24px;
 }
 /* ===== Reset & Base ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 /* Ensure the HTML `hidden` attribute always wins over display rules in class selectors */
-[hidden] { display: none !important; }
+[hidden] {
+  display: none !important;
+}
 
 :root {
   --bg: #1a1a2e;
@@ -50,7 +54,7 @@ button:disabled {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -69,7 +73,9 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
   text-decoration: none;
   color: white;
 }
@@ -253,7 +259,9 @@ body {
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: border-color 0.15s, transform 0.1s;
+  transition:
+    border-color 0.15s,
+    transform 0.1s;
 }
 
 .btn-color-choice:active {
@@ -380,7 +388,8 @@ body {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  .game-main-left, .game-main-right {
+  .game-main-left,
+  .game-main-right {
     gap: 0;
   }
   .game-container .rules-panel {
@@ -500,7 +509,7 @@ body {
 }
 
 .captured-pieces[data-piece-color="white"]:not(:empty) {
-  background: rgba(0, 0, 0, 0.80);
+  background: rgba(0, 0, 0, 0.8);
   padding: 3px 8px;
   border-radius: 7px;
 }
@@ -581,7 +590,7 @@ body {
 
 /* Legal move dot */
 .square.legal-move::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 28%;
   height: 28%;
@@ -592,7 +601,7 @@ body {
 
 /* Legal capture ring */
 .square.legal-capture::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 90%;
   height: 90%;
@@ -603,7 +612,7 @@ body {
 
 /* Legal castling ring (castling target — blue) */
 .square.legal-friendly::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 90%;
   height: 90%;
@@ -615,17 +624,21 @@ body {
 /* Pieces */
 
 .piece {
-  font-family: 'Segoe UI Symbol', 'Noto Sans Symbols', sans-serif;
+  font-family: "Segoe UI Symbol", "Noto Sans Symbols", sans-serif;
   font-size: min(7vw, 65px);
   line-height: 1;
   align-self: end;
   pointer-events: none;
   z-index: 1;
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
-  transition: transform 0.16s cubic-bezier(0.4,0.0,0.2,1), left 0.16s, top 0.16s;
+  transition:
+    transform 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.16s,
+    top 0.16s;
 }
 
-.piece img, img.piece {
+.piece img,
+img.piece {
   width: min(12vw, 60px);
   height: min(12vw, 60px);
   object-fit: contain;
@@ -633,7 +646,10 @@ body {
   pointer-events: none;
   user-select: none;
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
-  transition: transform 0.16s cubic-bezier(0.4,0.0,0.2,1), left 0.16s, top 0.16s;
+  transition:
+    transform 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.16s,
+    top 0.16s;
 }
 
 .piece-white {
@@ -710,7 +726,9 @@ body {
   border: 2px solid #444;
   border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
   background: #f0d9b5;
   color: #1a1a2e;
   border-color: #b58863;
@@ -808,7 +826,7 @@ body {
   max-width: 360px;
   margin: 14px auto 0;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .rules-panel-angry h3 {
@@ -989,7 +1007,10 @@ body {
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(46, 204, 113, 0.7);
-  transition: transform 0.12s, background 0.18s, box-shadow 0.18s;
+  transition:
+    transform 0.12s,
+    background 0.18s,
+    box-shadow 0.18s;
   padding: 0;
 }
 
@@ -1016,7 +1037,9 @@ body {
   border: none;
   cursor: pointer;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
-  transition: transform 0.12s, background 0.18s;
+  transition:
+    transform 0.12s,
+    background 0.18s;
   padding: 0;
 }
 
@@ -1139,7 +1162,7 @@ body {
 /* Faint square-colour tint + grid lines rendered above the fog so bishops can be lined up */
 .dark-shrouded.light::before,
 .dark-shrouded.dark::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 6;
@@ -1155,7 +1178,7 @@ body {
 
 /* Blurry dark-fog overlay — sits above pieces, bleeds softly into adjacent revealed squares */
 .dark-shrouded::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: -5px;
   background: rgba(5, 5, 15, 0.96);
@@ -1179,8 +1202,6 @@ body {
   user-select: none;
   pointer-events: none;
 }
-
-
 
 /* ===== Superchess ===== */
 .btn-superchess {
