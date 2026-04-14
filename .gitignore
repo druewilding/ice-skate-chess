@@ -7,3 +7,6 @@ js/firebase-config.js
 # Cloud Functions dependencies
 functions/node_modules/
 firebase-debug.log
+
+# Ignore node_modules for the main project as well
+node_modules/
