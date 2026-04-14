@@ -47,8 +47,8 @@ exports.notifyPlayerTurn = onValueWritten(
     if (game.state.gameOver) {
       // Game is over — notify both players with a win/loss/draw message.
       const result = game.state.result;         // 'white', 'black', or 'draw'
-      const resultReason = game.state.resultReason || '';
-      const reasonLabel = resultReason ? ` by ${resultReason}` : '';
+      const resultReason = game.state.resultReason || "";
+      const reasonLabel = resultReason ? ` by ${resultReason}` : "";
 
       const sends = [];
       for (const color of ["white", "black"]) {

@@ -3,8 +3,8 @@
 // Supports: e4, Nf3, Bxe5, O-O, O-O-O, exd5, e8=Q, Rae1, R1e3, Qd1d3,
 // plus suffixes (+, #, *, $, !, ?) which are stripped before matching.
 
-const FILES = 'abcdefgh';
-const RANKS = '87654321'; // rank 0 = '8', rank 7 = '1'
+const FILES = "abcdefgh";
+const RANKS = "87654321"; // rank 0 = '8', rank 7 = '1'
 
 /**
  * Parse an algebraic notation string and find the matching legal move
@@ -13,35 +13,35 @@ const RANKS = '87654321'; // rank 0 = '8', rank 7 = '1'
  */
 export function parseAlgebraic(engine, notation) {
   // Strip decorative suffixes
-  let san = notation.replace(/[+#*$!?]+$/, '').trim();
+  let san = notation.replace(/[+#*$!?]+$/, "").trim();
 
   // --- Castling ---
-  if (san === 'O-O' || san === '0-0') {
-    return findCastlingMove(engine, 'king');
+  if (san === "O-O" || san === "0-0") {
+    return findCastlingMove(engine, "king");
   }
-  if (san === 'O-O-O' || san === '0-0-0') {
-    return findCastlingMove(engine, 'queen');
+  if (san === "O-O-O" || san === "0-0-0") {
+    return findCastlingMove(engine, "queen");
   }
 
   // --- Promotion ---
   let promotion = null;
   const promoMatch = san.match(/=([QRBNKA])$/i);
   if (promoMatch) {
-    const promoMap = { K: 'knight', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', A: 'amazon' };
+    const promoMap = { K: "knight", Q: "queen", R: "rook", B: "bishop", N: "knight", A: "amazon" };
     promotion = promoMap[promoMatch[1].toUpperCase()];
-    san = san.replace(/=[QRBNKA]$/i, '');
+    san = san.replace(/=[QRBNKA]$/i, "");
   }
 
   // --- Piece type ---
-  const pieceSymbols = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', A: 'amazon' };
-  let pieceType = 'pawn';
+  const pieceSymbols = { K: "king", Q: "queen", R: "rook", B: "bishop", N: "knight", A: "amazon" };
+  let pieceType = "pawn";
   if (/^[KQRBNKA]/.test(san)) {
     pieceType = pieceSymbols[san[0]];
     san = san.slice(1);
   }
 
   // --- Strip capture marker ---
-  san = san.replace(/x/g, '');
+  san = san.replace(/x/g, "");
 
   // Now san is something like: "e4", "f3", "ae1", "1e3", "d1d3", "d5"
   // Last two chars are always the target square
@@ -80,7 +80,7 @@ export function parseAlgebraic(engine, notation) {
       for (const move of moves) {
         if (move.rank !== targetRank || move.file !== targetFile) continue;
         if (promotion && move.promotion !== promotion) continue;
-        if (!promotion && move.promotion && move.promotion !== 'queen') continue; // default to queen
+        if (!promotion && move.promotion && move.promotion !== "queen") continue; // default to queen
         candidates.push({
           fromRank: r,
           fromFile: f,
@@ -98,7 +98,7 @@ export function parseAlgebraic(engine, notation) {
     throw new Error(
       `No legal move found for "${notation}" (${engine.turn} to move). ` +
       `Parsed: ${pieceType} → ${FILES[targetFile]}${RANKS[targetRank]}` +
-      (promotion ? ` promote=${promotion}` : '')
+      (promotion ? ` promote=${promotion}` : "")
     );
   }
 
@@ -106,7 +106,7 @@ export function parseAlgebraic(engine, notation) {
     // Try to narrow — shouldn't happen with correct notation, but be safe
     throw new Error(
       `Ambiguous move "${notation}" — ${candidates.length} candidates: ` +
-      candidates.map(c => `${FILES[c.fromFile]}${RANKS[c.fromRank]}-${FILES[c.toFile]}${RANKS[c.toRank]}`).join(', ')
+      candidates.map(c => `${FILES[c.fromFile]}${RANKS[c.fromRank]}-${FILES[c.toFile]}${RANKS[c.toRank]}`).join(", ")
     );
   }
 
@@ -115,11 +115,11 @@ export function parseAlgebraic(engine, notation) {
 
 function findCastlingMove(engine, side) {
   const color = engine.turn;
-  const baseRank = color === 'white' ? 7 : 0;
+  const baseRank = color === "white" ? 7 : 0;
 
   for (let f = 0; f < 8; f++) {
     const piece = engine.board[baseRank][f];
-    if (!piece || piece.type !== 'king' || piece.color !== color) continue;
+    if (!piece || piece.type !== "king" || piece.color !== color) continue;
 
     const moves = engine.getLegalMoves(baseRank, f);
     const castleMove = moves.find(m => m.castling === side);
@@ -136,5 +136,5 @@ function findCastlingMove(engine, side) {
     }
   }
 
-  throw new Error(`Castling ${side === 'king' ? 'O-O' : 'O-O-O'} is not legal for ${color}`);
+  throw new Error(`Castling ${side === "king" ? "O-O" : "O-O-O"} is not legal for ${color}`);
 }
