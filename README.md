@@ -58,6 +58,25 @@ All variants have a **Chess960** (Fischer Random) mode, where the back rank piec
 | `js/game-manager.js` | Firebase — game creation, real-time sync, draw offers     |
 | `functions/index.js` | Cloud Function — FCM push notifications                   |
 
+## Testing
+
+Tests are written with [Vitest](https://vitest.dev/) and live in the `tests/` directory. They cover all five variants: standard chess, Ice Skate, Angry, Dark, and Superchess.
+
+```bash
+npm test            # single run
+npm run test:watch  # watch mode
+```
+
+| File                       | What's tested                                                         |
+| -------------------------- | --------------------------------------------------------------------- |
+| `tests/standard.test.js`   | Captures, castling, en passant, promotion, stalemate, notation, draws |
+| `tests/angry.test.js`      | Friendly captures, capture accounting, `*` notation, checkmate cases  |
+| `tests/dark.test.js`       | Rules parity with standard, Scholar's mate, castling, en passant      |
+| `tests/iceskate.test.js`   | Forced maximum slide, check-blocking exception, captures              |
+| `tests/superchess.test.js` | Amazon promotion, amazon movement (queen + knight), checkmate         |
+
+Tests run automatically on every pull request via GitHub Actions.
+
 ## Running Locally
 
 ```bash
