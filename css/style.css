@@ -24,10 +24,14 @@ button:disabled {
   font-weight: bold;
   font-size: 13px;
   text-align: center;
-  padding: 6px 12px;
+  padding: 12px;
   border-radius: 6px;
   margin-bottom: 8px;
   letter-spacing: 0.03em;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 /* ===== Reset & Base ===== */
 *,

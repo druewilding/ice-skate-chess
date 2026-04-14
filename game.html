@@ -1108,7 +1108,7 @@
               warningEl.id = warningId;
               warningEl.className = "capture-inconsistency-warning";
             }
-            warningEl.textContent = `OH NO: capture pens are wrong (board ${boardAdvantage > 0 ? "+" : ""}${boardAdvantage}, pens ${penAdvantage > 0 ? "+" : ""}${penAdvantage})`;
+            warningEl.textContent = `Capture pens are wrong (board ${boardAdvantage > 0 ? "+" : ""}${boardAdvantage}, pens ${penAdvantage > 0 ? "+" : ""}${penAdvantage})`;
             document.querySelector(".game-main").prepend(warningEl);
             console.error("[capture-pen] inconsistency detected", {
               boardAdvantage,

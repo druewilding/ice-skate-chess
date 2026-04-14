@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { chess, chessFromPosition } from "./harness.js";
 import { ChessEngine } from "../js/chess-engine.js";
+import { chess, chessFromPosition } from "./harness.js";
 
 describe("Angry Chess", () => {
   // ── Friendly captures ──────────────────────────────────────────────
