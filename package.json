@@ -27,5 +27,6 @@
   "devDependencies": {
     "eslint-config-plus-prettier": "4.2.10",
     "vitest": "^4.1.4"
-  }
+  },
+  "prettier": "eslint-config-plus-prettier/prettier"
 }
