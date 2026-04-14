@@ -22,6 +22,9 @@ export class ChessEngine {
     // a friendly piece "shines a torch" (is selected) to reveal its targets.
     this.dark = options.dark || false;
 
+    // Superchess: pawns may promote to an Amazon (queen + knight combo piece).
+    this.superchess = options.superchess || false;
+
     this.reset();
   }
 
