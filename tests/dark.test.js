@@ -3,7 +3,6 @@ import { describe, it } from "vitest";
 import { chess } from "./harness.js";
 
 describe("Dark Chess", () => {
-
   // Dark Chess uses standard chess rules — the `dark` flag on the engine is
   // purely informational and doesn't change move generation or legality.
   // All visibility hiding is done by the UI (ChessUI). So here we verify that
@@ -17,8 +16,10 @@ describe("Dark Chess", () => {
       .play("e4", "e5", "Nf3", "Nc6", "Bb5")
       .assertTurn("black")
       .assertBoard({
-        e4: "wp", e5: "bp",
-        f3: "wN", c6: "bN",
+        e4: "wp",
+        e5: "bp",
+        f3: "wN",
+        c6: "bN",
         b5: "wB",
       })
       .assertCaptures({ white: [], black: [] })

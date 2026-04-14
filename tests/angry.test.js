@@ -3,7 +3,6 @@ import { describe, it } from "vitest";
 import { chess, chessFromPosition } from "./harness.js";
 
 describe("Angry Chess", () => {
-
   // ── Friendly captures ──────────────────────────────────────────────
 
   it("can capture own pieces (except king)", () => {
@@ -24,7 +23,7 @@ describe("Angry Chess", () => {
     // White knight on f3 captures own pawn on d2 — friendly capture
     chess("angry")
       .play("e4", "e5", "Nf3", "Nc6")
-      .play("Nfxd2")  // knight captures own pawn on d2
+      .play("Nfxd2") // knight captures own pawn on d2
       .assertPiece("d2", "knight", "white")
       .assertEmpty("f3")
       // Friendly capture: the captured piece (own pawn) is credited to OPPONENT's list
@@ -33,9 +32,7 @@ describe("Angry Chess", () => {
   });
 
   it("friendly capture notation uses * suffix", () => {
-    chess("angry")
-      .play("e4", "e5", "Nf3", "Nc6", "Nfxd2")
-      .assertLastMoves("Nfxd2*");
+    chess("angry").play("e4", "e5", "Nf3", "Nc6", "Nfxd2").assertLastMoves("Nfxd2*");
   });
 
   // ── Cannot capture own king ────────────────────────────────────────
@@ -74,10 +71,10 @@ describe("Angry Chess", () => {
   it("mixed friendly and enemy captures", () => {
     chess("angry")
       .play("e4", "e5", "Nf3", "Nc6")
-      .play("Nxe5")  // capture enemy pawn on e5
+      .play("Nxe5") // capture enemy pawn on e5
       .assertCaptures({ white: ["pawn"], black: [] })
       .assertMaterial(1)
-      .play("Nxe5")  // black recaptures white knight
+      .play("Nxe5") // black recaptures white knight
       .assertCaptures({ white: ["pawn"], black: ["knight"] })
       .assertMaterial(-2);
   });
@@ -87,10 +84,10 @@ describe("Angry Chess", () => {
   it("navigate history of angry captures", () => {
     chess("angry")
       .play("e4", "e5", "Nf3", "Nc6", "Nfxd2") // friendly capture move 5
-      .goToMove(4)   // before the friendly capture
+      .goToMove(4) // before the friendly capture
       .assertCaptures({ white: [], black: [] })
       .assertMaterial(0)
-      .goToMove(5)   // after the friendly capture
+      .goToMove(5) // after the friendly capture
       .assertCaptures({ white: [], black: ["pawn"] })
       .assertMaterial(-1)
       .goToLive();
@@ -101,10 +98,10 @@ describe("Angry Chess", () => {
   it("checkmate with no friendly escape in angry chess", () => {
     // Black king alone on h8. White queen on b7 → Qg7# covers g8 (file),
     // h7 (rank), and f8 (diagonal). No friendly black pieces to escape into.
-    chessFromPosition(
-      ".......k/.Q....../.....K../......../......../......../......../........",
-      { variant: "angry", turn: "white" }
-    )
+    chessFromPosition(".......k/.Q....../.....K../......../......../......../......../........", {
+      variant: "angry",
+      turn: "white",
+    })
       .play("Qg7#")
       .assertGameOver("white", "checkmate");
   });

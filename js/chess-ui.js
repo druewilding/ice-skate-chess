@@ -22,27 +22,26 @@ export class ChessUI {
     this.playerColor = options.playerColor || "white";
     this.darkRevealed = false;
 
-
     // Map for image filenames
     this.pieceImagePaths = {
       white: {
-        king:  "assets/pieces/white/king.webp",
+        king: "assets/pieces/white/king.webp",
         queen: "assets/pieces/white/queen.webp",
-        rook:  "assets/pieces/white/rook.webp",
-        bishop:"assets/pieces/white/bishop.webp",
-        knight:"assets/pieces/white/knight.webp",
-        pawn:  "assets/pieces/white/pawn.webp",
+        rook: "assets/pieces/white/rook.webp",
+        bishop: "assets/pieces/white/bishop.webp",
+        knight: "assets/pieces/white/knight.webp",
+        pawn: "assets/pieces/white/pawn.webp",
         amazon: "assets/pieces/white/amazon.webp",
       },
       black: {
-        king:  "assets/pieces/black/king.webp",
+        king: "assets/pieces/black/king.webp",
         queen: "assets/pieces/black/queen.webp",
-        rook:  "assets/pieces/black/rook.webp",
-        bishop:"assets/pieces/black/bishop.webp",
-        knight:"assets/pieces/black/knight.webp",
-        pawn:  "assets/pieces/black/pawn.webp",
+        rook: "assets/pieces/black/rook.webp",
+        bishop: "assets/pieces/black/bishop.webp",
+        knight: "assets/pieces/black/knight.webp",
+        pawn: "assets/pieces/black/pawn.webp",
         amazon: "assets/pieces/black/amazon.webp",
-      }
+      },
     };
 
     this.buildBoard();
@@ -105,8 +104,12 @@ export class ChessUI {
       if (castling) {
         // Castling is always on the back rank (fromRank === toRank)
         const rookFromFile = this.engine.initialRookFiles
-          ? (castling === "king" ? this.engine.initialRookFiles.king : this.engine.initialRookFiles.queen)
-          : (castling === "king" ? 7 : 0);
+          ? castling === "king"
+            ? this.engine.initialRookFiles.king
+            : this.engine.initialRookFiles.queen
+          : castling === "king"
+            ? 7
+            : 0;
         const kingToFile = toFile;
         const rookToFile = castling === "king" ? 5 : 3;
 
@@ -114,7 +117,7 @@ export class ChessUI {
         // Check destinations first, then sources — order matters for 960 overlaps
         if (file === kingToFile) return this.engine.getPiece(fromRank, fromFile);
         if (file === rookToFile) return this.engine.getPiece(fromRank, rookFromFile);
-        if (file === fromFile)    return null; // king vacated
+        if (file === fromFile) return null; // king vacated
         if (file === rookFromFile) return null; // rook vacated
         return this.engine.getPiece(rank, file);
       }
@@ -189,10 +192,29 @@ export class ChessUI {
         if (oldPiece) oldPiece.remove();
 
         // Remove state classes
-        square.classList.remove("selected", "legal-move", "legal-capture", "legal-friendly", "last-move", "in-check", "in-checkmate", "in-stalemate", "pending-from", "pending-to", "preview-check", "preview-checkmate", "preview-stalemate", "dark-shrouded", "dark-illuminated");
+        square.classList.remove(
+          "selected",
+          "legal-move",
+          "legal-capture",
+          "legal-friendly",
+          "last-move",
+          "in-check",
+          "in-checkmate",
+          "in-stalemate",
+          "pending-from",
+          "pending-to",
+          "preview-check",
+          "preview-checkmate",
+          "preview-stalemate",
+          "dark-shrouded",
+          "dark-illuminated"
+        );
 
         // Dark Chess: determine if this piece is hidden in darkness
-        const hidePiece = isDark && piece && piece.color !== this.playerColor &&
+        const hidePiece =
+          isDark &&
+          piece &&
+          piece.color !== this.playerColor &&
           !(illuminatedSquares && illuminatedSquares.has(`${rank},${file}`));
 
         if (piece && !hidePiece) {
@@ -219,26 +241,33 @@ export class ChessUI {
         if (this.lastMove) {
           const lastMoveIsOpponent = isDark && this.lastMove.piece.color !== this.playerColor;
           if (!lastMoveIsOpponent) {
-            if ((rank === this.lastMove.from.rank && file === this.lastMove.from.file) ||
-                (rank === this.lastMove.to.rank && file === this.lastMove.to.file)) {
+            if (
+              (rank === this.lastMove.from.rank && file === this.lastMove.from.file) ||
+              (rank === this.lastMove.to.rank && file === this.lastMove.to.file)
+            ) {
               square.classList.add("last-move");
             }
           }
         }
 
         // Highlight selected square (suppressed while confirming a pending move)
-        if (!this.pendingMoveConfirm && this.selectedSquare && rank === this.selectedSquare.rank && file === this.selectedSquare.file) {
+        if (
+          !this.pendingMoveConfirm &&
+          this.selectedSquare &&
+          rank === this.selectedSquare.rank &&
+          file === this.selectedSquare.file
+        ) {
           square.classList.add("selected");
         }
 
         // Highlight legal moves (suppressed while confirming a pending move)
         if (!this.pendingMoveConfirm) {
-          const isLegalTarget = this.legalMoves.some(m => m.rank === rank && m.file === file);
+          const isLegalTarget = this.legalMoves.some((m) => m.rank === rank && m.file === file);
           if (isLegalTarget) {
             const targetPiece = this.engine.getPiece(rank, file);
             // Also check en passant
-            const isEnPassant = this.legalMoves.some(m => m.rank === rank && m.file === file && m.enPassant);
-            const isCastlingTarget = this.legalMoves.some(m => m.rank === rank && m.file === file && m.castling);
+            const isEnPassant = this.legalMoves.some((m) => m.rank === rank && m.file === file && m.enPassant);
+            const isCastlingTarget = this.legalMoves.some((m) => m.rank === rank && m.file === file && m.castling);
             if (isCastlingTarget) {
               square.classList.add("legal-friendly");
             } else if (targetPiece || isEnPassant) {
@@ -301,20 +330,20 @@ export class ChessUI {
 
     // If a piece is selected and we clicked on a legal target
     if (this.selectedSquare) {
-      const isLegalTarget = this.legalMoves.some(m => m.rank === rank && m.file === file);
+      const isLegalTarget = this.legalMoves.some((m) => m.rank === rank && m.file === file);
 
       if (isLegalTarget) {
         // Check if this is a promotion move
-        const promotionMove = this.legalMoves.find(m => m.rank === rank && m.file === file && m.promotion);
+        const promotionMove = this.legalMoves.find((m) => m.rank === rank && m.file === file && m.promotion);
         if (promotionMove) {
           this.showPromotionDialog(rank, file);
           return;
         }
 
         // Check for castling ambiguity (Chess 960: king move and castle land on same square)
-        const movesToSquare = this.legalMoves.filter(m => m.rank === rank && m.file === file);
-        const castlingCandidate = movesToSquare.find(m => m.castling);
-        const regularCandidate = movesToSquare.find(m => !m.castling);
+        const movesToSquare = this.legalMoves.filter((m) => m.rank === rank && m.file === file);
+        const castlingCandidate = movesToSquare.find((m) => m.castling);
+        const regularCandidate = movesToSquare.find((m) => !m.castling);
         if (castlingCandidate && regularCandidate) {
           this.showCastlingDisambiguationDialog(rank, file, castlingCandidate, regularCandidate);
           return;
@@ -322,7 +351,7 @@ export class ChessUI {
 
         // Stage for confirmation instead of executing immediately
         if (this.confirmMove) {
-          const legalMove = this.legalMoves.find(m => m.rank === rank && m.file === file);
+          const legalMove = this.legalMoves.find((m) => m.rank === rank && m.file === file);
           this.pendingMoveConfirm = {
             fromRank: this.selectedSquare.rank,
             fromFile: this.selectedSquare.file,
@@ -378,10 +407,10 @@ export class ChessUI {
   // Animate a piece sliding from one square to another, then call onComplete.
   animateMove(fromRank, fromFile, toRank, toFile, pieceType, pieceColor, onComplete) {
     const fromEl = this.getSquareEl(fromRank, fromFile);
-    const toEl   = this.getSquareEl(toRank,   toFile);
+    const toEl = this.getSquareEl(toRank, toFile);
 
     const fromRect = fromEl.getBoundingClientRect();
-    const toRect   = toEl.getBoundingClientRect();
+    const toRect = toEl.getBoundingClientRect();
 
     // Hide the real piece at source (and destination, for remote moves where
     // the piece is already rendered at the target)
@@ -399,8 +428,8 @@ export class ChessUI {
     Object.assign(flyer.style, {
       position: "fixed",
       left: fromRect.left + "px",
-      top:  fromRect.top  + "px",
-      width:  fromRect.width  + "px",
+      top: fromRect.top + "px",
+      width: fromRect.width + "px",
       height: fromRect.height + "px",
       pointerEvents: "none",
       zIndex: "1000",
@@ -414,7 +443,7 @@ export class ChessUI {
     flyer.getBoundingClientRect();
 
     flyer.style.left = toRect.left + "px";
-    flyer.style.top  = toRect.top  + "px";
+    flyer.style.top = toRect.top + "px";
 
     const DURATION = 160; // ms
     let finished = false;
@@ -432,7 +461,6 @@ export class ChessUI {
   }
 
   executeMove(fromRank, fromFile, toRank, toFile, promotion = null, castling = undefined) {
-
     const piece = this.engine.getPiece(fromRank, fromFile);
     if (!piece) return;
     // Clear selection highlights and lock interaction for the duration of the animation
@@ -443,7 +471,10 @@ export class ChessUI {
 
     this.animateMove(fromRank, fromFile, toRank, toFile, piece.type, piece.color, () => {
       const moveData = this.engine.makeMove(fromRank, fromFile, toRank, toFile, promotion, castling);
-      if (!moveData) { this.render(); return; }
+      if (!moveData) {
+        this.render();
+        return;
+      }
 
       this.lastMove = moveData;
       this.render();
@@ -459,7 +490,14 @@ export class ChessUI {
     const { fromRank, fromFile, toRank, toFile, promotion, castling } = this.pendingMoveConfirm;
     this.pendingMoveConfirm = null;
     if (this.onPendingMoveChange) this.onPendingMoveChange(null);
-    this.executeMove(fromRank, fromFile, toRank, toFile, promotion || null, castling !== undefined ? castling : undefined);
+    this.executeMove(
+      fromRank,
+      fromFile,
+      toRank,
+      toFile,
+      promotion || null,
+      castling !== undefined ? castling : undefined
+    );
   }
 
   cancelPendingMove() {
@@ -596,16 +634,15 @@ export class ChessUI {
     if (this.pendingMoveConfirm) {
       const { fromRank, fromFile, toRank, toFile, enPassant } = this.pendingMoveConfirm;
       const movingPiece = this.engine.getPiece(fromRank, fromFile);
-      const capturedPiece = enPassant
-        ? this.engine.getPiece(fromRank, toFile)
-        : this.engine.getPiece(toRank, toFile);
+      const capturedPiece = enPassant ? this.engine.getPiece(fromRank, toFile) : this.engine.getPiece(toRank, toFile);
       if (movingPiece && capturedPiece) {
         pendingCapture = { capturedBy: movingPiece.color, type: capturedPiece.type };
       }
     }
 
     // Score by live board so promotions count automatically
-    let whiteOnBoard = 0, blackOnBoard = 0;
+    let whiteOnBoard = 0,
+      blackOnBoard = 0;
     for (let r = 0; r < 8; r++) {
       for (let f = 0; f < 8; f++) {
         const p = this.engine.board[r][f];
@@ -743,9 +780,21 @@ export class ChessUI {
     }
 
     // capturedDisplayWhite shows pieces captured BY white (i.e. black pieces)
-    render(capturedDisplayWhite, whiteCaptures, whitePreviewType, "black",
-           previewWhiteAdv, previewWhiteAdv !== currentWhiteAdv);
-    render(capturedDisplayBlack, blackCaptures, blackPreviewType, "white",
-           previewBlackAdv, previewBlackAdv !== currentBlackAdv);
+    render(
+      capturedDisplayWhite,
+      whiteCaptures,
+      whitePreviewType,
+      "black",
+      previewWhiteAdv,
+      previewWhiteAdv !== currentWhiteAdv
+    );
+    render(
+      capturedDisplayBlack,
+      blackCaptures,
+      blackPreviewType,
+      "white",
+      previewBlackAdv,
+      previewBlackAdv !== currentBlackAdv
+    );
   }
 }

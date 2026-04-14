@@ -97,8 +97,8 @@ export function parseAlgebraic(engine, notation) {
   if (candidates.length === 0) {
     throw new Error(
       `No legal move found for "${notation}" (${engine.turn} to move). ` +
-      `Parsed: ${pieceType} → ${FILES[targetFile]}${RANKS[targetRank]}` +
-      (promotion ? ` promote=${promotion}` : "")
+        `Parsed: ${pieceType} → ${FILES[targetFile]}${RANKS[targetRank]}` +
+        (promotion ? ` promote=${promotion}` : "")
     );
   }
 
@@ -106,7 +106,9 @@ export function parseAlgebraic(engine, notation) {
     // Try to narrow — shouldn't happen with correct notation, but be safe
     throw new Error(
       `Ambiguous move "${notation}" — ${candidates.length} candidates: ` +
-      candidates.map(c => `${FILES[c.fromFile]}${RANKS[c.fromRank]}-${FILES[c.toFile]}${RANKS[c.toRank]}`).join(", ")
+        candidates
+          .map((c) => `${FILES[c.fromFile]}${RANKS[c.fromRank]}-${FILES[c.toFile]}${RANKS[c.toRank]}`)
+          .join(", ")
     );
   }
 
@@ -122,7 +124,7 @@ function findCastlingMove(engine, side) {
     if (!piece || piece.type !== "king" || piece.color !== color) continue;
 
     const moves = engine.getLegalMoves(baseRank, f);
-    const castleMove = moves.find(m => m.castling === side);
+    const castleMove = moves.find((m) => m.castling === side);
     if (castleMove) {
       return {
         fromRank: baseRank,

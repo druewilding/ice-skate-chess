@@ -21,9 +21,7 @@ self.addEventListener("push", (event) => {
   // Only show the notification if the user isn't already looking at the game.
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
-      const gameIsVisible = windowClients.some(
-        (c) => c.visibilityState === "visible" && c.url === (data.url || "/")
-      );
+      const gameIsVisible = windowClients.some((c) => c.visibilityState === "visible" && c.url === (data.url || "/"));
       if (gameIsVisible) return;
       return self.registration.showNotification(title, options);
     })

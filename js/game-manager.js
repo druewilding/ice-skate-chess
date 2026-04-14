@@ -18,8 +18,8 @@ export class GameManager {
   async init() {
     // Dynamic import of Firebase SDK from CDN
     const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js");
-    const { getDatabase, ref, set, get, onValue, update, push, onDisconnect, serverTimestamp }
-      = await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js");
+    const { getDatabase, ref, set, get, onValue, update, push, onDisconnect, serverTimestamp } =
+      await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js");
 
     this.app = initializeApp(firebaseConfig);
     // Pass databaseURL explicitly — required for non-US regions (Europe, Asia, etc.)
@@ -174,7 +174,8 @@ export class GameManager {
     if (!firebaseConfig.vapidKey) return;
     if (!("serviceWorker" in navigator)) return;
     try {
-      const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js");
+      const { getMessaging, getToken } =
+        await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js");
       const messaging = getMessaging(this.app);
       const swReg = await navigator.serviceWorker.ready;
       const token = await getToken(messaging, {
@@ -196,9 +197,9 @@ export class GameManager {
     // Use hash routing — the hash is never sent to the server so static hosts
     // (serve, GitHub Pages, Netlify, etc.) cannot strip or redirect it.
     const base = window.location.href
-      .replace(/#.*$/, "")          // strip existing hash
+      .replace(/#.*$/, "") // strip existing hash
       .replace(/game(\.html)?$/, "") // strip game / game.html filename
-      .replace(/\/$/, "");           // strip trailing slash
+      .replace(/\/$/, ""); // strip trailing slash
     return `${base}/game.html#${this.gameId}`;
   }
 

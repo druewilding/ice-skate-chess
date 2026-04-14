@@ -1,340 +1,380 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chess Variants</title>
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4a9eff">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Chess Variants</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess Variants</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#4a9eff" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Chess Variants</h1>
 
-    <div class="lobby-layout">
-
-    <div class="lobby-left">
-      <div class="card">
-        <h2>New Game</h2>
-        <div id="variant-picker">
-          <button id="btn-new-standard" class="btn btn-primary btn-iceskate">Ice Skate Chess</button>
-          <button id="btn-new-960" class="btn btn-primary btn-iceskate">Ice Skate Chess960</button>
-          <button id="btn-new-angry" class="btn btn-primary btn-angry">Angry Chess</button>
-          <button id="btn-new-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
-          <button id="btn-new-dark" class="btn btn-primary btn-dark">Dark Chess</button>
-          <button id="btn-new-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
-          <button id="btn-new-superchess" class="btn btn-primary btn-superchess">Superchess</button>
-          <button id="btn-new-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
-        </div>
-        <div id="color-picker" hidden>
-          <p id="color-picker-title" class="color-picker-title"></p>
-          <p class="color-picker-label">Choose your colour…</p>
-          <div class="color-picker-buttons">
-            <button id="btn-color-white" class="btn btn-color-choice btn-color-white-choice">
-              <span class="color-choice-piece"><img src="assets/pieces/white/king.webp" alt="" aria-hidden="true"></span>
-              <span>White</span>
-            </button>
-            <button id="btn-color-black" class="btn btn-color-choice btn-color-black-choice">
-              <span class="color-choice-piece"><img src="assets/pieces/black/king.webp" alt="" aria-hidden="true"></span>
-              <span>Black</span>
-            </button>
-            <button id="btn-color-random" class="btn btn-color-choice btn-color-random-choice">
-              <span class="color-choice-piece">🎲</span>
-              <span>Random</span>
-            </button>
+      <div class="lobby-layout">
+        <div class="lobby-left">
+          <div class="card">
+            <h2>New Game</h2>
+            <div id="variant-picker">
+              <button id="btn-new-standard" class="btn btn-primary btn-iceskate">Ice Skate Chess</button>
+              <button id="btn-new-960" class="btn btn-primary btn-iceskate">Ice Skate Chess960</button>
+              <button id="btn-new-angry" class="btn btn-primary btn-angry">Angry Chess</button>
+              <button id="btn-new-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
+              <button id="btn-new-dark" class="btn btn-primary btn-dark">Dark Chess</button>
+              <button id="btn-new-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
+              <button id="btn-new-superchess" class="btn btn-primary btn-superchess">Superchess</button>
+              <button id="btn-new-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
+            </div>
+            <div id="color-picker" hidden>
+              <p id="color-picker-title" class="color-picker-title"></p>
+              <p class="color-picker-label">Choose your colour…</p>
+              <div class="color-picker-buttons">
+                <button id="btn-color-white" class="btn btn-color-choice btn-color-white-choice">
+                  <span class="color-choice-piece"
+                    ><img src="assets/pieces/white/king.webp" alt="" aria-hidden="true"
+                  /></span>
+                  <span>White</span>
+                </button>
+                <button id="btn-color-black" class="btn btn-color-choice btn-color-black-choice">
+                  <span class="color-choice-piece"
+                    ><img src="assets/pieces/black/king.webp" alt="" aria-hidden="true"
+                  /></span>
+                  <span>Black</span>
+                </button>
+                <button id="btn-color-random" class="btn btn-color-choice btn-color-random-choice">
+                  <span class="color-choice-piece">🎲</span>
+                  <span>Random</span>
+                </button>
+              </div>
+              <button id="btn-back-to-variants" class="btn btn-small btn-back" style="width: 100%; margin-top: 8px">
+                ← Back
+              </button>
+            </div>
           </div>
-          <button id="btn-back-to-variants" class="btn btn-small btn-back" style="width:100%;margin-top:8px">← Back</button>
+
+          <div class="card">
+            <h2>Join Game</h2>
+            <div class="join-form">
+              <input type="text" id="game-id-input" placeholder="Enter game code" maxlength="8" autocomplete="off" />
+              <button id="btn-join" class="btn btn-primary">Join</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Play against a Bot 🤖</h2>
+            <div id="bot-variant-picker">
+              <button id="btn-bot-standard" class="btn btn-primary btn-iceskate">Ice Skate Chess</button>
+              <button id="btn-bot-960" class="btn btn-primary btn-iceskate">Ice Skate Chess960</button>
+              <button id="btn-bot-angry" class="btn btn-primary btn-angry">Angry Chess</button>
+              <button id="btn-bot-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
+              <button id="btn-bot-dark" class="btn btn-primary btn-dark">Dark Chess</button>
+              <button id="btn-bot-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
+              <button id="btn-bot-superchess" class="btn btn-primary btn-superchess">Superchess</button>
+              <button id="btn-bot-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
+            </div>
+            <div id="bot-color-picker" hidden>
+              <p id="bot-color-picker-title" class="color-picker-title"></p>
+              <p class="color-picker-label">Choose your colour…</p>
+              <div class="color-picker-buttons">
+                <button id="btn-bot-white" class="btn btn-color-choice btn-color-white-choice">
+                  <span class="color-choice-piece"
+                    ><img src="assets/pieces/white/king.webp" alt="" aria-hidden="true"
+                  /></span>
+                  <span>White</span>
+                </button>
+                <button id="btn-bot-black" class="btn btn-color-choice btn-color-black-choice">
+                  <span class="color-choice-piece"
+                    ><img src="assets/pieces/black/king.webp" alt="" aria-hidden="true"
+                  /></span>
+                  <span>Black</span>
+                </button>
+                <button id="btn-bot-random" class="btn btn-color-choice btn-color-random-choice">
+                  <span class="color-choice-piece">🎲</span>
+                  <span>Random</span>
+                </button>
+              </div>
+              <button id="btn-bot-back" class="btn btn-small btn-back" style="width: 100%; margin-top: 8px">
+                ← Back
+              </button>
+            </div>
+          </div>
+
+          <div id="error-message" class="error-message" hidden></div>
         </div>
+        <!-- /.lobby-left -->
+
+        <div class="lobby-right">
+          <section class="rules-panel rules-panel-iceskate">
+            <details open>
+              <summary><h3>How to Play Ice Skate Chess</h3></summary>
+              <div>
+                <p>
+                  Like regular chess, except sliding pieces (bishops, rooks, and queens)
+                  <strong>cannot stop early</strong> — they must travel as far as possible in their chosen direction,
+                  stopping only when they hit the edge of the board or a friendly piece, or capture an enemy piece. They
+                  <em>may</em> stop at an intermediate square to block check, as this is the furthest they can go in
+                  this situation.
+                </p>
+                <p>This variant was made up by my sibling Luna.</p>
+                <img
+                  src="assets/images/ice-skate-chess.png"
+                  alt="Ice Skate Chess screenshot"
+                  class="variant-screenshot"
+                />
+              </div>
+            </details>
+          </section>
+
+          <section class="rules-panel rules-panel-angry">
+            <details>
+              <summary><h3>How to Play Angry Chess</h3></summary>
+              <div>
+                <p>
+                  Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid
+                  target, except your own king. Be careful: sacrificing your own material can open lines, but it can
+                  also backfire spectacularly.
+                </p>
+                <img src="assets/images/angry-chess.png" alt="Angry Chess screenshot" class="variant-screenshot" />
+              </div>
+            </details>
+          </section>
+
+          <section class="rules-panel rules-panel-dark">
+            <details>
+              <summary><h3>How to Play Dark Chess</h3></summary>
+              <div>
+                <p>
+                  Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own
+                  pieces, but enemy pieces are completely hidden. Tap one of your pieces to
+                  <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.
+                </p>
+                <img src="assets/images/dark-chess.png" alt="Dark Chess screenshot" class="variant-screenshot" />
+              </div>
+            </details>
+          </section>
+
+          <section class="rules-panel rules-panel-superchess">
+            <details>
+              <summary><h3>How to Play Superchess</h3></summary>
+              <div>
+                <p>
+                  The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a
+                  powerful piece combining the abilities of both a queen and a knight, making it a formidable addition
+                  to your arsenal.
+                </p>
+                <img src="assets/images/superchess.png" alt="Superchess screenshot" class="variant-screenshot" />
+              </div>
+            </details>
+          </section>
+
+          <section class="rules-panel rules-panel-960">
+            <details>
+              <summary><h3>How to Play Chess960</h3></summary>
+              <div>
+                <p>
+                  Also known as <strong>Fischer Random Chess</strong>. The back rank pieces are shuffled into one of 960
+                  possible starting positions, so opening theory goes out the window. Castling still works — the king
+                  and rook end up on their usual squares, regardless of where they started.
+                </p>
+                <img src="assets/images/chess-960.png" alt="Chess960 screenshot" class="variant-screenshot" />
+              </div>
+            </details>
+          </section>
+        </div>
+        <!-- /.lobby-right -->
       </div>
+      <!-- /.lobby-layout -->
 
-      <div class="card">
-        <h2>Join Game</h2>
-        <div class="join-form">
-          <input type="text" id="game-id-input" placeholder="Enter game code" maxlength="8" autocomplete="off">
-          <button id="btn-join" class="btn btn-primary">Join</button>
-        </div>
-      </div>
+      <!-- Waiting screen shown after creating a game -->
+      <!-- Removed: waiting is now handled inside game.html -->
+    </div>
 
-      <div class="card">
-        <h2>Play against a Bot 🤖</h2>
-        <div id="bot-variant-picker">
-          <button id="btn-bot-standard" class="btn btn-primary btn-iceskate">Ice Skate Chess</button>
-          <button id="btn-bot-960" class="btn btn-primary btn-iceskate">Ice Skate Chess960</button>
-          <button id="btn-bot-angry" class="btn btn-primary btn-angry">Angry Chess</button>
-          <button id="btn-bot-angry-960" class="btn btn-primary btn-angry">Angry Chess960</button>
-          <button id="btn-bot-dark" class="btn btn-primary btn-dark">Dark Chess</button>
-          <button id="btn-bot-dark-960" class="btn btn-primary btn-dark">Dark Chess960</button>
-          <button id="btn-bot-superchess" class="btn btn-primary btn-superchess">Superchess</button>
-          <button id="btn-bot-superchess-960" class="btn btn-primary btn-superchess">Superchess960</button>
-        </div>
-        <div id="bot-color-picker" hidden>
-          <p id="bot-color-picker-title" class="color-picker-title"></p>
-          <p class="color-picker-label">Choose your colour…</p>
-          <div class="color-picker-buttons">
-            <button id="btn-bot-white" class="btn btn-color-choice btn-color-white-choice">
-              <span class="color-choice-piece"><img src="assets/pieces/white/king.webp" alt="" aria-hidden="true"></span>
-              <span>White</span>
-            </button>
-            <button id="btn-bot-black" class="btn btn-color-choice btn-color-black-choice">
-              <span class="color-choice-piece"><img src="assets/pieces/black/king.webp" alt="" aria-hidden="true"></span>
-              <span>Black</span>
-            </button>
-            <button id="btn-bot-random" class="btn btn-color-choice btn-color-random-choice">
-              <span class="color-choice-piece">🎲</span>
-              <span>Random</span>
-            </button>
-          </div>
-          <button id="btn-bot-back" class="btn btn-small btn-back" style="width:100%;margin-top:8px">← Back</button>
-        </div>
-      </div>
+    <script type="module">
+      import { ChessEngine } from "./js/chess-engine.js";
+      import { GameManager } from "./js/game-manager.js";
 
-      <div id="error-message" class="error-message" hidden></div>
-    </div><!-- /.lobby-left -->
+      const gm = new GameManager();
+      const engine = new ChessEngine({ iceskate: true });
+      let initialized = false;
 
-    <div class="lobby-right">
-      <section class="rules-panel rules-panel-iceskate">
-        <details open>
-          <summary><h3>How to Play Ice Skate Chess</h3></summary>
-          <div>
-            <p>Like regular chess, except sliding pieces (bishops, rooks, and queens) <strong>cannot stop early</strong> — they must travel as far as possible in their chosen direction, stopping only when they hit the edge of the board or a friendly piece, or capture an enemy piece. They <em>may</em> stop at an intermediate square to block check, as this is the furthest they can go in this situation.</p>
-            <p>This variant was made up by my sibling Luna.</p>
-            <img src="assets/images/ice-skate-chess.png" alt="Ice Skate Chess screenshot" class="variant-screenshot">
-          </div>
-        </details>
-      </section>
-
-      <section class="rules-panel rules-panel-angry">
-        <details>
-          <summary><h3>How to Play Angry Chess</h3></summary>
-          <div>
-            <p>Like regular chess, except you can <strong>capture your own pieces</strong>! Every piece is a valid target, except your own king. Be careful: sacrificing your own material can open lines, but it can also backfire spectacularly.</p>
-            <img src="assets/images/angry-chess.png" alt="Angry Chess screenshot" class="variant-screenshot">
-          </div>
-        </details>
-      </section>
-
-      <section class="rules-panel rules-panel-dark">
-        <details>
-          <summary><h3>How to Play Dark Chess</h3></summary>
-          <div>
-            <p>Standard chess, but the board is <strong>shrouded in darkness</strong>. You can always see your own pieces, but enemy pieces are completely hidden. Tap one of your pieces to <strong>shine a torch</strong> — its legal moves light up, revealing any enemies lurking in the path.</p>
-            <img src="assets/images/dark-chess.png" alt="Dark Chess screenshot" class="variant-screenshot">
-          </div>
-        </details>
-      </section>
-
-      <section class="rules-panel rules-panel-superchess">
-         <details>
-          <summary><h3>How to Play Superchess</h3></summary>
-          <div>
-            <p>The same as standard chess, until you get to promotion, at which point you can claim an Amazon, a powerful piece combining the abilities of both a queen and a knight, making it a formidable addition to your arsenal.</p>
-            <img src="assets/images/superchess.png" alt="Superchess screenshot" class="variant-screenshot">
-          </div>
-        </details>
-      </section>
-
-      <section class="rules-panel rules-panel-960">
-        <details>
-          <summary><h3>How to Play Chess960</h3></summary>
-          <div>
-            <p>Also known as <strong>Fischer Random Chess</strong>. The back rank pieces are shuffled into one of 960 possible starting positions, so opening theory goes out the window. Castling still works — the king and rook end up on their usual squares, regardless of where they started.</p>
-            <img src="assets/images/chess-960.png" alt="Chess960 screenshot" class="variant-screenshot">
-          </div>
-        </details>
-      </section>
-    </div><!-- /.lobby-right -->
-
-    </div><!-- /.lobby-layout -->
-
-    <!-- Waiting screen shown after creating a game -->
-    <!-- Removed: waiting is now handled inside game.html -->
-  </div>
-
-  <script type="module">
-    import { ChessEngine } from './js/chess-engine.js';
-    import { GameManager } from './js/game-manager.js';
-
-    const gm = new GameManager();
-    const engine = new ChessEngine({ iceskate: true });
-    let initialized = false;
-
-    async function ensureInit() {
-      if (!initialized) {
-        await gm.init();
-        initialized = true;
-      }
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('error-message');
-      el.textContent = msg;
-      el.hidden = false;
-      setTimeout(() => { el.hidden = true; }, 5000);
-    }
-
-    // If the user arrives at index.html with a game hash, forward to game.html
-    if (window.location.hash && window.location.hash.length > 1) {
-      window.location.href = 'game.html' + window.location.hash;
-    }
-
-    const VARIANT_NAMES = {
-      'iceskate':       'Ice Skate Chess',
-      'iceskate-960':   'Ice Skate Chess960',
-      'angry':          'Angry Chess',
-      'angry-960':      'Angry Chess960',
-      'dark':           'Dark Chess',
-      'dark-960':       'Dark Chess960',
-      'superchess':     'Superchess',
-      'superchess-960': 'Superchess960',
-    };
-
-    const VARIANT_PANEL_MAP = {
-      'iceskate':       ['.rules-panel-iceskate'],
-      'iceskate-960':   ['.rules-panel-iceskate', '.rules-panel-960'],
-      'angry':          ['.rules-panel-angry'],
-      'angry-960':      ['.rules-panel-angry', '.rules-panel-960'],
-      'dark':           ['.rules-panel-dark'],
-      'dark-960':       ['.rules-panel-dark', '.rules-panel-960'],
-      'superchess':     ['.rules-panel-superchess'],
-      'superchess-960': ['.rules-panel-superchess', '.rules-panel-960'],
-    };
-
-    function openRulesForVariant(variant) {
-      document.querySelectorAll('.rules-panel details').forEach(d => d.removeAttribute('open'));
-      const selectors = VARIANT_PANEL_MAP[variant] || [];
-      selectors.forEach(sel => {
-        const details = document.querySelector(sel + ' details');
-        if (details) details.setAttribute('open', '');
-      });
-    }
-
-    let pendingVariant = null;
-
-    function showColorPicker(variant) {
-      pendingVariant = variant;
-      document.getElementById('color-picker-title').textContent =
-        `Play ${VARIANT_NAMES[variant]} against an opponent`;
-      document.getElementById('variant-picker').hidden = true;
-      document.getElementById('color-picker').hidden = false;
-      openRulesForVariant(variant);
-    }
-
-    document.getElementById('btn-new-standard').addEventListener('click', () => showColorPicker('iceskate'));
-    document.getElementById('btn-new-960').addEventListener('click', () => showColorPicker('iceskate-960'));
-    document.getElementById('btn-new-angry').addEventListener('click', () => showColorPicker('angry'));
-    document.getElementById('btn-new-angry-960').addEventListener('click', () => showColorPicker('angry-960'));
-    document.getElementById('btn-new-dark').addEventListener('click', () => showColorPicker('dark'));
-    document.getElementById('btn-new-dark-960').addEventListener('click', () => showColorPicker('dark-960'));
-    document.getElementById('btn-new-superchess').addEventListener('click', () => showColorPicker('superchess'));
-    document.getElementById('btn-new-superchess-960').addEventListener('click', () => showColorPicker('superchess-960'));
-
-    document.getElementById('btn-back-to-variants').addEventListener('click', () => {
-      document.getElementById('color-picker').hidden = true;
-      document.getElementById('variant-picker').hidden = false;
-      pendingVariant = null;
-    });
-
-    async function startGame(chosenColor) {
-      const color = chosenColor === 'random'
-        ? (Math.random() < 0.5 ? 'white' : 'black')
-        : chosenColor;
-      try {
-        await ensureInit();
-        const gameId = await gm.createGame(pendingVariant, color);
-
-        const isIceskate = pendingVariant === 'iceskate' || pendingVariant === 'iceskate-960';
-        const isAngry = pendingVariant === 'angry' || pendingVariant === 'angry-960';
-        const isDark = pendingVariant === 'dark' || pendingVariant === 'dark-960';
-        const isSuperchess = pendingVariant === 'superchess' || pendingVariant === 'superchess-960';
-        engine.iceskate = isIceskate;
-        engine.angry = isAngry;
-        engine.dark = isDark;
-        engine.superchess = isSuperchess;
-        if (pendingVariant.endsWith('-960')) {
-          engine.setup960();
-        } else {
-          engine.reset();
+      async function ensureInit() {
+        if (!initialized) {
+          await gm.init();
+          initialized = true;
         }
-        await gm.sendGameState(engine.serialize());
-
-        localStorage.setItem('chess-color-' + gameId, color);
-        localStorage.setItem('chess-creator-' + gameId, '1');
-        window.location.href = 'game.html#' + gameId;
-      } catch (err) {
-        showError('Failed to create game: ' + err.message);
       }
-    }
 
-    document.getElementById('btn-color-white').addEventListener('click', () => startGame('white'));
-    document.getElementById('btn-color-random').addEventListener('click', () => startGame('random'));
-    document.getElementById('btn-color-black').addEventListener('click', () => startGame('black'));
-
-    // Join game
-    document.getElementById('btn-join').addEventListener('click', async () => {
-      const gameId = document.getElementById('game-id-input').value.trim().toLowerCase();
-      if (!gameId) {
-        showError('Please enter a game code');
-        return;
+      function showError(msg) {
+        const el = document.getElementById("error-message");
+        el.textContent = msg;
+        el.hidden = false;
+        setTimeout(() => {
+          el.hidden = true;
+        }, 5000);
       }
-      try {
-        await ensureInit();
-        await gm.joinGame(gameId);
-        localStorage.setItem('chess-color-' + gameId, 'black');
-        window.location.href = 'game.html#' + gameId;
-      } catch (err) {
-        showError(err.message);
+
+      // If the user arrives at index.html with a game hash, forward to game.html
+      if (window.location.hash && window.location.hash.length > 1) {
+        window.location.href = "game.html" + window.location.hash;
       }
-    });
 
-    // Allow Enter key in input
-    document.getElementById('game-id-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') document.getElementById('btn-join').click();
-    });
+      const VARIANT_NAMES = {
+        iceskate: "Ice Skate Chess",
+        "iceskate-960": "Ice Skate Chess960",
+        angry: "Angry Chess",
+        "angry-960": "Angry Chess960",
+        dark: "Dark Chess",
+        "dark-960": "Dark Chess960",
+        superchess: "Superchess",
+        "superchess-960": "Superchess960",
+      };
 
-    // Bot game
-    let pendingBotVariant = null;
+      const VARIANT_PANEL_MAP = {
+        iceskate: [".rules-panel-iceskate"],
+        "iceskate-960": [".rules-panel-iceskate", ".rules-panel-960"],
+        angry: [".rules-panel-angry"],
+        "angry-960": [".rules-panel-angry", ".rules-panel-960"],
+        dark: [".rules-panel-dark"],
+        "dark-960": [".rules-panel-dark", ".rules-panel-960"],
+        superchess: [".rules-panel-superchess"],
+        "superchess-960": [".rules-panel-superchess", ".rules-panel-960"],
+      };
 
-    function showBotColorPicker(variant) {
-      pendingBotVariant = variant;
-      document.getElementById('bot-color-picker-title').textContent =
-        `Play ${VARIANT_NAMES[variant]} against a bot`;
-      document.getElementById('bot-variant-picker').hidden = true;
-      document.getElementById('bot-color-picker').hidden = false;
-      openRulesForVariant(variant);
-    }
+      function openRulesForVariant(variant) {
+        document.querySelectorAll(".rules-panel details").forEach((d) => d.removeAttribute("open"));
+        const selectors = VARIANT_PANEL_MAP[variant] || [];
+        selectors.forEach((sel) => {
+          const details = document.querySelector(sel + " details");
+          if (details) details.setAttribute("open", "");
+        });
+      }
 
-    document.getElementById('btn-bot-standard').addEventListener('click', () => showBotColorPicker('iceskate'));
-    document.getElementById('btn-bot-960').addEventListener('click', () => showBotColorPicker('iceskate-960'));
-    document.getElementById('btn-bot-angry').addEventListener('click', () => showBotColorPicker('angry'));
-    document.getElementById('btn-bot-angry-960').addEventListener('click', () => showBotColorPicker('angry-960'));
-    document.getElementById('btn-bot-dark').addEventListener('click', () => showBotColorPicker('dark'));
-    document.getElementById('btn-bot-dark-960').addEventListener('click', () => showBotColorPicker('dark-960'));
-    document.getElementById('btn-bot-superchess').addEventListener('click', () => showBotColorPicker('superchess'));
-    document.getElementById('btn-bot-superchess-960').addEventListener('click', () => showBotColorPicker('superchess-960'));
+      let pendingVariant = null;
 
-    document.getElementById('btn-bot-back').addEventListener('click', () => {
-      document.getElementById('bot-color-picker').hidden = true;
-      document.getElementById('bot-variant-picker').hidden = false;
-      pendingBotVariant = null;
-    });
+      function showColorPicker(variant) {
+        pendingVariant = variant;
+        document.getElementById("color-picker-title").textContent =
+          `Play ${VARIANT_NAMES[variant]} against an opponent`;
+        document.getElementById("variant-picker").hidden = true;
+        document.getElementById("color-picker").hidden = false;
+        openRulesForVariant(variant);
+      }
 
-    function startBotGame(chosenColor) {
-      const color = chosenColor === 'random'
-        ? (Math.random() < 0.5 ? 'white' : 'black')
-        : chosenColor;
-      window.location.href = `game.html#bot:${pendingBotVariant}:${color}`;
-    }
+      document.getElementById("btn-new-standard").addEventListener("click", () => showColorPicker("iceskate"));
+      document.getElementById("btn-new-960").addEventListener("click", () => showColorPicker("iceskate-960"));
+      document.getElementById("btn-new-angry").addEventListener("click", () => showColorPicker("angry"));
+      document.getElementById("btn-new-angry-960").addEventListener("click", () => showColorPicker("angry-960"));
+      document.getElementById("btn-new-dark").addEventListener("click", () => showColorPicker("dark"));
+      document.getElementById("btn-new-dark-960").addEventListener("click", () => showColorPicker("dark-960"));
+      document.getElementById("btn-new-superchess").addEventListener("click", () => showColorPicker("superchess"));
+      document
+        .getElementById("btn-new-superchess-960")
+        .addEventListener("click", () => showColorPicker("superchess-960"));
 
-    document.getElementById('btn-bot-white').addEventListener('click', () => startBotGame('white'));
-    document.getElementById('btn-bot-black').addEventListener('click', () => startBotGame('black'));
-    document.getElementById('btn-bot-random').addEventListener('click', () => startBotGame('random'));
+      document.getElementById("btn-back-to-variants").addEventListener("click", () => {
+        document.getElementById("color-picker").hidden = true;
+        document.getElementById("variant-picker").hidden = false;
+        pendingVariant = null;
+      });
 
-    // Register service worker (enables PWA install + push notifications in game.html)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
-  </script>
-</body>
+      async function startGame(chosenColor) {
+        const color = chosenColor === "random" ? (Math.random() < 0.5 ? "white" : "black") : chosenColor;
+        try {
+          await ensureInit();
+          const gameId = await gm.createGame(pendingVariant, color);
+
+          const isIceskate = pendingVariant === "iceskate" || pendingVariant === "iceskate-960";
+          const isAngry = pendingVariant === "angry" || pendingVariant === "angry-960";
+          const isDark = pendingVariant === "dark" || pendingVariant === "dark-960";
+          const isSuperchess = pendingVariant === "superchess" || pendingVariant === "superchess-960";
+          engine.iceskate = isIceskate;
+          engine.angry = isAngry;
+          engine.dark = isDark;
+          engine.superchess = isSuperchess;
+          if (pendingVariant.endsWith("-960")) {
+            engine.setup960();
+          } else {
+            engine.reset();
+          }
+          await gm.sendGameState(engine.serialize());
+
+          localStorage.setItem("chess-color-" + gameId, color);
+          localStorage.setItem("chess-creator-" + gameId, "1");
+          window.location.href = "game.html#" + gameId;
+        } catch (err) {
+          showError("Failed to create game: " + err.message);
+        }
+      }
+
+      document.getElementById("btn-color-white").addEventListener("click", () => startGame("white"));
+      document.getElementById("btn-color-random").addEventListener("click", () => startGame("random"));
+      document.getElementById("btn-color-black").addEventListener("click", () => startGame("black"));
+
+      // Join game
+      document.getElementById("btn-join").addEventListener("click", async () => {
+        const gameId = document.getElementById("game-id-input").value.trim().toLowerCase();
+        if (!gameId) {
+          showError("Please enter a game code");
+          return;
+        }
+        try {
+          await ensureInit();
+          await gm.joinGame(gameId);
+          localStorage.setItem("chess-color-" + gameId, "black");
+          window.location.href = "game.html#" + gameId;
+        } catch (err) {
+          showError(err.message);
+        }
+      });
+
+      // Allow Enter key in input
+      document.getElementById("game-id-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("btn-join").click();
+      });
+
+      // Bot game
+      let pendingBotVariant = null;
+
+      function showBotColorPicker(variant) {
+        pendingBotVariant = variant;
+        document.getElementById("bot-color-picker-title").textContent = `Play ${VARIANT_NAMES[variant]} against a bot`;
+        document.getElementById("bot-variant-picker").hidden = true;
+        document.getElementById("bot-color-picker").hidden = false;
+        openRulesForVariant(variant);
+      }
+
+      document.getElementById("btn-bot-standard").addEventListener("click", () => showBotColorPicker("iceskate"));
+      document.getElementById("btn-bot-960").addEventListener("click", () => showBotColorPicker("iceskate-960"));
+      document.getElementById("btn-bot-angry").addEventListener("click", () => showBotColorPicker("angry"));
+      document.getElementById("btn-bot-angry-960").addEventListener("click", () => showBotColorPicker("angry-960"));
+      document.getElementById("btn-bot-dark").addEventListener("click", () => showBotColorPicker("dark"));
+      document.getElementById("btn-bot-dark-960").addEventListener("click", () => showBotColorPicker("dark-960"));
+      document.getElementById("btn-bot-superchess").addEventListener("click", () => showBotColorPicker("superchess"));
+      document
+        .getElementById("btn-bot-superchess-960")
+        .addEventListener("click", () => showBotColorPicker("superchess-960"));
+
+      document.getElementById("btn-bot-back").addEventListener("click", () => {
+        document.getElementById("bot-color-picker").hidden = true;
+        document.getElementById("bot-variant-picker").hidden = false;
+        pendingBotVariant = null;
+      });
+
+      function startBotGame(chosenColor) {
+        const color = chosenColor === "random" ? (Math.random() < 0.5 ? "white" : "black") : chosenColor;
+        window.location.href = `game.html#bot:${pendingBotVariant}:${color}`;
+      }
+
+      document.getElementById("btn-bot-white").addEventListener("click", () => startBotGame("white"));
+      document.getElementById("btn-bot-black").addEventListener("click", () => startBotGame("black"));
+      document.getElementById("btn-bot-random").addEventListener("click", () => startBotGame("random"));
+
+      // Register service worker (enables PWA install + push notifications in game.html)
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      }
+    </script>
+  </body>
 </html>

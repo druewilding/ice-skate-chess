@@ -139,8 +139,8 @@ class ChessTestGame {
     this.engine = engine;
     this._snapshots = [JSON.parse(JSON.stringify(engine.serialize()))]; // index 0 = start
     this._moveNotations = [];
-    this._pending = null;       // pending move preview
-    this._viewIndex = null;     // null = live, number = snapshot index
+    this._pending = null; // pending move preview
+    this._viewIndex = null; // null = live, number = snapshot index
     this._errors = [];
   }
 
@@ -150,20 +150,27 @@ class ChessTestGame {
   play(...moves) {
     for (const notation of moves) {
       if (this._viewIndex !== null) {
-        throw new Error(`Cannot play moves while reviewing history (at move ${this._viewIndex}). Call .goToLive() first.`);
+        throw new Error(
+          `Cannot play moves while reviewing history (at move ${this._viewIndex}). Call .goToLive() first.`
+        );
       }
       if (this._pending) {
         throw new Error("Cannot play moves with a pending preview. Call .commitPreview() or .cancelPreview() first.");
       }
       if (this.engine.gameOver) {
-        throw new Error(`Game is already over (${this.engine.result}, ${this.engine.resultReason}). Cannot play "${notation}".`);
+        throw new Error(
+          `Game is already over (${this.engine.result}, ${this.engine.resultReason}). Cannot play "${notation}".`
+        );
       }
 
       const parsed = parseAlgebraic(this.engine, notation);
       const moveData = this.engine.makeMove(
-        parsed.fromRank, parsed.fromFile,
-        parsed.toRank, parsed.toFile,
-        parsed.promotion, parsed.castling
+        parsed.fromRank,
+        parsed.fromFile,
+        parsed.toRank,
+        parsed.toFile,
+        parsed.promotion,
+        parsed.castling
       );
 
       if (!moveData) {
@@ -197,9 +204,7 @@ class ChessTestGame {
     const p = this._pending;
     this._pending = null;
 
-    const moveData = this.engine.makeMove(
-      p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling
-    );
+    const moveData = this.engine.makeMove(p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling);
     if (!moveData) throw new Error("Engine rejected previewed move on commit.");
 
     this._moveNotations.push(this.engine.getMoveNotation(moveData));
@@ -265,9 +270,7 @@ class ChessTestGame {
       const piece = eng.board[rank][file];
       const actual = describePiece(piece);
       if (actual !== expected) {
-        throw new Error(
-          `Board mismatch at ${sqName}: expected ${expected ?? "empty"}, got ${actual ?? "empty"}`
-        );
+        throw new Error(`Board mismatch at ${sqName}: expected ${expected ?? "empty"}, got ${actual ?? "empty"}`);
       }
     }
     return this;
@@ -294,15 +297,14 @@ class ChessTestGame {
 
     for (let r = 0; r < 8; r++) {
       const rankStr = ranks[r];
-      if (rankStr.length !== 8) throw new Error(`Rank ${8 - r} should have 8 chars, got ${rankStr.length}: "${rankStr}"`);
+      if (rankStr.length !== 8)
+        throw new Error(`Rank ${8 - r} should have 8 chars, got ${rankStr.length}: "${rankStr}"`);
       for (let f = 0; f < 8; f++) {
         const piece = eng.board[r][f];
         const expected = rankStr[f];
         const actual = piece ? fenSymbols[piece.type]?.[piece.color] || "?" : ".";
         if (actual !== expected) {
-          throw new Error(
-            `Board mismatch at ${FILES[f]}${8 - r}: expected '${expected}', got '${actual}'`
-          );
+          throw new Error(`Board mismatch at ${FILES[f]}${8 - r}: expected '${expected}', got '${actual}'`);
         }
       }
     }
@@ -331,9 +333,7 @@ class ChessTestGame {
       throw new Error(`Expected ${expectedColor} ${expectedType} at ${sqName}, but square is empty`);
     }
     if (piece.type !== expectedType || piece.color !== expectedColor) {
-      throw new Error(
-        `Expected ${expectedColor} ${expectedType} at ${sqName}, got ${piece.color} ${piece.type}`
-      );
+      throw new Error(`Expected ${expectedColor} ${expectedType} at ${sqName}, got ${piece.color} ${piece.type}`);
     }
     return this;
   }
@@ -402,14 +402,10 @@ class ChessTestGame {
     const expBlack = sortPieces(expected.black || []);
 
     if (JSON.stringify(actualWhite) !== JSON.stringify(expWhite)) {
-      throw new Error(
-        `Captured by white: expected [${expWhite}], got [${actualWhite}]`
-      );
+      throw new Error(`Captured by white: expected [${expWhite}], got [${actualWhite}]`);
     }
     if (JSON.stringify(actualBlack) !== JSON.stringify(expBlack)) {
-      throw new Error(
-        `Captured by black: expected [${expBlack}], got [${actualBlack}]`
-      );
+      throw new Error(`Captured by black: expected [${expBlack}], got [${actualBlack}]`);
     }
     return this;
   }
@@ -440,14 +436,10 @@ class ChessTestGame {
     const expBlack = sortPieces(expected.black || []);
 
     if (JSON.stringify(actualWhite) !== JSON.stringify(expWhite)) {
-      throw new Error(
-        `Preview captured by white: expected [${expWhite}], got [${actualWhite}]`
-      );
+      throw new Error(`Preview captured by white: expected [${expWhite}], got [${actualWhite}]`);
     }
     if (JSON.stringify(actualBlack) !== JSON.stringify(expBlack)) {
-      throw new Error(
-        `Preview captured by black: expected [${expBlack}], got [${actualBlack}]`
-      );
+      throw new Error(`Preview captured by black: expected [${expBlack}], got [${actualBlack}]`);
     }
     return this;
   }
@@ -467,9 +459,7 @@ class ChessTestGame {
   assertPreviewResult(expected) {
     if (!this._pending) throw new Error("No preview active. Call .preview() first.");
     const p = this._pending;
-    const result = this.engine.previewMoveResult(
-      p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling
-    );
+    const result = this.engine.previewMoveResult(p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling);
     for (const [key, val] of Object.entries(expected)) {
       if (result[key] !== val) {
         throw new Error(`Preview result.${key}: expected ${val}, got ${result[key]}`);
@@ -494,9 +484,7 @@ class ChessTestGame {
   assertLastMoves(...expected) {
     const actual = this._moveNotations.slice(-expected.length);
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-      throw new Error(
-        `Last moves mismatch:\n  expected: ${expected.join(", ")}\n  got:      ${actual.join(", ")}`
-      );
+      throw new Error(`Last moves mismatch:\n  expected: ${expected.join(", ")}\n  got:      ${actual.join(", ")}`);
     }
     return this;
   }
@@ -516,12 +504,10 @@ class ChessTestGame {
     const eng = this._currentEngine();
     const { rank, file } = sq(sqName);
     const moves = eng.getLegalMoves(rank, file);
-    const actual = moves.map(m => FILES[m.file] + RANKS[m.rank]).sort();
+    const actual = moves.map((m) => FILES[m.file] + RANKS[m.rank]).sort();
     const expected = [...expectedTargets].sort();
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-      throw new Error(
-        `Legal moves from ${sqName}: expected [${expected}], got [${actual}]`
-      );
+      throw new Error(`Legal moves from ${sqName}: expected [${expected}], got [${actual}]`);
     }
     return this;
   }
@@ -531,12 +517,10 @@ class ChessTestGame {
     const eng = this._currentEngine();
     const { rank, file } = sq(sqName);
     const moves = eng.getLegalMoves(rank, file);
-    const actual = new Set(moves.map(m => FILES[m.file] + RANKS[m.rank]));
-    const missing = targets.filter(t => !actual.has(t));
+    const actual = new Set(moves.map((m) => FILES[m.file] + RANKS[m.rank]));
+    const missing = targets.filter((t) => !actual.has(t));
     if (missing.length > 0) {
-      throw new Error(
-        `Legal moves from ${sqName} missing [${missing}]. Has: [${[...actual].sort()}]`
-      );
+      throw new Error(`Legal moves from ${sqName} missing [${missing}]. Has: [${[...actual].sort()}]`);
     }
     return this;
   }
@@ -546,12 +530,10 @@ class ChessTestGame {
     const eng = this._currentEngine();
     const { rank, file } = sq(sqName);
     const moves = eng.getLegalMoves(rank, file);
-    const actual = new Set(moves.map(m => FILES[m.file] + RANKS[m.rank]));
-    const present = targets.filter(t => actual.has(t));
+    const actual = new Set(moves.map((m) => FILES[m.file] + RANKS[m.rank]));
+    const present = targets.filter((t) => actual.has(t));
     if (present.length > 0) {
-      throw new Error(
-        `Legal moves from ${sqName} should not include [${present}]. Has: [${[...actual].sort()}]`
-      );
+      throw new Error(`Legal moves from ${sqName} should not include [${present}]. Has: [${[...actual].sort()}]`);
     }
     return this;
   }
@@ -679,8 +661,14 @@ export function chessFromPosition(fen, opts = {}) {
   for (let r = 0; r < 8; r++) {
     let f = 0;
     for (const ch of ranks[r]) {
-      if (ch === "." || ch === " ") { f++; continue; }
-      if (/[1-8]/.test(ch)) { f += parseInt(ch); continue; }
+      if (ch === "." || ch === " ") {
+        f++;
+        continue;
+      }
+      if (/[1-8]/.test(ch)) {
+        f += parseInt(ch);
+        continue;
+      }
       const piece = fenSymbols[ch];
       if (!piece) throw new Error(`Unknown piece symbol: '${ch}'`);
       board[r][f] = { ...piece };
@@ -689,7 +677,7 @@ export function chessFromPosition(fen, opts = {}) {
   }
 
   engine.board = board;
-  engine.startingBoard = board.map(row => row.slice());
+  engine.startingBoard = board.map((row) => row.slice());
   engine.turn = opts.turn || "white";
   engine.capturedPieces = { white: [], black: [] };
   engine.moveHistory = [];

@@ -3,7 +3,6 @@ import { describe, it } from "vitest";
 import { chess, chessFromPosition } from "./harness.js";
 
 describe("Standard Chess", () => {
-
   // ── Basic movement & captures ──────────────────────────────────────
 
   it("opening moves set up the board correctly", () => {
@@ -11,8 +10,10 @@ describe("Standard Chess", () => {
       .play("e4", "e5", "Nf3", "Nc6", "Bb5")
       .assertTurn("black")
       .assertBoard({
-        e4: "wp", e5: "bp",
-        f3: "wN", c6: "bN",
+        e4: "wp",
+        e5: "bp",
+        f3: "wN",
+        c6: "bN",
         b5: "wB",
       })
       .assertEmpty("g1", "f1")
@@ -51,9 +52,9 @@ describe("Standard Chess", () => {
 
   it("en passant capture", () => {
     chess("standard")
-      .play("e4", "a6", "e5", "d5", "exd6")  // en passant
-      .assertEmpty("d5")                        // captured pawn removed
-      .assertPiece("d6", "pawn", "white")       // capturing pawn lands here
+      .play("e4", "a6", "e5", "d5", "exd6") // en passant
+      .assertEmpty("d5") // captured pawn removed
+      .assertPiece("d6", "pawn", "white") // capturing pawn lands here
       .assertCaptures({ white: ["pawn"], black: [] })
       .assertMaterial(1);
   });
@@ -91,18 +92,14 @@ describe("Standard Chess", () => {
 
   it("pawn promotion to queen", () => {
     // Set up a position with a white pawn on e7 about to promote
-    chessFromPosition(
-      "...k..../....P.../......../......../......../......../......../....K..."
-    )
+    chessFromPosition("...k..../....P.../......../......../......../......../......../....K...")
       .play("e8=Q")
       .assertPiece("e8", "queen", "white")
       .assertEmpty("e7");
   });
 
   it("pawn promotion updates captured pieces correctly", () => {
-    chessFromPosition(
-      "...k..../....P.../......../......../......../......../......../....K..."
-    )
+    chessFromPosition("...k..../....P.../......../......../......../......../......../....K...")
       .play("e8=Q")
       // After promotion: opponent (black) gains a pawn, and since black never
       // captured a queen, white is credited with a queen (it "appeared")
@@ -110,9 +107,7 @@ describe("Standard Chess", () => {
   });
 
   it("promotion preview shows correct material", () => {
-    chessFromPosition(
-      "...k..../....P.../......../......../......../......../......../....K..."
-    )
+    chessFromPosition("...k..../....P.../......../......../......../......../......../....K...")
       .preview("e8=Q")
       .assertPreviewMaterial(9) // board-based: white pawn becomes queen = net +9 for white
       .cancelPreview()
@@ -124,10 +119,7 @@ describe("Standard Chess", () => {
   it("stalemate detection", () => {
     // Black king on a8, white king on a6, white queen on c5.
     // After Qb6, black has no legal moves and is not in check = stalemate.
-    chessFromPosition(
-      "k......./......../K......./..Q...../......../......../......../........",
-      { turn: "white" }
-    )
+    chessFromPosition("k......./......../K......./..Q...../......../......../......../........", { turn: "white" })
       .play("Qb6")
       .assertStalemate();
   });
@@ -137,16 +129,16 @@ describe("Standard Chess", () => {
   it("navigate backwards through history", () => {
     chess("standard")
       .play("e4", "e5", "Nf3", "Nc6", "Bb5")
-      .goToMove(0)   // starting position
+      .goToMove(0) // starting position
       .assertBoard({ e2: "wp", e7: "bp", g1: "wN" })
       .assertTurn("white")
-      .goToMove(2)   // after e4, e5
+      .goToMove(2) // after e4, e5
       .assertBoard({ e4: "wp", e5: "bp" })
       .assertTurn("white")
-      .goToMove(4)   // after Nf3, Nc6
+      .goToMove(4) // after Nf3, Nc6
       .assertBoard({ f3: "wN", c6: "bN" })
       .assertTurn("white")
-      .goToLive()    // live position (after Bb5)
+      .goToLive() // live position (after Bb5)
       .assertPiece("b5", "bishop", "white")
       .assertTurn("black");
   });
@@ -154,12 +146,12 @@ describe("Standard Chess", () => {
   it("captures at different history points", () => {
     chess("standard")
       .play("e4", "d5", "exd5", "Qxd5")
-      .goToMove(2)   // after e4, d5 — no captures yet
+      .goToMove(2) // after e4, d5 — no captures yet
       .assertCaptures({ white: [], black: [] })
-      .goToMove(3)   // after exd5
+      .goToMove(3) // after exd5
       .assertCaptures({ white: ["pawn"], black: [] })
       .assertMaterial(1)
-      .goToMove(4)   // after Qxd5
+      .goToMove(4) // after Qxd5
       .assertCaptures({ white: ["pawn"], black: ["pawn"] })
       .assertMaterial(0)
       .goToLive();
@@ -176,9 +168,7 @@ describe("Standard Chess", () => {
   // ── Insufficient material ─────────────────────────────────────────
 
   it("K vs K is insufficient material", () => {
-    chessFromPosition(
-      "....k.../......../......../......../......../......../......../....K..."
-    )
+    chessFromPosition("....k.../......../......../......../......../......../......../....K...")
       // Already drawn at start — but draw is checked after a move, so we need
       // to reach this via captures.  Set up K+P vs K where the pawn captures the
       // last piece and promotes... Actually, let's test with a simpler approach:
