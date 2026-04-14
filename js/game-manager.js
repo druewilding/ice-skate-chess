@@ -140,6 +140,7 @@ export class GameManager {
       'state/gameOver': true,
       'state/result': winner,
       'state/resultReason': 'resignation',
+      lastMoveAt: Date.now(),
     });
   }
 
@@ -158,6 +159,7 @@ export class GameManager {
       'state/gameOver': true,
       'state/result': 'draw',
       'state/resultReason': 'agreement',
+      lastMoveAt: Date.now(),
     });
   }
 

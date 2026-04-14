@@ -11,7 +11,7 @@ self.addEventListener('push', (event) => {
   const title = data.title ?? 'Ice Skate Chess';
   const options = {
     body: data.body ?? "It's your turn!",
-    tag: 'your-turn',
+    tag: data.tag ?? 'your-turn',
     renotify: true,
     icon: data.icon ?? '/ice-skate-chess/assets/icon-notification.svg',
     vibrate: [200, 100, 200],
