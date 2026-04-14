@@ -9,6 +9,7 @@ export default defineConfig({
     baseURL: "http://localhost:3847",
     // Run headless by default; use --headed to see the browser
     headless: true,
+    screenshot: "only-on-failure",
   },
   // Writes firebase config from .env (same as start.sh) then serves on a dedicated test port
   webServer: {
