@@ -88,6 +88,36 @@ After scoring, the bot **randomly ignores the scores 30% of the time** and picks
 
 The random rate is controlled by `BOT_RANDOM_RATE` at the top of `makeBotMove()` in `game.html`. Set it to `0` for a fully deterministic bot, or `1` for a completely random one.
 
+## Testing
+
+Tests live in the `tests/` directory and run with [Vitest](https://vitest.dev/).
+
+```bash
+npm test          # single run
+npm run test:watch  # watch mode
+```
+
+A GitHub Actions workflow (`.github/workflows/test.yml`) runs `npm test` automatically on every pull request.
+
+### Test harness
+`tests/harness.js` exports two helpers used by every test file:
+
+- **`setupGame(variant, options)`** — creates a `ChessEngine` and `ChessUI` pair pre-configured for the given variant string (`'standard'`, `'angry'`, `'dark'`, `'iceskate'`, `'superchess'`). Accepts an optional `{ chess960: true }` option.
+- **`playMoves(ui, moves)`** — drives the UI through an array of algebraic-style move strings (parsed by `tests/parse-notation.js`), automatically handling two-click selection + confirmation and the confirm-move flow.
+
+### Test files
+
+| File                       | Coverage                                                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tests/standard.test.js`   | Opening moves, captures, Scholar's mate, en passant, castling, promotion, stalemate, history, notation, insufficient material, check/checkmate preview |
+| `tests/angry.test.js`      | Friendly captures, capture accounting, `*` notation, king-capture prevention, pending-move preview, history navigation, checkmate edge cases           |
+| `tests/dark.test.js`       | Rules unchanged vs standard, Scholar's mate, en passant, castling, pending-move preview, history navigation                                            |
+| `tests/iceskate.test.js`   | Forced maximum slide, check-blocking exception, knight behaviour, captures at max distance, capture accounting, pending-move preview                   |
+| `tests/superchess.test.js` | Amazon promotion, promotion capture accounting, amazon queen/knight movement, amazon checkmate, history navigation, other promotion options            |
+
+### Adding tests
+Import `setupGame` and `playMoves` from `./harness.js`. Use `playMoves` to drive the board to a known position, then assert on `engine.board`, `engine.capturedPieces`, `engine.moveHistory`, `engine.gameOver`, or UI properties such as `ui.materialScore`.
+
 ## Deployment
 
 ### Frontend — GitHub Pages
