@@ -196,7 +196,12 @@
 
       function buildPositionSnapshots() {
         // Rebuilds from scratch using the live engine (must be at live state with full moveHistory)
-        const tempEng = new ChessEngine({ iceskate: engine.iceskate, angry: engine.angry });
+        const tempEng = new ChessEngine({
+          iceskate: engine.iceskate,
+          angry: engine.angry,
+          dark: engine.dark,
+          superchess: engine.superchess,
+        });
         // Use the engine's actual starting board so Chess960 positions are preserved.
         // engine.startingBoard is always set (standard or 960 layout).
         if (engine.startingBoard) {
