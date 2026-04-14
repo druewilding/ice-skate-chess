@@ -1,0 +1,25 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "A vanilla JS progressive web app implementing chess variants with real-time multiplayer and local bot play.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druewilding/chess.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/druewilding/chess/issues"
+  },
+  "homepage": "https://github.com/druewilding/chess#readme",
+  "devDependencies": {
+    "vitest": "^4.1.4"
+  }
+}
