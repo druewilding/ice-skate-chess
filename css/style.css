@@ -17,6 +17,18 @@ button:disabled {
 .game-container > .rules-panel {
   padding: 20px 24px 20px 24px;
 }
+/* Capture-pen consistency warning */
+.capture-inconsistency-warning {
+  background: #e74c3c;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-align: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+}
 /* ===== Reset & Base ===== */
 *,
 *::before,

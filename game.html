@@ -223,7 +223,7 @@
             move.to.rank,
             move.to.file,
             move.promotion || null,
-            move.castling || undefined
+            move.castling ?? null
           );
           snaps.push(JSON.parse(JSON.stringify(tempEng.serialize())));
         }
@@ -616,7 +616,7 @@
           chosen.toRank,
           chosen.toFile,
           promotion,
-          chosen.castling || undefined
+          chosen.castling ?? null
         );
         syncSnapshots();
 
@@ -1075,6 +1075,51 @@
           ui.updateCapturedPieces(bottomEl, topEl);
         } else {
           ui.updateCapturedPieces(topEl, bottomEl);
+        }
+
+        // Sanity-check: the capture-pen material advantage must equal the board
+        // material advantage at all times. If they diverge, display a warning.
+        // Skip the check while a move is being previewed (pending confirm).
+        if (!ui.pendingMoveConfirm) {
+          const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, amazon: 13 };
+          let whiteBoard = 0,
+            blackBoard = 0;
+          for (let r = 0; r < 8; r++) {
+            for (let f = 0; f < 8; f++) {
+              const p = engine.board[r][f];
+              if (!p) continue;
+              const v = pieceValues[p.type] || 0;
+              if (p.color === "white") whiteBoard += v;
+              else blackBoard += v;
+            }
+          }
+          const boardAdvantage = whiteBoard - blackBoard;
+          let whitePen = 0,
+            blackPen = 0;
+          for (const t of engine.capturedPieces.white) whitePen += pieceValues[t] || 0;
+          for (const t of engine.capturedPieces.black) blackPen += pieceValues[t] || 0;
+          const penAdvantage = whitePen - blackPen;
+
+          const warningId = "capture-inconsistency-warning";
+          let warningEl = document.getElementById(warningId);
+          if (boardAdvantage !== penAdvantage) {
+            if (!warningEl) {
+              warningEl = document.createElement("div");
+              warningEl.id = warningId;
+              warningEl.className = "capture-inconsistency-warning";
+            }
+            warningEl.textContent = `OH NO: capture pens are wrong (board ${boardAdvantage > 0 ? "+" : ""}${boardAdvantage}, pens ${penAdvantage > 0 ? "+" : ""}${penAdvantage})`;
+            document.querySelector(".game-main").prepend(warningEl);
+            console.error("[capture-pen] inconsistency detected", {
+              boardAdvantage,
+              penAdvantage,
+              capturedWhite: [...engine.capturedPieces.white],
+              capturedBlack: [...engine.capturedPieces.black],
+              moveCount: engine.moveHistory.length,
+            });
+          } else if (warningEl) {
+            warningEl.remove();
+          }
         }
       }
 
