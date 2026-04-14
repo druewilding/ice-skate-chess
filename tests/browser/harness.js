@@ -487,6 +487,42 @@ export class TwoPlayerGame {
     return this;
   }
 
+  // ── Page reload ─────────────────────────────────────────────────────
+
+  /**
+   * Reload a player's page and wait for Firebase to re-sync.
+   * Simulates a real user refreshing the browser mid-game.
+   *
+   * @param {string} color — "white" or "black"
+   */
+  async reload(color) {
+    const page = this.pages[color];
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    // Wait for the board to render
+    await page.waitForSelector("#chess-board .square", { timeout: 10_000 });
+
+    // Wait for Firebase state to sync — status shows "Your turn" or
+    // "Opponent's turn" or game is over
+    await page.waitForFunction(
+      () => {
+        const status = document.getElementById("game-status");
+        if (!status) return false;
+        const text = status.textContent;
+        return (
+          text.includes("Your turn") ||
+          text.includes("Opponent") ||
+          !document.getElementById("game-over-overlay").hidden ||
+          (typeof engine !== "undefined" && engine.gameOver)
+        );
+      },
+      { timeout: 15_000 }
+    );
+
+    // Small additional settle time for capture pen rendering
+    await page.waitForTimeout(500);
+  }
+
   // ── Cleanup ────────────────────────────────────────────────────────
 
   async close() {

@@ -42,6 +42,11 @@ test.describe("Dark Chess replay — 2026-04-14", () => {
     await game.play("Qxg2", "Bh6");
     await assertBothCaptures(game, { white: ["knight", "rook"], black: ["pawn", "pawn"] });
 
+    // ── Reload #1: test Firebase round-trip of capturedPieces after first captures
+    await game.reload("white");
+    await game.reload("black");
+    await assertBothCaptures(game, { white: ["knight", "rook"], black: ["pawn", "pawn"] });
+
     await game.play("Nf3", "f5", "d3", "Bxc1");
     await assertBothCaptures(game, {
       white: ["knight", "rook"],
@@ -69,6 +74,14 @@ test.describe("Dark Chess replay — 2026-04-14", () => {
     });
 
     await game.play("fxg2");
+    await assertBothCaptures(game, {
+      white: ["pawn", "knight", "bishop", "rook", "rook", "queen"],
+      black: ["pawn", "pawn", "bishop", "queen"],
+    });
+
+    // ── Reload #2: test snapshot rebuild after significant capture accumulation
+    await game.reload("white");
+    await game.reload("black");
     await assertBothCaptures(game, {
       white: ["pawn", "knight", "bishop", "rook", "rook", "queen"],
       black: ["pawn", "pawn", "bishop", "queen"],
@@ -238,8 +251,80 @@ test.describe("Dark Chess replay — 2026-04-14", () => {
       ],
     });
 
+    // ── Reload #3: test snapshot rebuild right before promotion
+    await game.reload("white");
+    await game.reload("black");
+    await assertBothCaptures(game, {
+      white: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+      black: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+    });
+
     // ── Promotion d8=Q+ ────────────────────────────────────────────
     await game.play("d8=Q+");
+    await assertBothCaptures(game, {
+      white: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+      black: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+      ],
+    });
+
+    // ── Reload #4: test post-promotion capture accounting after reload
+    await game.reload("white");
+    await game.reload("black");
     await assertBothCaptures(game, {
       white: [
         "pawn",
@@ -323,6 +408,12 @@ test.describe("Dark Chess replay — 2026-04-14", () => {
     await game.assertGameOver("white", "You Win!");
     await game.assertGameOver("black", "You Lose");
 
+    // ── Reload #5: test state after game over, before history review
+    await game.reload("white");
+    await game.reload("black");
+    await game.assertGameOver("white", "You Win!");
+    await game.assertGameOver("black", "You Lose");
+
     // ── History review after game over ─────────────────────────────
     await game.dismissGameOver("white");
     await game.dismissGameOver("black");
@@ -332,6 +423,75 @@ test.describe("Dark Chess replay — 2026-04-14", () => {
     await game.assertCaptures("white", { lower: [], upper: [] });
     await game.goToMove("black", 1);
     await game.assertCaptures("black", { lower: [], upper: [] });
+
+    // Go to move 72 (one BEFORE d8=Q+ promotion) — captures should NOT
+    // include the promotion-related pawn yet (reproduces "one move too early" bug)
+    await game.goToMove("white", 72);
+    await game.assertCaptures("white", {
+      lower: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+      upper: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+    });
+    await game.goToMove("black", 72);
+    await game.assertCaptures("black", {
+      lower: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+      upper: [
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "pawn",
+        "knight",
+        "knight",
+        "bishop",
+        "bishop",
+        "rook",
+        "rook",
+        "queen",
+      ],
+    });
 
     // Go to move 73 (after d8=Q+) — check from both perspectives
     await game.goToMove("white", 73);
