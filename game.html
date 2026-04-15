@@ -251,6 +251,12 @@
           // initGame() before Firebase data arrived (was standard position).
           positionSnapshots[0] = captureSnapshot();
         }
+        // If the game ended without a new move (e.g. agreed draw, resignation via Firebase),
+        // update the last snapshot so its gameOver flag is accurate. This ensures Dark Chess
+        // board-reveal and move-list unhiding work correctly during review.
+        if (engine.gameOver && positionSnapshots.length > 0 && !positionSnapshots[positionSnapshots.length - 1].gameOver) {
+          positionSnapshots[positionSnapshots.length - 1] = captureSnapshot();
+        }
       }
 
       function goToPosition(index) {
