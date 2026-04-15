@@ -164,6 +164,7 @@
       let positionSnapshots = []; // snapshots[i] = serialised engine state after i moves
       let reviewIndex = null; // null = live; number = reviewing that snapshot
       let gameVariant = null; // 'iceskate', 'iceskate-960', 'angry', 'angry-960', 'dark', 'dark-960', 'superchess', 'superchess-960'
+      let lastCaptureInconsistency = null; // tracks last-logged mismatch to avoid console spam
 
       // Bot mode: hash looks like #bot:iceskate:white or #bot:iceskate-960:black
       const isBotMode = gameId.startsWith("bot:");
@@ -1110,15 +1111,20 @@
             }
             warningEl.textContent = `Capture pens are wrong (board ${boardAdvantage > 0 ? "+" : ""}${boardAdvantage}, pens ${penAdvantage > 0 ? "+" : ""}${penAdvantage})`;
             document.querySelector(".game-main").prepend(warningEl);
-            console.error("[capture-pen] inconsistency detected", {
-              boardAdvantage,
-              penAdvantage,
-              capturedWhite: [...engine.capturedPieces.white],
-              capturedBlack: [...engine.capturedPieces.black],
-              moveCount: engine.moveHistory.length,
-            });
-          } else if (warningEl) {
-            warningEl.remove();
+            const mismatchKey = `${boardAdvantage}/${penAdvantage}/${engine.moveHistory.length}`;
+            if (lastCaptureInconsistency !== mismatchKey) {
+              lastCaptureInconsistency = mismatchKey;
+              console.error("[capture-pen] inconsistency detected", {
+                boardAdvantage,
+                penAdvantage,
+                capturedWhite: [...engine.capturedPieces.white],
+                capturedBlack: [...engine.capturedPieces.black],
+                moveCount: engine.moveHistory.length,
+              });
+            }
+          } else {
+            lastCaptureInconsistency = null;
+            if (warningEl) warningEl.remove();
           }
         }
       }
