@@ -438,8 +438,8 @@ export class TwoPlayerGame {
   async goToMove(color, moveIndex) {
     const page = this.pages[color];
 
-    // First go to start
-    await page.click("#btn-review-start");
+    // First go to start (force: true because the button may be disabled when already at position 0)
+    await page.click("#btn-review-start", { force: true });
     await page.waitForTimeout(300);
 
     // Then step forward to the desired position
@@ -457,7 +457,7 @@ export class TwoPlayerGame {
    */
   async goToLive(color) {
     const page = this.pages[color];
-    await page.click("#btn-review-end");
+    await page.click("#btn-review-end", { force: true });
     await page.waitForTimeout(300);
     return this;
   }
