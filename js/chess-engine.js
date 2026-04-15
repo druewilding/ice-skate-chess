@@ -968,8 +968,8 @@ export class ChessEngine {
     // come back as a numeric-keyed object when non-empty.
     const cp = state.capturedPieces || {};
     this.capturedPieces = {
-      white: Array.isArray(cp.white) ? cp.white : cp.white ? Object.values(cp.white) : [],
-      black: Array.isArray(cp.black) ? cp.black : cp.black ? Object.values(cp.black) : [],
+      white: Array.isArray(cp.white) ? [...cp.white] : cp.white ? Object.values(cp.white) : [],
+      black: Array.isArray(cp.black) ? [...cp.black] : cp.black ? Object.values(cp.black) : [],
     };
     this.gameOver = state.gameOver || false;
     this.result = state.result || null;
