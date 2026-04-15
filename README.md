@@ -63,6 +63,8 @@ All variants have a **Chess960** (Fischer Random) mode, where the back rank piec
 
 ## Testing
 
+### Unit tests (Vitest)
+
 Tests are written with [Vitest](https://vitest.dev/) and live in the `tests/` directory. They cover all five variants: standard chess, Ice Skate, Angry, Dark, and Superchess.
 
 ```bash
@@ -78,7 +80,24 @@ npm run test:watch  # watch mode
 | `tests/iceskate.test.js`   | Forced maximum slide, check-blocking exception, captures              |
 | `tests/superchess.test.js` | Amazon promotion, amazon movement (queen + knight), checkmate         |
 
-Tests run automatically on every pull request via GitHub Actions.
+Unit tests run automatically on every pull request via GitHub Actions.
+
+### Browser tests (Playwright)
+
+End-to-end tests spin up two real browser windows connected through Firebase and play actual multiplayer games. They live in `tests/browser/` and use a `TwoPlayerGame` harness that handles game creation, move input, and Firebase sync.
+
+```bash
+npm run test:browser           # run all browser tests headlessly
+npm run test:browser:headed    # run with visible browser windows (useful for debugging)
+
+# Run a single test file:
+npx playwright test tests/browser/dark-chess-draw.test.js
+
+# Run a single test file with visible browser windows:
+npx playwright test tests/browser/dark-chess-draw.test.js --headed
+```
+
+Browser tests require a running local server — the Playwright config starts one automatically via `start-test.sh`.
 
 ## Running Locally
 
