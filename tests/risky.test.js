@@ -64,8 +64,7 @@ describe("Risky Chess", () => {
     // Not d6. Use the working position test below instead.
     chessFromPosition("......../......../...k..../......../......../...N..../......../....K...", {
       variant: "risky",
-    })
-      .assertNotGameOver(); // knight can't reach d6 from d3
+    }).assertNotGameOver(); // knight can't reach d6 from d3
   });
 
   it("knight captures king (from correct square)", () => {
@@ -160,16 +159,14 @@ describe("Risky Chess", () => {
   it("king can walk adjacent to opponent's pieces", () => {
     chessFromPosition("...r..../......../......../......../......../......../......../...K....", {
       variant: "risky",
-    })
-      .assertLegalMovesInclude("d1", "c1", "c2", "d2", "e2", "e1");
+    }).assertLegalMovesInclude("d1", "c1", "c2", "d2", "e2", "e1");
   });
 
   it("one king can move adjacent to the other king", () => {
     chessFromPosition("......../......../......../...k..../...K..../......../......../........", {
       variant: "risky",
       turn: "white",
-    })
-      .assertLegalMovesInclude("d4", "d5", "c5", "e5");
+    }).assertLegalMovesInclude("d4", "d5", "c5", "e5");
   });
 
   // ── Pieces can leave king exposed ─────────────────────────────────
@@ -180,8 +177,7 @@ describe("Risky Chess", () => {
     // In risky, it CAN.
     chessFromPosition("....r.../......../......../......../....R.../......../......../....K..k", {
       variant: "risky",
-    })
-      .assertLegalMovesInclude("e4", "a4", "b4", "c4", "d4", "f4", "g4", "h4");
+    }).assertLegalMovesInclude("e4", "a4", "b4", "c4", "d4", "f4", "g4", "h4");
   });
 
   // ── Castling through 'check' ──────────────────────────────────────
@@ -287,23 +283,56 @@ describe("Risky Chess", () => {
 
   it("notation uses @ for losing king capture", () => {
     chess("risky")
-      .play("d4", "g5", "d5", "e5", "dxe6", "g4", "Nh3", "gxh3", "Nc3", "hxg2",
-        "Nb5", "gxh1=Q", "exd7", "Qxf1", "dxe8=N@")
+      .play(
+        "d4",
+        "g5",
+        "d5",
+        "e5",
+        "dxe6",
+        "g4",
+        "Nh3",
+        "gxh3",
+        "Nc3",
+        "hxg2",
+        "Nb5",
+        "gxh1=Q",
+        "exd7",
+        "Qxf1",
+        "dxe8=N@"
+      )
       .assertLastMoves("dxe8=N@");
   });
 
   it("notation uses $ for drawn king capture", () => {
     chess("risky")
-      .play("d4", "d5", "e4", "e5", "exd5", "Bd6", "Qh5", "exd4", "Nf3", "Be6",
-        "Ng5", "Bxd5", "Ne6", "Bxe6", "Qxf7", "Bxf7", "Bd3", "Bf8", "Bb5", "Bd6",
-        "Bxe8$")
+      .play(
+        "d4",
+        "d5",
+        "e4",
+        "e5",
+        "exd5",
+        "Bd6",
+        "Qh5",
+        "exd4",
+        "Nf3",
+        "Be6",
+        "Ng5",
+        "Bxd5",
+        "Ne6",
+        "Bxe6",
+        "Qxf7",
+        "Bxf7",
+        "Bd3",
+        "Bf8",
+        "Bb5",
+        "Bd6",
+        "Bxe8$"
+      )
       .assertLastMoves("Bxe8$");
   });
 
   it("regular captures use standard notation (no + or # for non-king)", () => {
-    chess("risky")
-      .play("e4", "d5", "exd5")
-      .assertLastMoves("exd5"); // no check suffix
+    chess("risky").play("e4", "d5", "exd5").assertLastMoves("exd5"); // no check suffix
   });
 
   // ── Serialization round-trip ──────────────────────────────────────
@@ -354,8 +383,21 @@ describe("Risky Chess", () => {
     // Black wins by 4.
     chess("risky")
       .play(
-        "d4", "g5", "d5", "e5", "dxe6", "g4", "Nh3", "gxh3", "Nc3", "hxg2",
-        "Nb5", "gxh1=Q", "exd7", "Qxf1", "dxe8=N@"
+        "d4",
+        "g5",
+        "d5",
+        "e5",
+        "dxe6",
+        "g4",
+        "Nh3",
+        "gxh3",
+        "Nc3",
+        "hxg2",
+        "Nb5",
+        "gxh1=Q",
+        "exd7",
+        "Qxf1",
+        "dxe8=N@"
       )
       .assertGameOver("black", "king captured — 4 points ahead")
       .assertCaptures({
@@ -368,8 +410,26 @@ describe("Risky Chess", () => {
     // White: 2 pawns + king = 14. Black: 2 pawns + knight + queen = 14.
     chess("risky")
       .play(
-        "d4", "d5", "e4", "e5", "exd5", "Bd6", "Qh5", "exd4", "Nf3", "Be6",
-        "Ng5", "Bxd5", "Ne6", "Bxe6", "Qxf7", "Bxf7", "Bd3", "Bf8", "Bb5", "Bd6",
+        "d4",
+        "d5",
+        "e4",
+        "e5",
+        "exd5",
+        "Bd6",
+        "Qh5",
+        "exd4",
+        "Nf3",
+        "Be6",
+        "Ng5",
+        "Bxd5",
+        "Ne6",
+        "Bxe6",
+        "Qxf7",
+        "Bxf7",
+        "Bd3",
+        "Bf8",
+        "Bb5",
+        "Bd6",
         "Bxe8$"
       )
       .assertGameOver("draw", "king captured — tied on points")

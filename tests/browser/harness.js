@@ -33,15 +33,6 @@ function sortPieces(arr) {
   return [...arr].sort((a, b) => PIECE_ORDER.indexOf(a) - PIECE_ORDER.indexOf(b));
 }
 
-// ── Square coordinate helpers ────────────────────────────────────────
-
-function algebraicToCoords(sq) {
-  const file = FILES.indexOf(sq[0]);
-  const rank = RANKS.indexOf(sq[1]);
-  if (file < 0 || rank < 0) throw new Error(`Bad square: "${sq}"`);
-  return { rank, file };
-}
-
 // ── Move‑notation parser (minimal, mirrors tests/parse-notation.js) ─
 
 function parseNotation(san) {
@@ -161,8 +152,6 @@ export class TwoPlayerGame {
    * @returns {Promise<TwoPlayerGame>}
    */
   static async create(browser, variant, creatorColor = "white") {
-    const joinerColor = creatorColor === "white" ? "black" : "white";
-
     // ── Player 1: create the game ─────────────────────────────────
     const ctx1 = await browser.newContext();
     const p1 = await ctx1.newPage();

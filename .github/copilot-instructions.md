@@ -79,7 +79,7 @@ Four automatic draw conditions are checked at the end of `makeMove()`, in this o
 
 - `*` — friendly capture (Angry Chess)
 - `$` — move ends the game as a draw: stalemate (`moveData.stalemate`), or one of the three rule-based draws — fifty-move rule, threefold repetition, insufficient material (`moveData.draw`), or drawn king capture in Risky Chess
-- `@` — king capture where the capturer *loses* on points (Risky Chess)
+- `@` — king capture where the capturer _loses_ on points (Risky Chess)
 - `+` — check, `#` — checkmate (standard), or winning king capture (Risky Chess)
 - `=Q` etc — promotion piece
 

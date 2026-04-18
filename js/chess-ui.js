@@ -291,7 +291,13 @@ export class ChessUI {
         // Highlight king in check, checkmate, or stalemate
         // Suppress during pending move preview — any legal pending move resolves check
         // Suppress entirely in Risky Chess (no check concept)
-        if (!this.engine.risky && !this.pendingMoveConfirm && piece && piece.type === "king" && piece.color === this.engine.turn) {
+        if (
+          !this.engine.risky &&
+          !this.pendingMoveConfirm &&
+          piece &&
+          piece.type === "king" &&
+          piece.color === this.engine.turn
+        ) {
           if (this.engine.gameOver && this.engine.resultReason === "checkmate") {
             square.classList.add("in-checkmate");
           } else if (this.engine.gameOver && this.engine.resultReason === "stalemate") {

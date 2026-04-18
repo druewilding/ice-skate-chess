@@ -907,10 +907,10 @@ export class ChessEngine {
         if (RISKY_TIE_IS_DRAW) {
           moveData.draw = true;
           this.result = "draw";
-          this.resultReason = `king captured — tied on points`;
+          this.resultReason = "king captured — tied on points";
         } else {
           this.result = piece.color;
-          this.resultReason = `king captured — tiebreaker`;
+          this.resultReason = "king captured — tiebreaker";
         }
       }
     }

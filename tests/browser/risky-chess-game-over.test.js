@@ -105,8 +105,26 @@ test.describe("Risky Chess — draw on equal material", () => {
     // 6. Ng5 Bxd5  7. Ne6 Bxe6  8. Qxf7 Bxf7  9. Bd3 Bf8  10. Bb5 Bd6  11. Bxe8$
     // White: 2 pawns + king = 14. Black: 2 pawns + knight + queen = 14. Draw.
     await game.play(
-      "d4", "d5", "e4", "e5", "exd5", "Bd6", "Qh5", "exd4", "Nf3", "Be6",
-      "Ng5", "Bxd5", "Ne6", "Bxe6", "Qxf7", "Bxf7", "Bd3", "Bf8", "Bb5", "Bd6",
+      "d4",
+      "d5",
+      "e4",
+      "e5",
+      "exd5",
+      "Bd6",
+      "Qh5",
+      "exd4",
+      "Nf3",
+      "Be6",
+      "Ng5",
+      "Bxd5",
+      "Ne6",
+      "Bxe6",
+      "Qxf7",
+      "Bxf7",
+      "Bd3",
+      "Bf8",
+      "Bb5",
+      "Bd6",
       "Bxe8$"
     );
 
