@@ -178,10 +178,27 @@ export class GameManager {
         await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js");
       const messaging = getMessaging(this.app);
       const swReg = await navigator.serviceWorker.ready;
-      const token = await getToken(messaging, {
-        vapidKey: firebaseConfig.vapidKey,
-        serviceWorkerRegistration: swReg,
-      });
+
+      let token;
+      try {
+        token = await getToken(messaging, {
+          vapidKey: firebaseConfig.vapidKey,
+          serviceWorkerRegistration: swReg,
+        });
+      } catch (innerErr) {
+        // Stale or invalid push subscription — unsubscribe and retry once.
+        const existingSub = await swReg.pushManager.getSubscription();
+        if (existingSub) {
+          await existingSub.unsubscribe();
+          token = await getToken(messaging, {
+            vapidKey: firebaseConfig.vapidKey,
+            serviceWorkerRegistration: swReg,
+          });
+        } else {
+          throw innerErr;
+        }
+      }
+
       if (!token) return;
       const { update } = this._fb;
       await update(this.gameRef, {
