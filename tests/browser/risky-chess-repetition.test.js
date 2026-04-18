@@ -41,8 +41,8 @@ test.describe("Risky Chess — repetition decided by board material", () => {
       "Ra3$"
     );
 
-    await game.assertGameOver("white", "You Win!", "by repetition — 1 points ahead");
-    await game.assertGameOver("black", "You Lose", "by repetition — 1 points behind");
+    await game.assertGameOver("white", "You Win!", "by repetition — 1 point ahead");
+    await game.assertGameOver("black", "You Lose", "by repetition — 1 point behind");
   });
 });
 

@@ -219,10 +219,10 @@ export class ChessEngine {
     const diff = Math.abs(whiteScore - blackScore);
     if (whiteScore > blackScore) {
       this.result = "white";
-      this.resultReason = `${reason} — ${diff} points ahead`;
+      this.resultReason = `${reason} — ${diff} ${diff === 1 ? 'point' : 'points'} ahead`;
     } else if (blackScore > whiteScore) {
       this.result = "black";
-      this.resultReason = `${reason} — ${diff} points ahead`;
+      this.resultReason = `${reason} — ${diff} ${diff === 1 ? 'point' : 'points'} ahead`;
     } else {
       moveData.draw = true;
       this.result = "draw";
@@ -938,11 +938,11 @@ export class ChessEngine {
       const diff = Math.abs(whiteScore - blackScore);
       if (whiteScore > blackScore) {
         this.result = "white";
-        this.resultReason = `king captured — ${diff} points ahead`;
+        this.resultReason = `king captured — ${diff} ${diff === 1 ? 'point' : 'points'} ahead`;
         if (piece.color !== "white") moveData.kingCaptureLoss = true;
       } else if (blackScore > whiteScore) {
         this.result = "black";
-        this.resultReason = `king captured — ${diff} points ahead`;
+        this.resultReason = `king captured — ${diff} ${diff === 1 ? 'point' : 'points'} ahead`;
         if (piece.color !== "black") moveData.kingCaptureLoss = true;
       } else {
         if (RISKY_TIE_IS_DRAW) {
