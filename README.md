@@ -156,7 +156,7 @@ For more details, see the [functions/index.js](functions/index.js) implementatio
 
 ## Push Notification Troubleshooting
 
-Push notifications rely on the browser forwarding messages through Google's FCM push service. A few situations where they won't work:
+Chromium-based browsers (Chrome/Brave/Edge) typically forward push messages through Google's FCM push service. A few situations where notifications won't work:
 
 ### Brave browser
 
