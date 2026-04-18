@@ -627,8 +627,8 @@ export class ChessUI {
   }
 
   updateCapturedPieces(capturedDisplayWhite, capturedDisplayBlack) {
-    const typeOrder = ["pawn", "knight", "bishop", "rook", "queen", "amazon"];
-    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, amazon: 13 };
+    const typeOrder = ["pawn", "knight", "bishop", "rook", "queen", "amazon", "king"];
+    const pieceValues = { pawn: 1, knight: 3, bishop: 3, rook: 5, queen: 9, amazon: 13, king: 12 };
 
     // Check for a pending capture from the confirm-move preview
     let pendingCapture = null; // { capturedBy: 'white'|'black', type: string }
