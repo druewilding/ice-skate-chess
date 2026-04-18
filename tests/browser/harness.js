@@ -45,7 +45,7 @@ function algebraicToCoords(sq) {
 // ── Move‑notation parser (minimal, mirrors tests/parse-notation.js) ─
 
 function parseNotation(san) {
-  let s = san.replace(/[+#*$!?]+$/, "").trim();
+  let s = san.replace(/[+#*$@!?]+$/, "").trim();
 
   // Castling
   if (s === "O-O" || s === "0-0") return { castle: "king" };

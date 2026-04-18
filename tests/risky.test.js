@@ -285,6 +285,21 @@ describe("Risky Chess", () => {
       .assertLastMoves("Qxd8#");
   });
 
+  it("notation uses @ for losing king capture", () => {
+    chess("risky")
+      .play("d4", "g5", "d5", "e5", "dxe6", "g4", "Nh3", "gxh3", "Nc3", "hxg2",
+        "Nb5", "gxh1=Q", "exd7", "Qxf1", "dxe8=N@")
+      .assertLastMoves("dxe8=N@");
+  });
+
+  it("notation uses $ for drawn king capture", () => {
+    chess("risky")
+      .play("d4", "d5", "e4", "e5", "exd5", "Bd6", "Qh5", "exd4", "Nf3", "Be6",
+        "Ng5", "Bxd5", "Ne6", "Bxe6", "Qxf7", "Bxf7", "Bd3", "Bf8", "Bb5", "Bd6",
+        "Bxe8$")
+      .assertLastMoves("Bxe8$");
+  });
+
   it("regular captures use standard notation (no + or # for non-king)", () => {
     chess("risky")
       .play("e4", "d5", "exd5")
@@ -332,7 +347,7 @@ describe("Risky Chess", () => {
       .assertCaptures({ white: ["king"], black: ["pawn"] });
   });
 
-  it("capturer loses on points — black wins after dxe8=N#", () => {
+  it("capturer loses on points — black wins after dxe8=N@", () => {
     // White captures king but black has more total capture points.
     // White captures: 3 pawns + king = 15.
     // Black captures: pawn + rook + queen + bishop + pawn = 19 (knight consumed by promotion).
@@ -340,7 +355,7 @@ describe("Risky Chess", () => {
     chess("risky")
       .play(
         "d4", "g5", "d5", "e5", "dxe6", "g4", "Nh3", "gxh3", "Nc3", "hxg2",
-        "Nb5", "gxh1=Q", "exd7", "Qxf1", "dxe8=N#"
+        "Nb5", "gxh1=Q", "exd7", "Qxf1", "dxe8=N@"
       )
       .assertGameOver("black", "king captured — 4 points ahead")
       .assertCaptures({

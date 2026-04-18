@@ -1,7 +1,7 @@
 // Algebraic notation parser — converts SAN strings to engine coordinates.
 //
 // Supports: e4, Nf3, Bxe5, O-O, O-O-O, exd5, e8=Q, Rae1, R1e3, Qd1d3,
-// plus suffixes (+, #, *, $, !, ?) which are stripped before matching.
+// plus suffixes (+, #, *, $, @, !, ?) which are stripped before matching.
 
 const FILES = "abcdefgh";
 const RANKS = "87654321"; // rank 0 = '8', rank 7 = '1'
@@ -13,7 +13,7 @@ const RANKS = "87654321"; // rank 0 = '8', rank 7 = '1'
  */
 export function parseAlgebraic(engine, notation) {
   // Strip decorative suffixes
-  let san = notation.replace(/[+#*$!?]+$/, "").trim();
+  let san = notation.replace(/[+#*$@!?]+$/, "").trim();
 
   // --- Castling ---
   if (san === "O-O" || san === "0-0") {

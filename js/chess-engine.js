@@ -898,9 +898,11 @@ export class ChessEngine {
       if (whiteScore > blackScore) {
         this.result = "white";
         this.resultReason = `king captured — ${diff} points ahead`;
+        if (piece.color !== "white") moveData.kingCaptureLoss = true;
       } else if (blackScore > whiteScore) {
         this.result = "black";
         this.resultReason = `king captured — ${diff} points ahead`;
+        if (piece.color !== "black") moveData.kingCaptureLoss = true;
       } else {
         if (RISKY_TIE_IS_DRAW) {
           moveData.draw = true;
@@ -1133,7 +1135,8 @@ export class ChessEngine {
     }
 
     if (moveData.friendlyCapture) notation += "*";
-    if (moveData.checkmate || (moveData.kingCapture && !moveData.draw)) notation += "#";
+    if (moveData.kingCaptureLoss) notation += "@";
+    else if (moveData.checkmate || (moveData.kingCapture && !moveData.draw)) notation += "#";
     else if (moveData.check) notation += "+";
     else if (moveData.stalemate || moveData.draw) notation += "$";
 

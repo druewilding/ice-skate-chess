@@ -6,7 +6,7 @@
 //
 // Test 2 — Capturer loses on points (Black wins):
 //   1. d4 g5  2. d5 e5  3. dxe6 g4  4. Nh3 gxh3  5. Nc3 hxg2
-//   6. Nb5 gxh1=Q  7. exd7 Qxf1  8. dxe8=N#
+//   6. Nb5 gxh1=Q  7. exd7 Qxf1  8. dxe8=N@
 //   White captures king but Black has 4 more points of material.
 //
 // Test 3 — Draw on equal material:
@@ -59,7 +59,7 @@ test.describe("Risky Chess — capturer loses on points", () => {
 
   test("white captures king but black wins on material", async () => {
     // 1. d4 g5  2. d5 e5  3. dxe6 g4  4. Nh3 gxh3  5. Nc3 hxg2
-    // 6. Nb5 gxh1=Q  7. exd7 Qxf1+  8. dxe8=N#
+    // 6. Nb5 gxh1=Q  7. exd7 Qxf1+  8. dxe8=N@
     // White captures: 3 pawns + king = 15 pts
     // Black captures: knight + rook + bishop + queen + 2 pawns = 19 pts (adjusted for promotion)
     // Black wins by 4 points
@@ -78,7 +78,7 @@ test.describe("Risky Chess — capturer loses on points", () => {
       "gxh1=Q",
       "exd7",
       "Qxf1",
-      "dxe8=N#"
+      "dxe8=N@"
     );
 
     // White (capturer but loser) sees "points behind"

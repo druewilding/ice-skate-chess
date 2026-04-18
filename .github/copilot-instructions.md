@@ -63,7 +63,7 @@ When a pawn promotes: the opponent gains a pawn in their `capturedPieces` list (
 
 ### Risky Chess — no check/pin/stalemate logic
 
-When `this.risky` is true, the engine skips all check-related logic: `getLegalMoves()` does not filter out moves that leave the king in check (the `wouldBeInCheck` filter is bypassed), knights and sliding pieces are allowed to capture enemy kings (`!this.risky` guards), `canCastle()` skips the "king passes through check" validation, and `makeMove()` skips the check/checkmate/stalemate block and the insufficient-material check entirely. The king capture game-over logic is a separate block in `makeMove()` that runs before the check/stalemate block: it detects that a king was captured, computes both sides' material totals, and sets `result` based on the score comparison (or draw if tied and `RISKY_TIE_IS_DRAW` is true). The `moveData.kingCapture` flag is set so the UI and notation can recognise it. Notation uses `#` for a winning king capture.
+When `this.risky` is true, the engine skips all check-related logic: `getLegalMoves()` does not filter out moves that leave the king in check (the `wouldBeInCheck` filter is bypassed), knights and sliding pieces are allowed to capture enemy kings (`!this.risky` guards), `canCastle()` skips the "king passes through check" validation, and `makeMove()` skips the check/checkmate/stalemate block and the insufficient-material check entirely. The king capture game-over logic is a separate block in `makeMove()` that runs before the check/stalemate block: it detects that a king was captured, computes both sides' material totals, and sets `result` based on the score comparison (or draw if tied and `RISKY_TIE_IS_DRAW` is true). The `moveData.kingCapture` flag is set so the UI and notation can recognise it. Notation uses `#` for a winning king capture, `@` for a losing king capture, and `$` for a drawn one.
 
 ### Draw detection
 
@@ -78,8 +78,9 @@ Four automatic draw conditions are checked at the end of `makeMove()`, in this o
 `getMoveNotation()` produces standard algebraic notation with custom suffixes:
 
 - `*` — friendly capture (Angry Chess)
-- `$` — move ends the game as a draw: stalemate (`moveData.stalemate`), or one of the three rule-based draws — fifty-move rule, threefold repetition, insufficient material (`moveData.draw`)
-- `+` — check, `#` — checkmate (standard)
+- `$` — move ends the game as a draw: stalemate (`moveData.stalemate`), or one of the three rule-based draws — fifty-move rule, threefold repetition, insufficient material (`moveData.draw`), or drawn king capture in Risky Chess
+- `@` — king capture where the capturer *loses* on points (Risky Chess)
+- `+` — check, `#` — checkmate (standard), or winning king capture (Risky Chess)
 - `=Q` etc — promotion piece
 
 Disambiguation (`Rae1`, `R1e3`, etc.) is computed by `computeDisambiguation()` **before** the move is applied. Critically, it **temporarily disables ice skate mode** while checking whether other same-type pieces could reach the same square — because ice skate restrictions don't exist in standard notation and would produce incorrect disambiguation strings.
