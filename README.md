@@ -153,3 +153,31 @@ The Cloud Function in [functions/index.js](functions/index.js) sends push notifi
 - It triggers on writes to `games/{gameId}/lastMoveAt` and sends a data-only FCM message to the player whose turn it is
 
 For more details, see the [functions/index.js](functions/index.js) implementation.
+
+## Push Notification Troubleshooting
+
+Push notifications rely on the browser forwarding messages through Google's FCM push service. A few situations where they won't work:
+
+### Brave browser
+
+Brave blocks Google's push messaging service by default for privacy reasons.
+
+- **Desktop:** `brave://settings/privacy` → enable **"Use Google services for push messaging"**
+- **Android:** the setting may not be exposed depending on your Brave version — use Chrome instead if you need notifications
+
+### Notification permission denied
+
+If you previously denied notification permission in the browser, the app won't re-prompt. Re-enable it via:
+
+- **Chrome/Brave desktop:** click the lock icon in the address bar → Notifications → Allow
+- **Chrome Android:** Settings → Site settings → Notifications → find the site and allow it
+
+### Firefox
+
+Firefox uses its own push service (Mozilla Push Service) rather than Google's FCM, so notifications should work without any special settings. If they don't, check that `dom.push.enabled` is `true` in `about:config`.
+
+### General checklist
+
+1. Notification permission is **granted** (not just "default" or "denied")
+2. The browser is not in a private/incognito window — push subscriptions are blocked there
+3. Your Firebase project has **Blaze billing enabled** — the Cloud Function can't send FCM on the free Spark plan
