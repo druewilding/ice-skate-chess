@@ -178,10 +178,33 @@ export class GameManager {
         await import("https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js");
       const messaging = getMessaging(this.app);
       const swReg = await navigator.serviceWorker.ready;
-      const token = await getToken(messaging, {
-        vapidKey: firebaseConfig.vapidKey,
-        serviceWorkerRegistration: swReg,
-      });
+
+      let token;
+      try {
+        token = await getToken(messaging, {
+          vapidKey: firebaseConfig.vapidKey,
+          serviceWorkerRegistration: swReg,
+        });
+      } catch (innerErr) {
+        // Stale or invalid push subscription — unsubscribe and retry once.
+        // Guard against environments where the Push API is unavailable (e.g. some iOS versions).
+        const existingSub = await swReg.pushManager?.getSubscription();
+        if (existingSub) {
+          try {
+            await existingSub.unsubscribe();
+            token = await getToken(messaging, {
+              vapidKey: firebaseConfig.vapidKey,
+              serviceWorkerRegistration: swReg,
+            });
+          } catch (retryErr) {
+            // Preserve the original getToken error as the cause for easier debugging.
+            throw new Error(`FCM retry failed: ${retryErr.message}`, { cause: innerErr });
+          }
+        } else {
+          throw innerErr;
+        }
+      }
+
       if (!token) return;
       const { update } = this._fb;
       await update(this.gameRef, {
