@@ -55,12 +55,12 @@ button:disabled {
   --danger: #e74c3c;
   --success: #2ecc71;
 
-  --board-light: #f0d9b5;
-  --board-dark: #b58863;
+  --board-light: #f0f0cc;
+  --board-dark: #6b9e6e;
   --board-selected: #ffff44;
   --board-legal: rgba(0, 0, 0, 0.15);
   --board-capture: rgba(220, 50, 50, 0.5);
-  --board-last-move: rgba(255, 255, 100, 0.35);
+  --board-last-move: rgba(244, 244, 117, 0.8);
   --board-check: rgba(255, 0, 0, 0.6);
   --board-checkmate: rgba(180, 0, 255, 0.7);
   --board-stalemate: rgba(90, 90, 90, 0.75);
@@ -291,8 +291,8 @@ body {
 }
 
 .btn-color-white-choice {
-  background: #b58863;
-  color: #e8dcc8;
+  background: var(--board-light);
+  color: #2c2415;
 }
 
 .btn-color-white-choice .color-choice-piece {
@@ -310,7 +310,7 @@ body {
 }
 
 .btn-color-black-choice {
-  background: #f0d9b5;
+  background: var(--board-dark);
   color: #2c2415;
   border-color: #d4b890;
 }
@@ -742,9 +742,9 @@ img.piece {
   transition:
     border-color 0.2s,
     background 0.2s;
-  background: #f0d9b5;
+  background: var(--board-light);
   color: #1a1a2e;
-  border-color: #b58863;
+  border-color: var(--board-dark);
 }
 
 .promotion-choice:hover {
