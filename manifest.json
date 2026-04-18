@@ -2,6 +2,7 @@
   "name": "Chess Variants",
   "short_name": "Chess Variants",
   "description": "Chess variants such as Ice Skate Chess, Angry Chess, Dark Chess and Superchess",
+  "gcm_sender_id": "103953800507",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",
