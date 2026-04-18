@@ -190,7 +190,9 @@ export class ChessEngine {
     return false;
   }
 
-  // Risky Chess: only K vs K is truly dead — any other material can still lead to king capture.
+  // Risky Chess: K vs K is a deliberate house-rule draw — even though kings can capture kings,
+  // two lone kings chasing each other indefinitely isn't meaningful play. Any other material
+  // present can still lead to a king capture, so the game continues in those cases.
   hasOnlyKings() {
     for (let r = 0; r < 8; r++) {
       for (let f = 0; f < 8; f++) {
@@ -999,7 +1001,8 @@ export class ChessEngine {
     }
 
     // Insufficient material
-    // Risky Chess: only K vs K is dead — any other material can still lead to king capture.
+    // Risky Chess: K vs K is a house-rule draw (kings can technically capture each other,
+    // but it's an intentional dead-position rule). Any other material keeps the game alive.
     // Standard: K vs K, K+minor vs K, K+B vs K+B (same colour bishops).
     if (!this.gameOver && (this.risky ? this.hasOnlyKings() : this.hasInsufficientMaterial())) {
       moveData.draw = true;
