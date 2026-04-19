@@ -70,44 +70,6 @@ function materialAdvantage(engine) {
 
 // ── Preview helpers (replicates chess-ui.js pending-move logic) ──────
 
-function computePreviewCaptures(engine, pending) {
-  const whiteCaps = [...engine.capturedPieces.white];
-  const blackCaps = [...engine.capturedPieces.black];
-
-  const movingPiece = engine.getPiece(pending.fromRank, pending.fromFile);
-  const capturedPiece = pending.enPassant
-    ? engine.getPiece(pending.fromRank, pending.toFile)
-    : engine.getPiece(pending.toRank, pending.toFile);
-
-  if (movingPiece && capturedPiece && !pending.castling) {
-    // Friendly capture (angry): credit opponent
-    if (capturedPiece.color === movingPiece.color) {
-      const opponent = movingPiece.color === "white" ? "black" : "white";
-      if (opponent === "white") whiteCaps.push(capturedPiece.type);
-      else blackCaps.push(capturedPiece.type);
-    } else {
-      if (movingPiece.color === "white") whiteCaps.push(capturedPiece.type);
-      else blackCaps.push(capturedPiece.type);
-    }
-  }
-
-  // Promotion adjustments
-  if (pending.promotion && movingPiece) {
-    const opponentColor = movingPiece.color === "white" ? "black" : "white";
-    const opponentCaps = opponentColor === "white" ? whiteCaps : blackCaps;
-    const promoterCaps = movingPiece.color === "white" ? whiteCaps : blackCaps;
-    opponentCaps.push("pawn");
-    const idx = opponentCaps.indexOf(pending.promotion);
-    if (idx !== -1) {
-      opponentCaps.splice(idx, 1);
-    } else {
-      promoterCaps.push(pending.promotion);
-    }
-  }
-
-  return { white: whiteCaps, black: blackCaps };
-}
-
 function computePreviewMaterial(engine, pending) {
   let whiteScore = boardMaterialScore(engine, "white");
   let blackScore = boardMaterialScore(engine, "black");
@@ -431,7 +393,12 @@ class ChessTestGame {
   assertPreviewCaptures(expected) {
     if (!this._pending) throw new Error("No preview active. Call .preview() first.");
 
-    const previewCaps = computePreviewCaptures(this.engine, this._pending);
+    const p = this._pending;
+    const result = this.engine.previewMoveResult(p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling);
+    if (!result.capturedPieces) {
+      throw new Error("Preview move was rejected by the engine — cannot assert captures on an illegal move.");
+    }
+    const previewCaps = result.capturedPieces;
     const actualWhite = sortPieces(previewCaps.white);
     const actualBlack = sortPieces(previewCaps.black);
     const expWhite = sortPieces(expected.white || []);

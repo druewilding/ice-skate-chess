@@ -776,10 +776,17 @@ export class ChessUI {
         const promoterCaptures = promoterColor === "white" ? whiteCaptures : blackCaptures;
         // Opponent gains the promoting pawn
         opponentCaptures.push("pawn");
-        // Promoted piece type: remove from opponent's prior captures or credit promoter
-        const idx = opponentCaptures.indexOf(promotion);
-        if (idx !== -1) {
-          opponentCaptures.splice(idx, 1);
+        // Determine whether the opponent genuinely captured one of the promoter's
+        // pieces of this type (uses the shared engine helper so engine and UI
+        // never drift apart).
+        const capturedFromPromoter = this.engine.genuineCapturedCount(promoterColor, promotion);
+        if (capturedFromPromoter > 0) {
+          const idx = opponentCaptures.indexOf(promotion);
+          if (idx !== -1) {
+            opponentCaptures.splice(idx, 1);
+          } else {
+            promoterCaptures.push(promotion);
+          }
         } else {
           promoterCaptures.push(promotion);
         }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ChessEngine } from "../js/chess-engine.js";
-import { chessFromPosition } from "./harness.js";
+import { chess, chessFromPosition } from "./harness.js";
 
 describe("Superchess", () => {
   // ── Constructor option ─────────────────────────────────────────────
@@ -162,6 +162,155 @@ describe("Superchess", () => {
       .assertPiece("e8", "amazon", "white")
       .assertEmpty("e7")
       .goToLive();
+  });
+
+  // ── Amazon capture pen accounting ─────────────────────────────────
+
+  it("two amazon promotions both appear in capture pens", () => {
+    chess("superchess")
+      .play("a4", "h5", "a5", "h4", "a6", "h3", "axb7")
+      .assertCaptures({ white: ["pawn"], black: [] })
+      .assertMaterial(1)
+      .play("hxg2")
+      .assertCaptures({ white: ["pawn"], black: ["pawn"] })
+      .assertMaterial(0)
+      .play("Nf3")
+      .preview("gxh1=A")
+      // preview: black captures pawn(g2) + rook(h1); promoting pawn → white;
+      // no white amazon captured so amazon goes into black's pen
+      .assertPreviewCaptures({ white: ["pawn", "pawn"], black: ["pawn", "rook", "amazon"] })
+      .commitPreview()
+      .assertCaptures({ white: ["pawn", "pawn"], black: ["pawn", "rook", "amazon"] })
+      .preview("bxc8=A")
+      // preview: white captures bishop(c8); promoting pawn → black;
+      // the amazon in black's pen belongs to black's OWN promotion, NOT a
+      // captured white piece — so white should get its own amazon
+      .assertPreviewCaptures({ white: ["pawn", "pawn", "bishop", "amazon"], black: ["pawn", "pawn", "rook", "amazon"] })
+      .assertPreviewMaterial(-2)
+      .commitPreview()
+      .assertCaptures({ white: ["pawn", "pawn", "bishop", "amazon"], black: ["pawn", "pawn", "rook", "amazon"] })
+      .assertMaterial(-2); // black is 2 points ahead
+  });
+
+  it("lists amazons correctly after captures", () => {
+    chess("superchess")
+      .play("a4", "h5", "a5", "h4", "a6", "h3", "axb7", "hxg2", "Nf3", "gxh1=A", "bxc8=A", "Qxc8")
+      .play("Nc3", "Ag3", "d4", "Ag6", "Bf4", "Axf4", "d5", "e5", "dxe6", "Ke7", "exd7", "Kf6")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "bishop", "amazon"],
+        black: ["pawn", "pawn", "bishop", "rook", "amazon", "amazon"],
+      })
+      .assertMaterial(-16)
+      .play("dxc8=A")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "bishop", "queen", "amazon"],
+        black: ["pawn", "pawn", "pawn", "bishop", "rook", "amazon"],
+      })
+      .assertMaterial(5)
+      .play("Bb4", "Axc7", "Axc7")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "queen", "amazon"],
+        black: ["pawn", "pawn", "pawn", "bishop", "rook", "amazon", "amazon"],
+      })
+      .assertMaterial(-7)
+      .play("Rxa7", "Rxa7", "Qd7", "Bxc3+")
+      .assertCheck(true)
+      .play("Nd2")
+      .assertCheck(false)
+      .play("Bxd2+")
+      .assertCheck(true)
+      .play("Kxd2")
+      .assertCheck(false)
+      .play("g5", "Qd6+")
+      .assertCheck(true)
+      .play("Axd6+")
+      .assertCheck(true)
+      .play("Kc3")
+      .assertCheck(false)
+      .play("g4", "b4", "Rxh2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-24)
+      .play("b5", "Axb5+")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-25)
+      .play("Kd2", "Ad4+", "Kc1", "Rxf2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-26)
+      .play("Bh3", "Rxe2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-27)
+      .play("c3", "Ac2#")
+      .assertGameOver("black", "checkmate");
   });
 
   // ── Checkmate with amazon ──────────────────────────────────────────

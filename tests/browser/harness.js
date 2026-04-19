@@ -240,6 +240,72 @@ export class TwoPlayerGame {
     return this;
   }
 
+  /**
+   * Stage a move for preview without confirming it.
+   * The confirm bar will be visible and capture pens show the preview state.
+   * Call assertPreviewCaptures() to check the preview, then confirmPreview()
+   * or cancelPreview() to proceed.
+   */
+  async preview(notation) {
+    const page = this.activePage;
+    const parsed = parseNotation(notation);
+
+    if (parsed.castle) {
+      await this._playCastling(page, parsed.castle);
+    } else {
+      const from = await this._findSourceSquare(page, parsed);
+      const toSq = `[data-rank="${parsed.toRank}"][data-file="${parsed.toFile}"]`;
+      const fromSq = `[data-rank="${from.rank}"][data-file="${from.file}"]`;
+
+      await page.click(`#chess-board .square${fromSq}`);
+      await page.click(`#chess-board .square${toSq}`);
+
+      if (parsed.promotion) {
+        const promoType = parsed.promotion;
+        await page.click(`.promotion-overlay .promotion-choice:has(img[alt$="${promoType}"])`);
+      }
+    }
+
+    // Wait for the confirm bar to appear (move is staged)
+    await page.waitForFunction(() => !document.getElementById("confirm-move-bar").hidden, { timeout: 5_000 });
+    return this;
+  }
+
+  /**
+   * Confirm a previously previewed move and wait for sync.
+   */
+  async confirmPreview() {
+    const page = this.activePage;
+    await page.click("#btn-confirm-move");
+    await page.waitForFunction(() => document.getElementById("confirm-move-bar").hidden, { timeout: 5_000 });
+
+    this._moveCount++;
+
+    const other = this.activePage;
+    await other.waitForFunction(
+      () => {
+        const status = document.getElementById("game-status");
+        return (
+          (status && status.textContent.includes("Your turn")) ||
+          !document.getElementById("game-over-overlay").hidden ||
+          engine.gameOver
+        );
+      },
+      { timeout: 10_000 }
+    );
+    return this;
+  }
+
+  /**
+   * Cancel a previously previewed move (click anywhere on the board).
+   */
+  async cancelPreview() {
+    const page = this.activePage;
+    await page.click("#btn-cancel-move");
+    await page.waitForFunction(() => document.getElementById("confirm-move-bar").hidden, { timeout: 5_000 });
+    return this;
+  }
+
   async _playOne(notation) {
     const page = this.activePage;
     const parsed = parseNotation(notation);
