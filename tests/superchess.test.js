@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ChessEngine } from "../js/chess-engine.js";
-import { chessFromPosition } from "./harness.js";
+import { chess, chessFromPosition } from "./harness.js";
 
 describe("Superchess", () => {
   // ── Constructor option ─────────────────────────────────────────────
@@ -162,6 +162,28 @@ describe("Superchess", () => {
       .assertPiece("e8", "amazon", "white")
       .assertEmpty("e7")
       .goToLive();
+  });
+
+  // ── Amazon capture pen accounting ─────────────────────────────────
+
+  it("two amazon promotions both appear in capture pens", () => {
+    chess("superchess")
+      .play("a4", "h5", "a5", "h4", "a6", "h3", "axb7")
+      .assertCaptures({ white: ["pawn"], black: [] })
+      .assertMaterial(1)
+      .play("hxg2")
+      .assertCaptures({ white: ["pawn"], black: ["pawn"] })
+      .assertMaterial(0)
+      .play("Nf3", "gxh1=A")
+      // black captures pawn(g2) + rook(h1); promoting pawn credited to white;
+      // no white amazon previously captured so amazon goes into black's pen
+      .assertCaptures({ white: ["pawn", "pawn"], black: ["pawn", "rook", "amazon"] })
+      .play("bxc8=A")
+      // white captures bishop(c8); promoting pawn credited to black;
+      // the amazon in black's pen belongs to black's earlier promotion, NOT a
+      // white piece that can be "returned" — so white should get its own amazon
+      .assertCaptures({ white: ["pawn", "pawn", "bishop", "amazon"], black: ["pawn", "pawn", "rook", "amazon"] })
+      .assertMaterial(-2); // black is 2 points ahead
   });
 
   // ── Checkmate with amazon ──────────────────────────────────────────
