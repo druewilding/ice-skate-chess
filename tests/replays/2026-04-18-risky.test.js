@@ -68,7 +68,7 @@ describe("Risky Chess, 2026-04-18", () => {
       .play("Rc5", "Kb2")
       .play("Qb6", "Ka3")
       .play("Qb3", "Kxb3")
-      .play("Bxb3")
+      .play("Bxb3#")
       .assertGameOver("white", "king captured — 22 points ahead");
   });
 });
