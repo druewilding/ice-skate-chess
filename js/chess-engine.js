@@ -864,10 +864,40 @@ export class ChessEngine {
       const opponent = piece.color === "white" ? "black" : "white";
       this.capturedPieces[opponent].push("pawn");
       const promoType = matchingMove.promotion;
-      const opponentIdx = this.capturedPieces[opponent].indexOf(promoType);
-      if (opponentIdx !== -1) {
-        // Opponent had captured one of these — the promoted piece "came back"
-        this.capturedPieces[opponent].splice(opponentIdx, 1);
+
+      // To decide whether the opponent genuinely captured one of the promoter's
+      // pieces of this type (vs the opponent's capture list containing a self-
+      // credited entry from *their own* promotion), count how many of promoType
+      // the promoter has ever had minus how many are on the board right now.
+      let startingCount = 0;
+      for (let r = 0; r < 8; r++)
+        for (let f = 0; f < 8; f++) {
+          const p = this.startingBoard[r][f];
+          if (p && p.color === piece.color && p.type === promoType) startingCount++;
+        }
+      let previousPromotions = 0;
+      for (const m of this.moveHistory) {
+        if (m.piece.color === piece.color && m.promotion === promoType) previousPromotions++;
+      }
+      let onBoard = 0;
+      for (let r = 0; r < 8; r++)
+        for (let f = 0; f < 8; f++) {
+          const p = this.board[r][f];
+          if (p && p.color === piece.color && p.type === promoType) onBoard++;
+        }
+      // onBoard includes the just-placed piece, so (onBoard - 1) is what was
+      // on the board before this promotion. The difference is genuine captures.
+      const capturedFromPromoter = startingCount + previousPromotions - (onBoard - 1);
+
+      if (capturedFromPromoter > 0) {
+        const opponentIdx = this.capturedPieces[opponent].indexOf(promoType);
+        if (opponentIdx !== -1) {
+          // Opponent had captured one of these — the promoted piece "came back"
+          this.capturedPieces[opponent].splice(opponentIdx, 1);
+        } else {
+          // All captures were already returned by earlier promotions
+          this.capturedPieces[piece.color].push(promoType);
+        }
       } else {
         // No such piece was previously captured — credit the promoting player
         this.capturedPieces[piece.color].push(promoType);

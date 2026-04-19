@@ -776,10 +776,35 @@ export class ChessUI {
         const promoterCaptures = promoterColor === "white" ? whiteCaptures : blackCaptures;
         // Opponent gains the promoting pawn
         opponentCaptures.push("pawn");
-        // Promoted piece type: remove from opponent's prior captures or credit promoter
-        const idx = opponentCaptures.indexOf(promotion);
-        if (idx !== -1) {
-          opponentCaptures.splice(idx, 1);
+        // Check whether the opponent genuinely captured one of the promoter's
+        // pieces of this type (vs the opponent's list containing a self-credited
+        // entry from their own earlier promotion).
+        let startingCount = 0;
+        for (let r = 0; r < 8; r++)
+          for (let f = 0; f < 8; f++) {
+            const p = this.engine.startingBoard[r][f];
+            if (p && p.color === promoterColor && p.type === promotion) startingCount++;
+          }
+        let previousPromotions = 0;
+        for (const m of this.engine.moveHistory) {
+          if (m.piece.color === promoterColor && m.promotion === promotion) previousPromotions++;
+        }
+        let onBoard = 0;
+        for (let r = 0; r < 8; r++)
+          for (let f = 0; f < 8; f++) {
+            const p = this.engine.board[r][f];
+            if (p && p.color === promoterColor && p.type === promotion) onBoard++;
+          }
+        // Board is pre-move so onBoard is the current count (no -1 needed).
+        const capturedFromPromoter = startingCount + previousPromotions - onBoard;
+
+        if (capturedFromPromoter > 0) {
+          const idx = opponentCaptures.indexOf(promotion);
+          if (idx !== -1) {
+            opponentCaptures.splice(idx, 1);
+          } else {
+            promoterCaptures.push(promotion);
+          }
         } else {
           promoterCaptures.push(promotion);
         }
