@@ -765,22 +765,42 @@ export class ChessEngine {
   // permanently modifying game state. Used for move-preview indicators.
   previewMoveResult(fromRank, fromFile, toRank, toFile, promotion = null, castling = undefined) {
     const piece = this.board[fromRank][fromFile];
-    if (!piece) return { check: false, checkmate: false, stalemate: false, draw: false, kingCapture: false };
+    if (!piece)
+      return {
+        check: false,
+        checkmate: false,
+        stalemate: false,
+        draw: false,
+        kingCapture: false,
+        capturedPieces: null,
+      };
 
     // Deep-copy the entire engine state, apply the move for real, read the result
     // flags (check/checkmate/stalemate/draw), then restore. This avoids brittle
     // manual hash re-computation and correctly handles all draw conditions.
     const savedState = JSON.parse(JSON.stringify(this.serialize()));
     const moveData = this.makeMove(fromRank, fromFile, toRank, toFile, promotion, castling);
-    this.deserialize(savedState);
 
-    if (!moveData) return { check: false, checkmate: false, stalemate: false, draw: false, kingCapture: false };
+    if (!moveData) {
+      this.deserialize(savedState);
+      return {
+        check: false,
+        checkmate: false,
+        stalemate: false,
+        draw: false,
+        kingCapture: false,
+        capturedPieces: null,
+      };
+    }
+    const capturedPieces = { white: [...this.capturedPieces.white], black: [...this.capturedPieces.black] };
+    this.deserialize(savedState);
     return {
       check: !!moveData.check,
       checkmate: !!moveData.checkmate,
       stalemate: !!moveData.stalemate,
       draw: !!moveData.draw,
       kingCapture: !!moveData.kingCapture,
+      capturedPieces,
     };
   }
 
