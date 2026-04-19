@@ -192,6 +192,127 @@ describe("Superchess", () => {
       .assertMaterial(-2); // black is 2 points ahead
   });
 
+  it("lists amazons correctly after captures", () => {
+    chess("superchess")
+      .play("a4", "h5", "a5", "h4", "a6", "h3", "axb7", "hxg2", "Nf3", "gxh1=A", "bxc8=A", "Qxc8")
+      .play("Nc3", "Ag3", "d4", "Ag6", "Bf4", "Axf4", "d5", "e5", "dxe6", "Ke7", "exd7", "Kf6")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "bishop", "amazon"],
+        black: ["pawn", "pawn", "bishop", "rook", "amazon", "amazon"],
+      })
+      .assertMaterial(-16)
+      .play("dxc8=A")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "bishop", "queen", "amazon"],
+        black: ["pawn", "pawn", "pawn", "bishop", "rook", "amazon"],
+      })
+      .assertMaterial(5)
+      .play("Bb4", "Axc7", "Axc7")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "queen", "amazon"],
+        black: ["pawn", "pawn", "pawn", "bishop", "rook", "amazon", "amazon"],
+      })
+      .assertMaterial(-7)
+      .play("Rxa7", "Rxa7", "Qd7", "Bxc3+")
+      .assertCheck(true)
+      .play("Nd2")
+      .assertCheck(false)
+      .play("Bxd2+")
+      .assertCheck(true)
+      .play("Kxd2")
+      .assertCheck(false)
+      .play("g5", "Qd6+")
+      .assertCheck(true)
+      .play("Axd6+")
+      .assertCheck(true)
+      .play("Kc3")
+      .assertCheck(false)
+      .play("g4", "b4", "Rxh2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-24)
+      .play("b5", "Axb5+")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-25)
+      .play("Kd2", "Ad4+", "Kc1", "Rxf2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-26)
+      .play("Bh3", "Rxe2")
+      .assertCaptures({
+        white: ["pawn", "pawn", "pawn", "pawn", "pawn", "pawn", "bishop", "bishop", "queen", "amazon"],
+        black: [
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "pawn",
+          "knight",
+          "knight",
+          "bishop",
+          "rook",
+          "rook",
+          "queen",
+          "amazon",
+          "amazon",
+        ],
+      })
+      .assertMaterial(-27)
+      .play("c3", "Ac2#")
+      .assertGameOver("black", "checkmate");
+  });
+
   // ── Checkmate with amazon ──────────────────────────────────────────
 
   it("amazon can deliver checkmate", () => {
