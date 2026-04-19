@@ -395,6 +395,9 @@ class ChessTestGame {
 
     const p = this._pending;
     const result = this.engine.previewMoveResult(p.fromRank, p.fromFile, p.toRank, p.toFile, p.promotion, p.castling);
+    if (!result.capturedPieces) {
+      throw new Error("Preview move was rejected by the engine — cannot assert captures on an illegal move.");
+    }
     const previewCaps = result.capturedPieces;
     const actualWhite = sortPieces(previewCaps.white);
     const actualBlack = sortPieces(previewCaps.black);
