@@ -55,8 +55,8 @@ button:disabled {
   --danger: #e74c3c;
   --success: #2ecc71;
 
-  --board-light: #f0f0cc;
-  --board-dark: #6b9e6e;
+  --board-light: #fffde6;
+  --board-dark: #5d8a4d;
   --board-selected: #ffff44;
   --board-legal: rgba(0, 0, 0, 0.15);
   --board-capture: rgba(220, 50, 50, 0.5);
@@ -673,6 +673,10 @@ img.piece {
 .piece-black {
   color: #222;
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+img.piece.piece-black {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
 }
 
 /* Coordinate labels */
