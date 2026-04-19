@@ -1230,8 +1230,10 @@
 
       document.getElementById("btn-draw").addEventListener("click", () => {
         if (engine.gameOver) return;
-        gm.offerDraw(myColor);
-        document.getElementById("game-status").textContent = "Draw offered...";
+        if (confirm("Are you sure you want to offer a draw?")) {
+          gm.offerDraw(myColor);
+          document.getElementById("game-status").textContent = "Draw offered...";
+        }
       });
 
       document.getElementById("btn-accept-draw").addEventListener("click", () => {

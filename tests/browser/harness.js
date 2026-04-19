@@ -539,6 +539,7 @@ export class TwoPlayerGame {
    */
   async offerDraw(color) {
     const page = this.pages[color];
+    page.once("dialog", (dialog) => dialog.accept());
     await page.click("#btn-draw");
     return this;
   }
