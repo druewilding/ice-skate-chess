@@ -125,6 +125,18 @@ cp .env.example .env
 
 No build step required. Multiplayer and push notifications require a Firebase project configured via `.env`.
 
+## Firebase Database Security Rules
+
+The database rules are defined in [database.rules.json](database.rules.json) and allow public read/write access to `games/{gameId}` only. Everything else is denied by default.
+
+To deploy the rules after any changes:
+
+```bash
+firebase deploy --only database
+```
+
+> **Note:** Firebase projects created in Test Mode start with open rules that expire after 30 days. The rules in this repo replace those with appropriate production rules.
+
 ## Deploying the Push Notification Function
 
 The Cloud Function in [functions/index.js](functions/index.js) sends push notifications when it's a player's turn. To deploy it:
